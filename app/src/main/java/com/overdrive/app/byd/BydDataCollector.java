@@ -15785,6 +15785,12 @@ public class BydDataCollector {
     private final Object chargingScheduleLock = new Object();
 
     /**
+     * True once this session armed a local schedule window that has not been cleared. Guards the
+     * bare smart-charging enable so it never re-arms a stale window the firmware may still hold.
+     */
+    private volatile boolean localScheduleStaged = false;
+
+    /**
      * Save a charging schedule locally (SDK fallback for ChargeScheduleCommand).
      *
      * @param startHm  "HH:mm" local start time (required)
@@ -15816,6 +15822,14 @@ public class BydDataCollector {
                     logger.debug("saveChargingScheduleLocal: car not charging — local schedule "
                             + "writes are dropped by the firmware; not attempting");
                     return false;
+                }
+                // The local time family expresses a single NEXT window only. A weekly/daily
+                // repeat (chargeWay other than "s"=once) can't be reproduced locally — cloud
+                // keeps that precision. Surface the downgrade instead of silently dropping it.
+                if (chargeWay != null && !chargeWay.trim().isEmpty()
+                        && !"s".equalsIgnoreCase(chargeWay.trim())) {
+                    logger.warn("saveChargingScheduleLocal: chargeWay='" + chargeWay
+                            + "' (repeat) not supported locally — arming only the next window");
                 }
                 int[] hmStart = parseHm(startHm);
                 if (hmStart == null) {
@@ -15858,9 +15872,12 @@ public class BydDataCollector {
                 // Step 3: arm.
                 if (!setTimingStateLocal(true)) return false;
                 // Verify by the only honest signal on this trim: BMS -> SCHEDULED (9).
-                boolean armed = awaitBmsState(9, true);
+                // ~3.6s budget: live it flips within ~2s.
+                boolean armed = awaitBmsState(9, true, 6);
                 logScheduleState("saveChargingScheduleLocal verified(BMS->9)=" + armed);
-                if (!armed) {
+                if (armed) {
+                    localScheduleStaged = true;
+                } else {
                     // Arming did not take — leave nothing half-staged.
                     clearChargingScheduleLocal();
                 }
@@ -15883,9 +15900,10 @@ public class BydDataCollector {
         chargingGroupedSet(APPOINTMENT_START_IDS, SCHEDULE_SENTINEL_FIELDS);
         chargingGroupedSet(APPOINTMENT_END_IDS, SCHEDULE_SENTINEL_FIELDS);
         setCarPlanLocal(100);
-        // Success = the pack is no longer deferring (BMS != SCHEDULED). If it was never
-        // scheduled, this is already true.
-        boolean cleared = awaitBmsState(9, false);
+        localScheduleStaged = false;
+        // Success = the pack is no longer deferring (BMS != SCHEDULED). Leaving 9 is fast
+        // (~1s live), so a short budget suffices.
+        boolean cleared = awaitBmsState(9, false, 3);
         logScheduleState("clearChargingScheduleLocal cleared(BMS!=9)=" + cleared);
         return cleared;
     }
@@ -15906,21 +15924,24 @@ public class BydDataCollector {
     }
 
     /**
-     * Short, bounded BMS poll (no open-ended loop). Waits up to ~4s for the BMS to reach
-     * {@code target} (when {@code want}=true) or to leave it (when {@code want}=false).
+     * Short, bounded BMS poll (no open-ended loop). Waits up to {@code maxTries} × ~600ms for a
+     * READABLE BMS to reach {@code target} (when {@code want}=true) or to leave it (when
+     * {@code want}=false). An unreadable BMS (MIN_VALUE) is never counted as satisfying the
+     * condition — otherwise a transient read failure would falsely confirm a clear.
      */
-    private boolean awaitBmsState(int target, boolean want) {
-        for (int i = 0; i < 6; i++) {
-            boolean is = bmsStateLocal() == target;
-            if (is == want) return true;
+    private boolean awaitBmsState(int target, boolean want, int maxTries) {
+        for (int i = 0; i < maxTries; i++) {
+            int b = bmsStateLocal();
+            if (b != Integer.MIN_VALUE && (b == target) == want) return true;
             try {
-                Thread.sleep(650L);
+                Thread.sleep(600L);
             } catch (InterruptedException ie) {
                 Thread.currentThread().interrupt();
                 break;
             }
         }
-        return (bmsStateLocal() == target) == want;
+        int b = bmsStateLocal();
+        return b != Integer.MIN_VALUE && (b == target) == want;
     }
 
     /** setCarPlan(1, 2, targetSoc, 2127, 15, 0, 31, 63) — establishes the plan; result 0 = accepted. */
@@ -15945,14 +15966,20 @@ public class BydDataCollector {
                 // Disable is a full local cancel — always allowed.
                 return clearChargingScheduleLocal();
             }
-            // A bare enable carries no time window. It can only re-arm while a plan is
-            // still staged AND the car is charging; verify honestly via BMS->SCHEDULED(9).
+            // A bare enable carries no time window of its own. Only re-arm a window WE staged
+            // this session — never blindly flip the timing flag, which could re-arm a stale
+            // window the firmware still holds from an earlier plan. Without a staged window
+            // there is nothing meaningful to enable locally; let cloud own that.
+            if (!localScheduleStaged) {
+                logger.debug("setSmartChargingEnabledLocal: no locally-staged window to enable");
+                return false;
+            }
             if (!isChargingNowLocal()) {
                 logger.debug("setSmartChargingEnabledLocal: car not charging — enable dropped by firmware");
                 return false;
             }
             if (!setTimingStateLocal(true)) return false;
-            boolean armed = awaitBmsState(9, true);
+            boolean armed = awaitBmsState(9, true, 6);
             logScheduleState("setSmartChargingEnabledLocal(true) verified(BMS->9)=" + armed);
             if (!armed) clearChargingScheduleLocal();
             return armed;
@@ -15970,21 +15997,11 @@ public class BydDataCollector {
         return code == 0;
     }
 
-    /** Grouped write via set(int[], BYDAutoEventValue(int[])) — the overload this trim honours. */
+    /** Grouped write via set(int[], BYDAutoEventValue) — the overload this trim honours. */
     private boolean chargingGroupedSet(int[] ids, int[] values) {
         if (chargingDevice == null || ids.length != values.length) return false;
         for (int id : ids) if (id == BydFeatureIds.UNRESOLVED_ID) return false;
-        try {
-            Class<?> ev = Class.forName("android.hardware.bydauto.BYDAutoEventValue");
-            Object evObj = ev.getConstructor(int[].class).newInstance((Object) values);
-            java.lang.reflect.Method set =
-                    chargingDevice.getClass().getMethod("set", int[].class, ev);
-            Object r = set.invoke(chargingDevice, ids, evObj);
-            return r instanceof Number && ((Number) r).intValue() == 0;
-        } catch (Throwable t) {
-            logger.debug("chargingGroupedSet failed: " + t.getMessage());
-            return false;
-        }
+        return BydDeviceHelper.sendSetCommandGroupedRaw(chargingDevice, ids, values) == 0;
     }
 
     /** Short, non-blocking diagnostic read of the schedule state after a write. */

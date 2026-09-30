@@ -2018,6 +2018,36 @@ public final class BydDeviceHelper {
     }
 
     /**
+     * Grouped set: writes several feature ids in one {@code set(int[] ids, BYDAutoEventValue)}
+     * call, carrying the values in the event's {@code intArrayValue} field — the same shape the
+     * seat/mirror grouped writes use (see BodyworkSeatProbe). Returns the RAW SDK result code
+     * (0 = accepted), or {@link Integer#MIN_VALUE} when the call threw before producing one.
+     * {@code ids} and {@code values} must be the same length.
+     */
+    public static int sendSetCommandGroupedRaw(Object device, int[] ids, int[] values) {
+        if (device == null || ids == null || values == null || ids.length != values.length
+                || VehicleActuatorBridge.isDiLink5RequestExpired()) {
+            return Integer.MIN_VALUE;
+        }
+        try {
+            Class<?> eventValueClass = Class.forName("android.hardware.bydauto.BYDAutoEventValue");
+            Object eventValue = eventValueClass.getConstructor(new Class[0]).newInstance(new Object[0]);
+            eventValueClass.getField("intArrayValue").set(eventValue, values);
+            Method setMethod = device.getClass().getMethod("set", int[].class, eventValueClass);
+            Object result = setMethod.invoke(device, ids, eventValue);
+            if (result instanceof Integer) {
+                return ((Integer) result).intValue();
+            } else if (result instanceof Boolean) {
+                return ((Boolean) result).booleanValue() ? 0 : -1;
+            }
+            return 0; // non-null result, assume success
+        } catch (Exception e) {
+            logger.debug("sendSetCommandGroupedRaw failed: " + e.getMessage());
+            return Integer.MIN_VALUE;
+        }
+    }
+
+    /**
      * OEM-strict variant for commands whose contract requires an actual Integer result.
      * Returns null when the invocation did not produce one; unlike {@link #sendSetCommandRaw},
      * a void, Boolean, or other non-Integer result is never manufactured into success.
