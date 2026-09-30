@@ -15802,6 +15802,16 @@ public class BydDataCollector {
                     // Clearing: just drop the timing flag; leave stale times untouched.
                     return setTimingStateLocal(false);
                 }
+                // Confirmed live on a Sealion 6 DM-i: the firmware ACCEPTS (result 0) every
+                // schedule write while the car is not charging, but silently drops it —
+                // CHARGING_SCHEDULE_STATE stays INVALID and nothing reads back. OD Charge
+                // gates the same way (it refuses to write unless charging). So require an
+                // active charge before attempting, otherwise we'd report a false success.
+                if (!isChargingNowLocal()) {
+                    logger.debug("saveChargingScheduleLocal: car not charging — local schedule "
+                            + "writes are dropped by the firmware; not attempting");
+                    return false;
+                }
                 int[] hmStart = parseHm(startHm);
                 if (hmStart == null) {
                     logger.debug("saveChargingScheduleLocal: bad start '" + startHm + "'");
@@ -15835,8 +15845,11 @@ public class BydDataCollector {
                     logger.debug("saveChargingScheduleLocal: no time family accepted");
                     return false;
                 }
-                boolean armed = setTimingStateLocal(true);
-                logScheduleState("saveChargingScheduleLocal armed=" + armed);
+                if (!setTimingStateLocal(true)) return false;
+                // Real verify (not just "write accepted"): the schedule must actually reflect
+                // as armed. An accepted-but-dropped write leaves the state INVALID(1)/NONE(3).
+                boolean armed = scheduleArmedLocal();
+                logScheduleState("saveChargingScheduleLocal verified=" + armed);
                 return armed;
             } catch (Exception e) {
                 logger.debug("saveChargingScheduleLocal failed: " + e.getMessage());
@@ -15845,13 +15858,44 @@ public class BydDataCollector {
         }
     }
 
+    /** BMS reports actively charging (state 1) — the precondition for a local schedule write. */
+    private boolean isChargingNowLocal() {
+        try {
+            Object bms = BydDeviceHelper.callGetter(chargingDevice, "getBatteryManagementDeviceState");
+            return bms instanceof Number && ((Number) bms).intValue() == 1;
+        } catch (Throwable t) {
+            return false;
+        }
+    }
+
+    /** True once the schedule state reflects an armed schedule (LOCAL=4 or REMOTE=5). */
+    private boolean scheduleArmedLocal() {
+        try {
+            Object st = BydDeviceHelper.callGet(
+                    chargingDevice, BydFeatureIds.CHARGING_SCHEDULE_STATE, Integer.class);
+            if (st instanceof Number) {
+                int v = ((Number) st).intValue();
+                return v == 4 || v == 5;
+            }
+        } catch (Throwable ignored) {
+        }
+        return false;
+    }
+
     /** Enable/disable the smart-charge schedule locally (SDK fallback for the toggle). */
     public boolean setSmartChargingEnabledLocal(boolean enabled) {
         if (chargingDevice == null) return false;
         synchronized (chargingScheduleLock) {
-            boolean ok = setTimingStateLocal(enabled);
-            logScheduleState("setSmartChargingEnabledLocal(" + enabled + ")=" + ok);
-            return ok;
+            // Enabling only takes effect while charging (see saveChargingScheduleLocal);
+            // disabling is always allowed so a schedule can be cleared any time.
+            if (enabled && !isChargingNowLocal()) {
+                logger.debug("setSmartChargingEnabledLocal: car not charging — enable dropped by firmware");
+                return false;
+            }
+            if (!setTimingStateLocal(enabled)) return false;
+            boolean armed = scheduleArmedLocal();
+            logScheduleState("setSmartChargingEnabledLocal(" + enabled + ") verified=" + (enabled ? armed : !armed));
+            return enabled ? armed : true;
         }
     }
 
