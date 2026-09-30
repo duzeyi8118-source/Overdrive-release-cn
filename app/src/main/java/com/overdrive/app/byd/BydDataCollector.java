@@ -15738,6 +15738,199 @@ public class BydDataCollector {
         }
     }
 
+    // ===== Local smart-charge schedule (fallback when BYD cloud is unavailable) =====
+    //
+    // Cloud (/control/smartCharge/*) stays the primary path — see
+    // VehicleCommandRouter.ChargeScheduleCommand, which is CLOUD_FIRST. These SDK
+    // legs run only when the cloud leg is unavailable or fails, so a schedule can
+    // still be set from an offline / account-less head unit.
+    //
+    // Technique: the charging-schedule time family is written GROUPED via
+    // set(int[], BYDAutoEventValue) and then the timing-enable flag is written.
+    // This is the sequence the OD Charge companion app uses, and every write here
+    // was confirmed accepted (result 0) live on a Sealion 6 DM-i. The per-id
+    // set(deviceType, id, value) form is silently dropped on this trim, so it is
+    // deliberately NOT used. Effectiveness of a local *time-window* schedule is
+    // best-effort and trim-dependent: the verify below only confirms the writes
+    // were accepted and reads back the schedule state for diagnostics.
+
+    private static final int[] SCHEDULE_START_IDS = {
+            BydFeatureIds.CHARGING_SCHEDULE_START_TIME_YEAR_SET,
+            BydFeatureIds.CHARGING_SCHEDULE_START_TIME_MONTH_SET,
+            BydFeatureIds.CHARGING_SCHEDULE_START_TIME_DAY_SET,
+            BydFeatureIds.CHARGING_SCHEDULE_START_TIME_HOUR_SET,
+            BydFeatureIds.CHARGING_SCHEDULE_START_TIME_MINUTE_SET };
+    private static final int[] SCHEDULE_END_IDS = {
+            BydFeatureIds.CHARGING_SCHEDULE_END_TIME_YEAR_SET,
+            BydFeatureIds.CHARGING_SCHEDULE_END_TIME_MONTH_SET,
+            BydFeatureIds.CHARGING_SCHEDULE_END_TIME_DAY_SET,
+            BydFeatureIds.CHARGING_SCHEDULE_END_TIME_HOUR_SET,
+            BydFeatureIds.CHARGING_SCHEDULE_END_TIME_MINUTE_SET };
+    private static final int[] APPOINTMENT_START_IDS = {
+            BydFeatureIds.CHARGING_APPOINTMENT_START_TIME_YEAR_SET,
+            BydFeatureIds.CHARGING_APPOINTMENT_START_TIME_MONTH_SET,
+            BydFeatureIds.CHARGING_APPOINTMENT_START_TIME_DAY_SET,
+            BydFeatureIds.CHARGING_APPOINTMENT_START_TIME_HOUR_SET,
+            BydFeatureIds.CHARGING_APPOINTMENT_START_TIME_MINUTE_SET };
+    private static final int[] APPOINTMENT_END_IDS = {
+            BydFeatureIds.CHARGING_APPOINTMENT_END_TIME_YEAR_SET,
+            BydFeatureIds.CHARGING_APPOINTMENT_END_TIME_MONTH_SET,
+            BydFeatureIds.CHARGING_APPOINTMENT_END_TIME_DAY_SET,
+            BydFeatureIds.CHARGING_APPOINTMENT_END_TIME_HOUR_SET,
+            BydFeatureIds.CHARGING_APPOINTMENT_END_TIME_MINUTE_SET };
+
+    private final Object chargingScheduleLock = new Object();
+
+    /**
+     * Save a charging schedule locally (SDK fallback for ChargeScheduleCommand).
+     *
+     * @param startHm  "HH:mm" local start time (required)
+     * @param endHm    "HH:mm" local end time, or "full"/null for charge-to-full
+     * @param chargeWay cloud day spec ("s" once, "e" daily, or "0,1,..6"); the
+     *                  local family expresses only a single next window, so the
+     *                  day-of-week set is not applied here (cloud keeps weekly
+     *                  precision). Accepted for signature parity.
+     * @param enabled  arm (true) or clear (false) the schedule
+     * @return true when the register writes were accepted
+     */
+    public boolean saveChargingScheduleLocal(String startHm, String endHm,
+                                             String chargeWay, boolean enabled) {
+        if (chargingDevice == null) return false;
+        synchronized (chargingScheduleLock) {
+            try {
+                if (!enabled) {
+                    // Clearing: just drop the timing flag; leave stale times untouched.
+                    return setTimingStateLocal(false);
+                }
+                int[] hmStart = parseHm(startHm);
+                if (hmStart == null) {
+                    logger.debug("saveChargingScheduleLocal: bad start '" + startHm + "'");
+                    return false;
+                }
+                java.util.Calendar start = nextOccurrence(hmStart[0], hmStart[1]);
+                java.util.Calendar end = (java.util.Calendar) start.clone();
+                boolean full = endHm == null || "full".equalsIgnoreCase(endHm.trim());
+                if (full) {
+                    // No user end; leave a wide window so the schedule brackets the charge.
+                    end.add(java.util.Calendar.HOUR_OF_DAY, 12);
+                } else {
+                    int[] hmEnd = parseHm(endHm);
+                    if (hmEnd == null) {
+                        logger.debug("saveChargingScheduleLocal: bad end '" + endHm + "'");
+                        return false;
+                    }
+                    end.set(java.util.Calendar.HOUR_OF_DAY, hmEnd[0]);
+                    end.set(java.util.Calendar.MINUTE, hmEnd[1]);
+                    end.set(java.util.Calendar.SECOND, 0);
+                    if (!end.after(start)) end.add(java.util.Calendar.DAY_OF_MONTH, 1);
+                }
+                int[] sf = dateTimeFields(start);
+                int[] ef = dateTimeFields(end);
+                // OD Charge writes the appointment family first, then the schedule family.
+                boolean wrote = chargingGroupedSet(APPOINTMENT_START_IDS, sf)
+                        & chargingGroupedSet(APPOINTMENT_END_IDS, ef);
+                boolean wroteSchedule = chargingGroupedSet(SCHEDULE_START_IDS, sf)
+                        & chargingGroupedSet(SCHEDULE_END_IDS, ef);
+                if (!wrote && !wroteSchedule) {
+                    logger.debug("saveChargingScheduleLocal: no time family accepted");
+                    return false;
+                }
+                boolean armed = setTimingStateLocal(true);
+                logScheduleState("saveChargingScheduleLocal armed=" + armed);
+                return armed;
+            } catch (Exception e) {
+                logger.debug("saveChargingScheduleLocal failed: " + e.getMessage());
+                return false;
+            }
+        }
+    }
+
+    /** Enable/disable the smart-charge schedule locally (SDK fallback for the toggle). */
+    public boolean setSmartChargingEnabledLocal(boolean enabled) {
+        if (chargingDevice == null) return false;
+        synchronized (chargingScheduleLock) {
+            boolean ok = setTimingStateLocal(enabled);
+            logScheduleState("setSmartChargingEnabledLocal(" + enabled + ")=" + ok);
+            return ok;
+        }
+    }
+
+    /** Write the single timing-enable flag; skip cleanly when the id is unresolved. */
+    private boolean setTimingStateLocal(boolean enabled) {
+        if (BydFeatureIds.CHARGING_TIMING_STATE_SET == BydFeatureIds.UNRESOLVED_ID) {
+            logger.debug("CHARGING_TIMING_STATE_SET unresolved on this trim");
+            return false;
+        }
+        int code = BydDeviceHelper.sendSetCommandRaw(
+                chargingDevice, BydFeatureIds.CHARGING_TIMING_STATE_SET, enabled ? 1 : 0);
+        return code == 0;
+    }
+
+    /** Grouped write via set(int[], BYDAutoEventValue(int[])) — the overload this trim honours. */
+    private boolean chargingGroupedSet(int[] ids, int[] values) {
+        if (chargingDevice == null || ids.length != values.length) return false;
+        for (int id : ids) if (id == BydFeatureIds.UNRESOLVED_ID) return false;
+        try {
+            Class<?> ev = Class.forName("android.hardware.bydauto.BYDAutoEventValue");
+            Object evObj = ev.getConstructor(int[].class).newInstance((Object) values);
+            java.lang.reflect.Method set =
+                    chargingDevice.getClass().getMethod("set", int[].class, ev);
+            Object r = set.invoke(chargingDevice, ids, evObj);
+            return r instanceof Number && ((Number) r).intValue() == 0;
+        } catch (Throwable t) {
+            logger.debug("chargingGroupedSet failed: " + t.getMessage());
+            return false;
+        }
+    }
+
+    /** Short, non-blocking diagnostic read of the schedule state after a write. */
+    private void logScheduleState(String tag) {
+        try {
+            Object st = BydDeviceHelper.callGet(
+                    chargingDevice, BydFeatureIds.CHARGING_SCHEDULE_STATE, Integer.class);
+            logger.debug(tag + "; CHARGING_SCHEDULE_STATE="
+                    + (st instanceof Number ? ((Number) st).intValue() : st)
+                    + " (1=INVALID 2=CANCEL 3=NONE 4=LOCAL 5=REMOTE)");
+        } catch (Throwable ignored) {
+        }
+    }
+
+    private static int[] parseHm(String hm) {
+        if (hm == null) return null;
+        String[] p = hm.trim().split(":");
+        if (p.length != 2) return null;
+        try {
+            int h = Integer.parseInt(p[0].trim());
+            int m = Integer.parseInt(p[1].trim());
+            if (h < 0 || h > 23 || m < 0 || m > 59) return null;
+            return new int[] { h, m };
+        } catch (NumberFormatException e) {
+            return null;
+        }
+    }
+
+    /** Next local occurrence of h:m — today if still ahead, otherwise tomorrow. */
+    private static java.util.Calendar nextOccurrence(int h, int m) {
+        java.util.Calendar c = java.util.Calendar.getInstance();
+        java.util.Calendar t = (java.util.Calendar) c.clone();
+        t.set(java.util.Calendar.HOUR_OF_DAY, h);
+        t.set(java.util.Calendar.MINUTE, m);
+        t.set(java.util.Calendar.SECOND, 0);
+        t.set(java.util.Calendar.MILLISECOND, 0);
+        if (!t.after(c)) t.add(java.util.Calendar.DAY_OF_MONTH, 1);
+        return t;
+    }
+
+    /** {year, month(1-12), day, hour, minute} — the order the *_SET family expects. */
+    private static int[] dateTimeFields(java.util.Calendar c) {
+        return new int[] {
+                c.get(java.util.Calendar.YEAR),
+                c.get(java.util.Calendar.MONTH) + 1,
+                c.get(java.util.Calendar.DAY_OF_MONTH),
+                c.get(java.util.Calendar.HOUR_OF_DAY),
+                c.get(java.util.Calendar.MINUTE) };
+    }
+
     /**
      * Set a generic charging cutoff only through the charge-stop backend.
      * SOC target/hold is a PHEV driving feature and is intentionally exposed

@@ -49,7 +49,7 @@ import java.util.Map;
  *   POST /api/system/ivi-reboot     — parked-only Android head-unit reboot
  *   POST /api/vehicle/battery-heat  — CLOUD_ONLY
  *   GET  /api/vehicle/charging-schedule  — cloud state with local last-known fallback
- *   POST /api/vehicle/charging-schedule  — { startChargeTime, endChargeTime, chargeWay, enabled } CLOUD_ONLY
+ *   POST /api/vehicle/charging-schedule  — { startChargeTime, endChargeTime, chargeWay, enabled } cloud-first, local fallback
  *   POST /api/vehicle/start-charging      — CLOUD_ONLY, terminally confirmed
  *   GET  /api/vehicle/charge-cap         — { percent, enabled, supported } SDK_ONLY (verified charge-stop backend)
  *   POST /api/vehicle/charge-cap         — { percent? 50..100, enabled? } SDK_ONLY (verified charge-stop backend)
@@ -3039,7 +3039,8 @@ public class VehicleControlApiHandler {
     }
 
     /**
-     * Charging schedule — CLOUD_ONLY. Wraps BYD's saveOrUpdate (window + repeat)
+     * Charging schedule — cloud-first with a local SDK fallback. Wraps BYD's
+     * saveOrUpdate (window + repeat)
      * and changeChargeStatue (master switch). Payload mirrors pyBYD:
      * <pre>
      *   { startChargeTime: "HH:MM",

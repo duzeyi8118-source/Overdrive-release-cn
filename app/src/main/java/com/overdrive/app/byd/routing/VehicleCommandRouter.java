@@ -1575,8 +1575,11 @@ public final class VehicleCommandRouter {
             this.enabled = enabled;
         }
         public String name() { return "charge-schedule"; }
-        public Capability cloudCapability() { return Capability.REQUIRED; }
-        public RoutePreference defaultPreference() { return RoutePreference.CLOUD_ONLY; }
+        // Cloud stays primary; the SDK leg is a local fallback for an offline /
+        // account-less head unit. CLOUD_FIRST routing tries cloud, then local.
+        public Capability cloudCapability() { return Capability.AVAILABLE; }
+        public Capability sdkCapability() { return Capability.AVAILABLE; }
+        public RoutePreference defaultPreference() { return RoutePreference.CLOUD_FIRST; }
         public boolean requiresControlPin() { return false; }
         public boolean requiresKnownCloudFeature() { return true; }
         public long cloudTimeoutMs() { return 30_000L; }
@@ -1587,6 +1590,9 @@ public final class VehicleCommandRouter {
         public CloudOutcome executeViaCloud(BydCloudClient client, String vin) throws Exception {
             boolean ok = client.saveChargingSchedule(vin, startChargeTime, endChargeTime, chargeWay, enabled);
             return ok ? CloudOutcome.success() : CloudOutcome.failed();
+        }
+        public boolean executeViaSdk(BydDataCollector collector) {
+            return collector.saveChargingScheduleLocal(startChargeTime, endChargeTime, chargeWay, enabled);
         }
     }
 
@@ -1675,14 +1681,19 @@ public final class VehicleCommandRouter {
         public final boolean enabled;
         public SmartChargingToggleCommand(boolean on) { this.enabled = on; }
         public String name() { return "smart-charging-toggle"; }
-        public Capability cloudCapability() { return Capability.REQUIRED; }
-        public RoutePreference defaultPreference() { return RoutePreference.CLOUD_ONLY; }
+        // Cloud primary, local SDK fallback (see ChargeScheduleCommand).
+        public Capability cloudCapability() { return Capability.AVAILABLE; }
+        public Capability sdkCapability() { return Capability.AVAILABLE; }
+        public RoutePreference defaultPreference() { return RoutePreference.CLOUD_FIRST; }
         public boolean requiresControlPin() { return false; }
         public boolean requiresKnownCloudFeature() { return true; }
         public long cloudTimeoutMs() { return 30_000L; }
         public CloudOutcome executeViaCloud(BydCloudClient client, String vin) throws Exception {
             boolean ok = client.toggleSmartCharging(vin, enabled);
             return ok ? CloudOutcome.success() : CloudOutcome.failed();
+        }
+        public boolean executeViaSdk(BydDataCollector collector) {
+            return collector.setSmartChargingEnabledLocal(enabled);
         }
         public CloudCapabilities.Feature cloudFeature() {
             return CloudCapabilities.Feature.SMART_CHARGING;

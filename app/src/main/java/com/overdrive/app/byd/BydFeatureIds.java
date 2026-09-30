@@ -251,6 +251,64 @@ public final class BydFeatureIds {
      */
     public static final int CHARGING_CHARGE_CAPACITY = resolveOrFallback("Charging.CHARGING_CHARGE_CAPACITY", 666894360);
 
+    // ==================== CHARGING SCHEDULE (LOCAL SMART-CHARGE) ====================
+    // Write ids for the local smart-charge schedule fallback (BydDataCollector
+    // .saveChargingScheduleLocal). They are written GROUPED via
+    // set(int[], BYDAutoEventValue) — the per-id set(type,id,value) form is
+    // accepted-then-dropped on Di 3.0. Numeric fallbacks captured live from a
+    // Sealion 6 DM-i (0x2CF0A0xx / 0x2CF0B0xx families); name resolution keeps
+    // other trims correct. Names/values match the OD Charge companion technique.
+    public static final int CHARGING_SCHEDULE_START_TIME_YEAR_SET =
+            resolveOrFallback("Charging.CHARGING_SCHEDULE_START_TIME_YEAR_SET", 0x2CF0A010);
+    public static final int CHARGING_SCHEDULE_START_TIME_MONTH_SET =
+            resolveOrFallback("Charging.CHARGING_SCHEDULE_START_TIME_MONTH_SET", 0x2CF0A018);
+    public static final int CHARGING_SCHEDULE_START_TIME_DAY_SET =
+            resolveOrFallback("Charging.CHARGING_SCHEDULE_START_TIME_DAY_SET", 0x2CF0A020);
+    public static final int CHARGING_SCHEDULE_START_TIME_HOUR_SET =
+            resolveOrFallback("Charging.CHARGING_SCHEDULE_START_TIME_HOUR_SET", 0x2CF0A028);
+    public static final int CHARGING_SCHEDULE_START_TIME_MINUTE_SET =
+            resolveOrFallback("Charging.CHARGING_SCHEDULE_START_TIME_MINUTE_SET", 0x2CF0A030);
+    public static final int CHARGING_SCHEDULE_END_TIME_YEAR_SET =
+            resolveOrFallback("Charging.CHARGING_SCHEDULE_END_TIME_YEAR_SET", 0x2CF0B010);
+    public static final int CHARGING_SCHEDULE_END_TIME_MONTH_SET =
+            resolveOrFallback("Charging.CHARGING_SCHEDULE_END_TIME_MONTH_SET", 0x2CF0B018);
+    public static final int CHARGING_SCHEDULE_END_TIME_DAY_SET =
+            resolveOrFallback("Charging.CHARGING_SCHEDULE_END_TIME_DAY_SET", 0x2CF0B020);
+    public static final int CHARGING_SCHEDULE_END_TIME_HOUR_SET =
+            resolveOrFallback("Charging.CHARGING_SCHEDULE_END_TIME_HOUR_SET", 0x2CF0B028);
+    public static final int CHARGING_SCHEDULE_END_TIME_MINUTE_SET =
+            resolveOrFallback("Charging.CHARGING_SCHEDULE_END_TIME_MINUTE_SET", 0x2CF0B030);
+    // Appointment family — OD Charge writes this first, then the schedule family.
+    public static final int CHARGING_APPOINTMENT_START_TIME_YEAR_SET =
+            resolveOrFallback("Charging.CHARGING_APPOINTMENT_START_TIME_YEAR_SET", 0x4C210010);
+    public static final int CHARGING_APPOINTMENT_START_TIME_MONTH_SET =
+            resolveOrFallback("Charging.CHARGING_APPOINTMENT_START_TIME_MONTH_SET", 0x4C210018);
+    public static final int CHARGING_APPOINTMENT_START_TIME_DAY_SET =
+            resolveOrFallback("Charging.CHARGING_APPOINTMENT_START_TIME_DAY_SET", 0x4C210020);
+    public static final int CHARGING_APPOINTMENT_START_TIME_HOUR_SET =
+            resolveOrFallback("Charging.CHARGING_APPOINTMENT_START_TIME_HOUR_SET", 0x4C210028);
+    public static final int CHARGING_APPOINTMENT_START_TIME_MINUTE_SET =
+            resolveOrFallback("Charging.CHARGING_APPOINTMENT_START_TIME_MINUTE_SET", 0x4C210030);
+    public static final int CHARGING_APPOINTMENT_END_TIME_YEAR_SET =
+            resolveOrFallback("Charging.CHARGING_APPOINTMENT_END_TIME_YEAR_SET", 0x4C211010);
+    public static final int CHARGING_APPOINTMENT_END_TIME_MONTH_SET =
+            resolveOrFallback("Charging.CHARGING_APPOINTMENT_END_TIME_MONTH_SET", 0x4C211018);
+    public static final int CHARGING_APPOINTMENT_END_TIME_DAY_SET =
+            resolveOrFallback("Charging.CHARGING_APPOINTMENT_END_TIME_DAY_SET", 0x4C211020);
+    public static final int CHARGING_APPOINTMENT_END_TIME_HOUR_SET =
+            resolveOrFallback("Charging.CHARGING_APPOINTMENT_END_TIME_HOUR_SET", 0x4C211028);
+    public static final int CHARGING_APPOINTMENT_END_TIME_MINUTE_SET =
+            resolveOrFallback("Charging.CHARGING_APPOINTMENT_END_TIME_MINUTE_SET", 0x4C211030);
+    // Enable flag (written single) and read-back state ids for the short verify.
+    // No numeric literal captured for the enable flag; name resolution covers the
+    // trims that publish it, and an UNRESOLVED id is skipped by the write helper.
+    public static final int CHARGING_TIMING_STATE_SET =
+            resolveOrFallback("Charging.CHARGING_TIMING_STATE_SET", UNRESOLVED_ID);
+    public static final int CHARGING_SCHEDULE_STATE =
+            resolveOrFallback("Charging.CHARGING_SCHEDULE_STATE", 0x4C201010);
+    public static final int CHARGING_SCHEDULE_ENABLE_STATE =
+            resolveOrFallback("Charging.CHARGING_SCHEDULE_ENABLE_STATE", 0x0550000E);
+
     // ==================== ENGINE (EXTENDED) ====================
     public static final int ENGINE_SPEED = resolveOrFallback("Engine.ENGINE_SPEED", 339738642);
     public static final int ENGINE_SPEED_GB = resolveOrFallback("Engine.ENGINE_SPEED_GB", 282066952);
