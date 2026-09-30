@@ -15779,6 +15779,9 @@ public class BydDataCollector {
             BydFeatureIds.CHARGING_APPOINTMENT_END_TIME_HOUR_SET,
             BydFeatureIds.CHARGING_APPOINTMENT_END_TIME_MINUTE_SET };
 
+    /** Far-future "unset" window {year, month, day, hour, minute} the OEM uses to blank a plan. */
+    private static final int[] SCHEDULE_SENTINEL_FIELDS = { 2127, 15, 0, 31, 63 };
+
     private final Object chargingScheduleLock = new Object();
 
     /**
@@ -15799,14 +15802,16 @@ public class BydDataCollector {
         synchronized (chargingScheduleLock) {
             try {
                 if (!enabled) {
-                    // Clearing: just drop the timing flag; leave stale times untouched.
-                    return setTimingStateLocal(false);
+                    return clearChargingScheduleLocal();
                 }
-                // Confirmed live on a Sealion 6 DM-i: the firmware ACCEPTS (result 0) every
-                // schedule write while the car is not charging, but silently drops it —
-                // CHARGING_SCHEDULE_STATE stays INVALID and nothing reads back. OD Charge
-                // gates the same way (it refuses to write unless charging). So require an
-                // active charge before attempting, otherwise we'd report a false success.
+                // Verified live on a Sealion 6 DM-i (Di 3.0), 2026-09-30: a local schedule
+                // arms ONLY through OD Charge's exact sequence — setCarPlan(...) FIRST, then
+                // the appointment time family, then the timing-enable flag — and ONLY while
+                // the car is actively charging (BMS=1). Writes made without setCarPlan, or
+                // while unplugged/idle, are accepted (result 0) but silently dropped.
+                // The head unit never publishes CHARGING_SCHEDULE_STATE on this trim (stays
+                // INVALID), so the only trustworthy success signal is the BMS moving to
+                // SCHEDULED (9) — i.e. the pack has deferred charging to the window.
                 if (!isChargingNowLocal()) {
                     logger.debug("saveChargingScheduleLocal: car not charging — local schedule "
                             + "writes are dropped by the firmware; not attempting");
@@ -15836,20 +15841,29 @@ public class BydDataCollector {
                 }
                 int[] sf = dateTimeFields(start);
                 int[] ef = dateTimeFields(end);
-                // OD Charge writes the appointment family first, then the schedule family.
-                boolean wrote = chargingGroupedSet(APPOINTMENT_START_IDS, sf)
-                        & chargingGroupedSet(APPOINTMENT_END_IDS, ef);
-                boolean wroteSchedule = chargingGroupedSet(SCHEDULE_START_IDS, sf)
-                        & chargingGroupedSet(SCHEDULE_END_IDS, ef);
-                if (!wrote && !wroteSchedule) {
-                    logger.debug("saveChargingScheduleLocal: no time family accepted");
+                // Step 1 (REQUIRED first): establish the plan. Target 100% = a pure
+                // time-window schedule with no SOC cap (charge-cap is a separate feature).
+                if (!setCarPlanLocal(100)) {
+                    logger.debug("saveChargingScheduleLocal: setCarPlan rejected");
                     return false;
                 }
+                // Step 2: write the appointment window (OD Charge writes appointment first,
+                // then the schedule family as a fallback for trims that use it).
+                boolean wrote = chargingGroupedSet(APPOINTMENT_START_IDS, sf)
+                        & chargingGroupedSet(APPOINTMENT_END_IDS, ef);
+                if (!wrote) {
+                    chargingGroupedSet(SCHEDULE_START_IDS, sf);
+                    chargingGroupedSet(SCHEDULE_END_IDS, ef);
+                }
+                // Step 3: arm.
                 if (!setTimingStateLocal(true)) return false;
-                // Real verify (not just "write accepted"): the schedule must actually reflect
-                // as armed. An accepted-but-dropped write leaves the state INVALID(1)/NONE(3).
-                boolean armed = scheduleArmedLocal();
-                logScheduleState("saveChargingScheduleLocal verified=" + armed);
+                // Verify by the only honest signal on this trim: BMS -> SCHEDULED (9).
+                boolean armed = awaitBmsState(9, true);
+                logScheduleState("saveChargingScheduleLocal verified(BMS->9)=" + armed);
+                if (!armed) {
+                    // Arming did not take — leave nothing half-staged.
+                    clearChargingScheduleLocal();
+                }
                 return armed;
             } catch (Exception e) {
                 logger.debug("saveChargingScheduleLocal failed: " + e.getMessage());
@@ -15858,44 +15872,90 @@ public class BydDataCollector {
         }
     }
 
+    /**
+     * Cancel any local plan and let the pack resume normal charging. Mirrors OD Charge's
+     * prepareMonitoring cancel (timing flag off), then blanks the appointment window and
+     * resets the plan target so no deferral or SOC cap remains. Verified 2026-09-30: BMS
+     * leaves SCHEDULED(9) within ~1s and the pack resumes charging.
+     */
+    private boolean clearChargingScheduleLocal() {
+        setTimingStateLocal(false);
+        chargingGroupedSet(APPOINTMENT_START_IDS, SCHEDULE_SENTINEL_FIELDS);
+        chargingGroupedSet(APPOINTMENT_END_IDS, SCHEDULE_SENTINEL_FIELDS);
+        setCarPlanLocal(100);
+        // Success = the pack is no longer deferring (BMS != SCHEDULED). If it was never
+        // scheduled, this is already true.
+        boolean cleared = awaitBmsState(9, false);
+        logScheduleState("clearChargingScheduleLocal cleared(BMS!=9)=" + cleared);
+        return cleared;
+    }
+
     /** BMS reports actively charging (state 1) — the precondition for a local schedule write. */
     private boolean isChargingNowLocal() {
+        return bmsStateLocal() == 1;
+    }
+
+    /** Current BMS state, or Integer.MIN_VALUE when unreadable. */
+    private int bmsStateLocal() {
         try {
             Object bms = BydDeviceHelper.callGetter(chargingDevice, "getBatteryManagementDeviceState");
-            return bms instanceof Number && ((Number) bms).intValue() == 1;
+            return bms instanceof Number ? ((Number) bms).intValue() : Integer.MIN_VALUE;
         } catch (Throwable t) {
-            return false;
+            return Integer.MIN_VALUE;
         }
     }
 
-    /** True once the schedule state reflects an armed schedule (LOCAL=4 or REMOTE=5). */
-    private boolean scheduleArmedLocal() {
-        try {
-            Object st = BydDeviceHelper.callGet(
-                    chargingDevice, BydFeatureIds.CHARGING_SCHEDULE_STATE, Integer.class);
-            if (st instanceof Number) {
-                int v = ((Number) st).intValue();
-                return v == 4 || v == 5;
+    /**
+     * Short, bounded BMS poll (no open-ended loop). Waits up to ~4s for the BMS to reach
+     * {@code target} (when {@code want}=true) or to leave it (when {@code want}=false).
+     */
+    private boolean awaitBmsState(int target, boolean want) {
+        for (int i = 0; i < 6; i++) {
+            boolean is = bmsStateLocal() == target;
+            if (is == want) return true;
+            try {
+                Thread.sleep(650L);
+            } catch (InterruptedException ie) {
+                Thread.currentThread().interrupt();
+                break;
             }
-        } catch (Throwable ignored) {
         }
-        return false;
+        return (bmsStateLocal() == target) == want;
+    }
+
+    /** setCarPlan(1, 2, targetSoc, 2127, 15, 0, 31, 63) — establishes the plan; result 0 = accepted. */
+    private boolean setCarPlanLocal(int targetSoc) {
+        try {
+            java.lang.reflect.Method m = chargingDevice.getClass().getMethod(
+                    "setCarPlan", int.class, int.class, int.class, int.class,
+                    int.class, int.class, int.class, int.class);
+            Object r = m.invoke(chargingDevice, 1, 2, targetSoc, 2127, 15, 0, 31, 63);
+            return r instanceof Number && ((Number) r).intValue() == 0;
+        } catch (Throwable t) {
+            logger.debug("setCarPlanLocal failed: " + t.getMessage());
+            return false;
+        }
     }
 
     /** Enable/disable the smart-charge schedule locally (SDK fallback for the toggle). */
     public boolean setSmartChargingEnabledLocal(boolean enabled) {
         if (chargingDevice == null) return false;
         synchronized (chargingScheduleLock) {
-            // Enabling only takes effect while charging (see saveChargingScheduleLocal);
-            // disabling is always allowed so a schedule can be cleared any time.
-            if (enabled && !isChargingNowLocal()) {
+            if (!enabled) {
+                // Disable is a full local cancel — always allowed.
+                return clearChargingScheduleLocal();
+            }
+            // A bare enable carries no time window. It can only re-arm while a plan is
+            // still staged AND the car is charging; verify honestly via BMS->SCHEDULED(9).
+            if (!isChargingNowLocal()) {
                 logger.debug("setSmartChargingEnabledLocal: car not charging — enable dropped by firmware");
                 return false;
             }
-            if (!setTimingStateLocal(enabled)) return false;
-            boolean armed = scheduleArmedLocal();
-            logScheduleState("setSmartChargingEnabledLocal(" + enabled + ") verified=" + (enabled ? armed : !armed));
-            return enabled ? armed : true;
+            if (!setTimingStateLocal(true)) return false;
+            boolean armed = awaitBmsState(9, true);
+            logScheduleState("setSmartChargingEnabledLocal(true) verified(BMS->9)=" + armed);
+            if (!armed) clearChargingScheduleLocal();
+            return armed;
         }
     }
 
