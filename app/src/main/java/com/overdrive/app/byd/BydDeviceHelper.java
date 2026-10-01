@@ -2019,10 +2019,14 @@ public final class BydDeviceHelper {
 
     /**
      * Grouped set: writes several feature ids in one {@code set(int[] ids, BYDAutoEventValue)}
-     * call, carrying the values in the event's {@code intArrayValue} field — the same shape the
-     * seat/mirror grouped writes use (see BodyworkSeatProbe). Returns the RAW SDK result code
-     * (0 = accepted), or {@link Integer#MIN_VALUE} when the call threw before producing one.
-     * {@code ids} and {@code values} must be the same length.
+     * call. Returns the RAW SDK result code (0 = accepted), or {@link Integer#MIN_VALUE} when the
+     * call threw before producing one. {@code ids} and {@code values} must be the same length.
+     *
+     * <p>The event is built via the {@code BYDAutoEventValue(int[])} constructor. This matters:
+     * live on a Sealion 6 DM-i (Di 3.0), the charging-schedule grouped write only takes effect
+     * when built this way — the no-arg ctor + {@code intArrayValue} field form returns success
+     * but is silently dropped by the charging HAL, so the schedule never arms (BMS never → 9).
+     * The field form is kept only as a fallback for trims whose SDK lacks the int[] constructor.
      */
     public static int sendSetCommandGroupedRaw(Object device, int[] ids, int[] values) {
         if (device == null || ids == null || values == null || ids.length != values.length
@@ -2031,8 +2035,14 @@ public final class BydDeviceHelper {
         }
         try {
             Class<?> eventValueClass = Class.forName("android.hardware.bydauto.BYDAutoEventValue");
-            Object eventValue = eventValueClass.getConstructor(new Class[0]).newInstance(new Object[0]);
-            eventValueClass.getField("intArrayValue").set(eventValue, values);
+            Object eventValue;
+            try {
+                eventValue = eventValueClass.getConstructor(int[].class).newInstance((Object) values);
+            } catch (NoSuchMethodException noIntArrayCtor) {
+                // Older SDKs without the int[] constructor: fall back to the field form.
+                eventValue = eventValueClass.getConstructor(new Class[0]).newInstance(new Object[0]);
+                eventValueClass.getField("intArrayValue").set(eventValue, values);
+            }
             Method setMethod = device.getClass().getMethod("set", int[].class, eventValueClass);
             Object result = setMethod.invoke(device, ids, eventValue);
             if (result instanceof Integer) {

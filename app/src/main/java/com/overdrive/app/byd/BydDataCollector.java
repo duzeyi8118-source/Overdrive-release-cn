@@ -15823,13 +15823,18 @@ public class BydDataCollector {
                             + "writes are dropped by the firmware; not attempting");
                     return false;
                 }
-                // The local time family expresses a single NEXT window only. A weekly/daily
-                // repeat (chargeWay other than "s"=once) can't be reproduced locally — cloud
-                // keeps that precision. Surface the downgrade instead of silently dropping it.
+                // Recurring schedules are NOT achievable on-device on this gen: probe-verified
+                // (2026-10-01) that the weekly-timer HAL (setChargingTimerInfo /
+                // CHARGING_TIMER_CYCLE_* registers) accepts writes but never stores them and never
+                // defers — it's a cloud-only feature. The local path does ONE-TIME only. So a
+                // repeat request (chargeWay other than "s"/empty) is DECLINED here rather than
+                // silently armed as a misleading single window; CLOUD_FIRST routing sends it to
+                // cloud, and when cloud is unavailable the caller surfaces "recurring needs cloud".
                 if (chargeWay != null && !chargeWay.trim().isEmpty()
                         && !"s".equalsIgnoreCase(chargeWay.trim())) {
                     logger.warn("saveChargingScheduleLocal: chargeWay='" + chargeWay
-                            + "' (repeat) not supported locally — arming only the next window");
+                            + "' is recurring — not supported on-device (cloud-only); declining");
+                    return false;
                 }
                 int[] hmStart = parseHm(startHm);
                 if (hmStart == null) {
@@ -15855,9 +15860,9 @@ public class BydDataCollector {
                 }
                 int[] sf = dateTimeFields(start);
                 int[] ef = dateTimeFields(end);
-                // Step 1 (REQUIRED first): establish the plan. Target 100% = a pure
+                // Step 1 (REQUIRED first): establish/arm the plan (mode 1). Target 100% = a pure
                 // time-window schedule with no SOC cap (charge-cap is a separate feature).
-                if (!setCarPlanLocal(100)) {
+                if (!setCarPlanLocal(1, 100)) {
                     logger.debug("saveChargingScheduleLocal: setCarPlan rejected");
                     return false;
                 }
@@ -15897,13 +15902,18 @@ public class BydDataCollector {
      */
     private boolean clearChargingScheduleLocal() {
         setTimingStateLocal(false);
+        // The arm can land on either family (appointment is rejected on some trims, schedule on
+        // others), so blank BOTH — a clear that only sentineled the appointment family left the
+        // schedule-family window active and charging never resumed (probe-verified 2026-10-01).
         chargingGroupedSet(APPOINTMENT_START_IDS, SCHEDULE_SENTINEL_FIELDS);
         chargingGroupedSet(APPOINTMENT_END_IDS, SCHEDULE_SENTINEL_FIELDS);
-        setCarPlanLocal(100);
+        chargingGroupedSet(SCHEDULE_START_IDS, SCHEDULE_SENTINEL_FIELDS);
+        chargingGroupedSet(SCHEDULE_END_IDS, SCHEDULE_SENTINEL_FIELDS);
+        setCarPlanLocal(0, 100); // mode 0 = CANCEL the plan (mode 1 would re-arm the defer)
         localScheduleStaged = false;
-        // Success = the pack is no longer deferring (BMS != SCHEDULED). Leaving 9 is fast
-        // (~1s live), so a short budget suffices.
-        boolean cleared = awaitBmsState(9, false, 3);
+        // Success = the pack is no longer deferring (BMS != SCHEDULED). Allow a few seconds —
+        // the pack can take ~several s to release the defer and spin charging back up.
+        boolean cleared = awaitBmsState(9, false, 8);
         logScheduleState("clearChargingScheduleLocal cleared(BMS!=9)=" + cleared);
         return cleared;
     }
@@ -15945,12 +15955,17 @@ public class BydDataCollector {
     }
 
     /** setCarPlan(1, 2, targetSoc, 2127, 15, 0, 31, 63) — establishes the plan; result 0 = accepted. */
-    private boolean setCarPlanLocal(int targetSoc) {
+    /**
+     * setCarPlan(mode, 2, targetSoc, sentinel-date). Live-verified on a Sealion 6 DM-i:
+     * {@code mode=1} ESTABLISHES/arms the plan (and defers charging), {@code mode=0} CANCELS it.
+     * Using mode 1 inside a cancel would re-arm the defer — so clear uses mode 0.
+     */
+    private boolean setCarPlanLocal(int mode, int targetSoc) {
         try {
             java.lang.reflect.Method m = chargingDevice.getClass().getMethod(
                     "setCarPlan", int.class, int.class, int.class, int.class,
                     int.class, int.class, int.class, int.class);
-            Object r = m.invoke(chargingDevice, 1, 2, targetSoc, 2127, 15, 0, 31, 63);
+            Object r = m.invoke(chargingDevice, mode, 2, targetSoc, 2127, 15, 0, 31, 63);
             return r instanceof Number && ((Number) r).intValue() == 0;
         } catch (Throwable t) {
             logger.debug("setCarPlanLocal failed: " + t.getMessage());
