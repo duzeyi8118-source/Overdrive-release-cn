@@ -289,13 +289,16 @@ class TunnelLauncher(
     private fun launchCloudflaredInternal(callback: TunnelCallback) {
         callback.onLog("Starting cloudflared tunnel...")
         
-        // Check if sing-box proxy is running
+        // Use the sing-box proxy only if its port (8119 = 0x1FB7) is actually
+        // listening. `pgrep -f sing-box` matched its own `sh -c` wrapper, so it
+        // always reported the proxy as up; QUIC ignores proxy env vars, which hid
+        // that, but an HTTP/2 tunnel then dialed a dead 127.0.0.1:8119 forever.
         adbShellExecutor.execute(
-            command = "pgrep -f sing-box",
+            command = "grep -qiE ':1FB7 [0-9A-F:]+ 0A ' /proc/net/tcp /proc/net/tcp6 && echo up",
             callback = object : AdbShellExecutor.ShellCallback {
                 override fun onSuccess(output: String) {
-                    // Sing-box is running, use proxy
-                    val useProxy = output.trim().isNotEmpty()
+                    // Sing-box proxy is listening, use it
+                    val useProxy = output.trim() == "up"
                     launchCloudflaredWithConfig(callback, useProxy)
                 }
                 
