@@ -44,9 +44,13 @@ public final class DaemonStorage {
      * files as it does under {@code /data/local/tmp}, and migrate the previous
      * external-storage base exactly once. Concurrent callers wait for the
      * migrating one so no daemon starts against a half-copied config.
+     * TMPDIR is exported because mksh writes here-document temp files to
+     * /data/local/tmp by default, which the shell domain cannot create on
+     * DiLink 5; daemons launched by the command inherit it.
      */
     private static final String RELOCATED_PRELUDE =
             "mkdir -p " + RELOCATED_BASE + " 2>/dev/null; "
+            + "export TMPDIR=" + RELOCATED_BASE + "; "
             + "chmod 711 " + SHELL_DATA_DIR + " 2>/dev/null; "
             + "chmod 771 " + RELOCATED_BASE + " 2>/dev/null; "
             + "if [ ! -e " + RELOCATED_BASE + "/.migrated ]; then "
