@@ -5504,6 +5504,10 @@ public class AccSentryDaemon {
                     // off the user's master toggle, never off the camera-mode
                     // selection. Inert (one config read) while the toggle is off.
                     di5KeepAliveTick(transitionGeneration);
+                    // DiLink 5 (Desay) QNX common-network keep-alive: asks the
+                    // firmware OTA service to keep the vehicle network awake.
+                    // Inert unless surveillance.di5QnxNetworkKeepAlive is on.
+                    di5QnxNetworkTick(transitionGeneration);
                     // 1. Maintain Network Interface Stability
                     if (!isKeepAliveCommitCurrent(transitionGeneration)) break;
                     ensureWifiEnabled(transitionGeneration);
@@ -5865,6 +5869,7 @@ public class AccSentryDaemon {
             }
 
             log("System Persistence Service stopped");
+            di5QnxNetworkRelease("keep-alive loop stopped");
             boolean requestReplacement = false;
             synchronized (systemKeepAliveLock) {
                 if (systemKeepAliveThread == Thread.currentThread()) {
@@ -6240,6 +6245,124 @@ public class AccSentryDaemon {
     }
 
     /** 10 s keep-alive tick for the lease. No-op when not installed. */
+    // ==================== DI5 QNX COMMON-NETWORK KEEP-ALIVE ====================
+    // On the Desay SV DiLink 5 the head unit's sleep is decided on the QNX side;
+    // the one keep-awake lever open to the shell is the QNX common-network
+    // control relayed by the QnxMessage service (see QnxMessageBus). Driven
+    // from this daemon so it does not depend
+    // on the app process, which the OS may kill while parked.
+    private static final long DI5_QNX_REASSERT_MS = 30_000L;
+    private static final int DI5_QNX_DEFAULT_MAX_MINUTES = 60;
+    private static final int DI5_QNX_LOW_VOLTS = 11;
+    private static final int DI5_QNX_LOW_SAMPLES = 3;
+    /** VHAL BATTERY_VOLTAGE_SECOND: the 12 V battery, whole volts on this platform. */
+    private static final String VHAL_12V_PROPERTY = "0x2140461e";
+    private static final Object di5QnxLock = new Object();
+    private static int di5QnxLowSamples;
+    private static long di5QnxGeneration = -1L;
+    private static long di5QnxStartedAtMs;
+    private static long di5QnxLastSentMs;
+    private static boolean di5QnxStarted;
+    private static boolean di5QnxExpired;
+
+    private static void di5QnxNetworkTick(long transitionGeneration) {
+        org.json.JSONObject surveillance = null;
+        try {
+            surveillance = com.overdrive.app.config.UnifiedConfigManager.getSurveillance();
+        } catch (Throwable ignored) {
+        }
+        boolean enabled = surveillance != null
+                && surveillance.optBoolean("di5QnxNetworkKeepAlive", false);
+        // Safety cap: the platform's 12 V reading is whole volts only, so also
+        // hold the network for at most N minutes per park, then let the car sleep.
+        int maxMinutes = surveillance != null
+                ? surveillance.optInt("di5QnxNetworkKeepAliveMaxMinutes",
+                        DI5_QNX_DEFAULT_MAX_MINUTES)
+                : DI5_QNX_DEFAULT_MAX_MINUTES;
+        if (!enabled) {
+            di5QnxNetworkRelease("setting off");
+            return;
+        }
+        long now = System.currentTimeMillis();
+        synchronized (di5QnxLock) {
+            if (di5QnxGeneration != transitionGeneration) {
+                di5QnxGeneration = transitionGeneration;
+                di5QnxStartedAtMs = now;
+                di5QnxLastSentMs = 0L;
+                di5QnxExpired = false;
+                di5QnxLowSamples = 0;
+            }
+            if (di5QnxExpired) return;
+            if (maxMinutes > 0 && now - di5QnxStartedAtMs >= maxMinutes * 60_000L) {
+                di5QnxExpired = true;
+            } else if (now - di5QnxLastSentMs < DI5_QNX_REASSERT_MS) {
+                return;
+            } else {
+                di5QnxLastSentMs = now;
+            }
+        }
+        boolean expired;
+        synchronized (di5QnxLock) {
+            expired = di5QnxExpired;
+        }
+        if (expired) {
+            di5QnxNetworkRelease("max " + maxMinutes + " min reached");
+            return;
+        }
+        // Coarse 12 V guard: the VHAL only reports whole volts here, so <= 11
+        // means below ~12.0 V. Three consecutive low samples (one per re-assert)
+        // end the hold for this park.
+        int volts = readVhal12vWholeVolts();
+        boolean lowVoltage;
+        synchronized (di5QnxLock) {
+            di5QnxLowSamples = volts > 0 && volts <= DI5_QNX_LOW_VOLTS
+                    ? di5QnxLowSamples + 1 : 0;
+            lowVoltage = di5QnxLowSamples >= DI5_QNX_LOW_SAMPLES;
+            if (lowVoltage) di5QnxExpired = true;
+        }
+        if (lowVoltage) {
+            di5QnxNetworkRelease("12V reading " + volts + " V");
+            return;
+        }
+        int result = di5QnxNetworkSend(true);
+        synchronized (di5QnxLock) {
+            di5QnxStarted = true;
+        }
+        log("Di5 QNX network START result=" + result + " 12V=" + volts
+                + " (parked " + ((now - di5QnxStartedAtMs) / 1000) + "s, gen="
+                + transitionGeneration + ")");
+    }
+
+    private static void di5QnxNetworkRelease(String reason) {
+        synchronized (di5QnxLock) {
+            if (!di5QnxStarted) return;
+            di5QnxStarted = false;
+        }
+        int result = di5QnxNetworkSend(false);
+        log("Di5 QNX network STOP result=" + result + " (" + reason + ")");
+    }
+
+    /** Last VHAL 12 V value in whole volts, or -1 when unavailable. */
+    private static int readVhal12vWholeVolts() {
+        ShellResult r = execShellResult(
+                "dumpsys car_service --hal 2>/dev/null | grep -m1 'lastEvent:Property:"
+                        + VHAL_12V_PROPERTY + ",'", 8_000L, null);
+        String out = r.output == null ? "" : r.output;
+        java.util.regex.Matcher m = java.util.regex.Pattern
+                .compile("int32Values: \\[(-?\\d+)").matcher(out);
+        if (!m.find()) return -1;
+        try {
+            return Integer.parseInt(m.group(1));
+        } catch (NumberFormatException e) {
+            return -1;
+        }
+    }
+
+    /** @return a {@code QnxMessageBus.RESULT_*} code. */
+    private static int di5QnxNetworkSend(boolean hold) {
+        return com.overdrive.app.byd.dilink5.QnxMessageBus.get().setVehicleNetworkHold(hold);
+    }
+
     private static void di5KeepAliveTick(long transitionGeneration) {
         com.overdrive.app.power.Di5ParkedPowerHold hold =
                 com.overdrive.app.power.Di5ParkedPowerHold.installedInstance();

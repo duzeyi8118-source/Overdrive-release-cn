@@ -646,6 +646,10 @@ object UnifiedConfigManager {
         // entering the deep-sleep state that drops ADB/camera access, but it uses
         // internet data and additional parked energy. Read by BydCloudDataProvider.
         if (!surveillance.has("di5CloudKeepAlive")) surveillance.put("di5CloudKeepAlive", false)
+        // DiLink 5 QNX common-network keep-alive (Experimental, opt-in). The hold
+        // is capped per park because the platform exposes no 12 V reading.
+        if (!surveillance.has("di5QnxNetworkKeepAlive")) surveillance.put("di5QnxNetworkKeepAlive", false)
+        if (!surveillance.has("di5QnxNetworkKeepAliveMaxMinutes")) surveillance.put("di5QnxNetworkKeepAliveMaxMinutes", 60)
         // DiLink 5 parked keep-alive (Experimental). DEFAULT FALSE (opt-in). The
         // single user-visible master switch; while it is OFF every lever below is
         // inert and the parked path is byte-identical to the prior build. The
