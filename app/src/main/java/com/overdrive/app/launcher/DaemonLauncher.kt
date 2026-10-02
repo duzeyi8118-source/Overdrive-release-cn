@@ -320,8 +320,28 @@ class DaemonLauncher(
             "  if watchdog_pid_matches \"\$OLD_WPID\"; then",
             "    return 1",
             "  fi",
-            "  # Fail closed on an invalid lock. The launcher cleanup path",
-            "  # removes it after old watchdog processes have been killed.",
+            "  # Stale lock: the owner PID is dead or not this watchdog (typically a",
+            "  # lock dir left on persistent storage by a previous boot, which no",
+            "  # launcher cleanup runs to clear after a cold start). Steal it: drop",
+            "  # the stale lock and re-acquire so the watchdog self-heals instead of",
+            "  # looping forever on a lock nobody owns.",
+            "  rm -f \"\$WATCHDOG_LOCK_OWNER\" 2>/dev/null",
+            "  rm -f \"\$WATCHDOG_PID_FILE\" 2>/dev/null",
+            "  rmdir \"\$WATCHDOG_LOCK_DIR\" 2>/dev/null",
+            "  if mkdir \"\$WATCHDOG_LOCK_DIR\" 2>/dev/null; then",
+            "    if ! echo \$\$ > \"\$WATCHDOG_LOCK_OWNER\" 2>/dev/null; then",
+            "      rmdir \"\$WATCHDOG_LOCK_DIR\" 2>/dev/null",
+            "      return 1",
+            "    fi",
+            "    if ! echo \$\$ > \"\$WATCHDOG_PID_FILE\" 2>/dev/null; then",
+            "      rm -f \"\$WATCHDOG_LOCK_OWNER\" 2>/dev/null",
+            "      rmdir \"\$WATCHDOG_LOCK_DIR\" 2>/dev/null",
+            "      return 1",
+            "    fi",
+            "    WATCHDOG_LOCK_OWNED=1",
+            "    return 0",
+            "  fi",
+            "  # Another watchdog won the race to re-acquire; stand down.",
             "  return 1",
             "}",
             "",
@@ -559,7 +579,7 @@ class DaemonLauncher(
             // daemon is the highest-volume stdout logger, so real-time
             // bounding of cam_daemon.log (the UI-shown file) matters most here.
             val appProcessLine =
-                "  CLASSPATH=/system/framework/bmmcamera.jar:$apkPath app_process " +
+                "  CLASSPATH=\$([ -f /system/framework/bmmcamera.jar ] && echo /system/framework/bmmcamera.jar:)$apkPath app_process " +
                 "-Djava.library.path=$nativeLibDir:/system/lib64:/vendor/lib64:/product/lib64:/odm/lib64 " +
                 "${proxyArgs}/system/bin " +
                 "--nice-name=$CAMERA_DAEMON_PROCESS " +
@@ -834,7 +854,7 @@ class DaemonLauncher(
         val nativeLibDir = context.applicationInfo.nativeLibraryDir
         
         val innerCmd = buildString {
-            append("CLASSPATH=/system/framework/bmmcamera.jar:$apkPath ")
+            append("CLASSPATH=\$([ -f /system/framework/bmmcamera.jar ] && echo /system/framework/bmmcamera.jar:)$apkPath ")
             append("app_process ")
             append("-Djava.library.path=$nativeLibDir:/system/lib64:/vendor/lib64:/product/lib64:/odm/lib64 ")
             append(proxyArgs)
