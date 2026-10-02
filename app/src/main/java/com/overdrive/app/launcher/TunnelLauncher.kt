@@ -189,24 +189,12 @@ class TunnelLauncher(
                         }
                     }
                 } else {
-                    // Not running, check if binary is installed
+                    // Not running — run straight from the bundled, executable
+                    // jniLib in nativeLibraryDir. The old path copied the binary
+                    // to the daemon storage and chmod +x'd it, which fails when
+                    // that storage is relocated to /sdcard (noexec) on DiLink 5.
                     callback.onLog("Setting up cloudflared...")
-                    adbShellExecutor.execute(
-                        command = "test -x $CLOUDFLARED_TMP_PATH && echo yes || echo no",
-                        callback = object : AdbShellExecutor.ShellCallback {
-                            override fun onSuccess(output: String) {
-                                if (output.trim() == "yes") {
-                                    launchCloudflaredInternal(callback)
-                                } else {
-                                    installCloudflared(callback)
-                                }
-                            }
-                            
-                            override fun onError(error: String) {
-                                installCloudflared(callback)
-                            }
-                        }
-                    )
+                    launchCloudflaredInternal(callback)
                 }
             }
         }
@@ -340,7 +328,7 @@ class TunnelLauncher(
 // FIX: Removed invalid flags. Added 'retries' and 'grace-period'.
 // --grace-period 45s: Waits 45s before panicking (Covers the 24s blackout)
 // --retries 20: Keeps trying to reconnect for a long time
-            append("$CLOUDFLARED_TMP_PATH ${com.overdrive.app.config.CloudflaredPaidConfig.getArgs()}")
+            append("${context.applicationInfo.nativeLibraryDir}/libcloudflared.so ${com.overdrive.app.config.CloudflaredPaidConfig.getArgs()}")
             append("' > $CLOUDFLARED_LOG 2>&1 &")
         }
         
