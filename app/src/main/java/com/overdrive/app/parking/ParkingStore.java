@@ -34,7 +34,7 @@ public final class ParkingStore {
     public static String defaultJdbcUrl() {
         return "jdbc:h2:file:" + DEFAULT_DB_PATH
                 + ";FILE_LOCK=SOCKET;TRACE_LEVEL_FILE=0;DB_CLOSE_ON_EXIT=FALSE"
-                + ";AUTO_COMPACT_FILL_RATE=50";
+                + ";AUTO_COMPACT_FILL_RATE=0";
     }
 
     private final String jdbcUrl;

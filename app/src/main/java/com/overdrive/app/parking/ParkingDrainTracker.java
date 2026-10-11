@@ -71,9 +71,10 @@ public final class ParkingDrainTracker {
     private static void handleAccOff() {
         long now = System.currentTimeMillis();
 
-        // 驻车停放自动释放高通 GNSS 卫星硬件（清理死咬 1s 定位的高德地图等后台）
+        // 驻车停放自动释放高通 GNSS 卫星硬件与多余后台应用（清理死咬 1s 定位的高德地图、酷我音乐等）
         try {
             Runtime.getRuntime().exec(new String[]{"am", "force-stop", "com.autonavi.amapauto"});
+            Runtime.getRuntime().exec(new String[]{"am", "force-stop", "cn.kuwo.kwmusiccar"});
         } catch (Throwable ignored) {}
 
         // 深度重启/守护进程重启防覆盖保护：
