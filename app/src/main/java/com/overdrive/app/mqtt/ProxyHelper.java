@@ -68,6 +68,9 @@ public class ProxyHelper {
 
     private static volatile boolean proxyChecked = false;
     private static volatile boolean proxyAvailable = false;
+    private static volatile boolean singboxAvailable = false;
+    private static volatile boolean tailscaleAvailable = false;
+    private static volatile boolean wireguardAvailable = false;
     private static volatile int proxyPort = PROXY_PORT;
     private static volatile long lastProbeTime = 0;
 
@@ -93,11 +96,21 @@ public class ProxyHelper {
 
     private ProxyHelper() {} // Utility class
 
+    private static void ensureProbed() {
+        long now = System.currentTimeMillis();
+        if (proxyChecked) {
+            long ttl = proxyAvailable ? CACHE_DURATION_MS : NEG_CACHE_DURATION_MS;
+            if ((now - lastProbeTime) < ttl) {
+                return;
+            }
+        }
+        isProxyAvailable();
+    }
+
     /**
-     * Check if the sing-box proxy is available. Result is cached — a POSITIVE result
+     * Check if any local proxy is available. Result is cached — a POSITIVE result
      * for {@link #CACHE_DURATION_MS}, a NEGATIVE result for only
-     * {@link #NEG_CACHE_DURATION_MS} so a transient probe miss doesn't strand traffic
-     * on the (timing-out) direct path for a full minute.
+     * {@link #NEG_CACHE_DURATION_MS}.
      */
     public static boolean isProxyAvailable() {
         long now = System.currentTimeMillis();
@@ -111,23 +124,26 @@ public class ProxyHelper {
         proxyChecked = true;
         lastProbeTime = now;
 
-        // Probe each candidate port on its OWN socket. Prefer sing-box (8119) since it is a full
-        // outbound proxy (supports public internet). Fall back to Tailscale (8539) or WireGuard (8541)
-        // which are primarily for internal tunnel/LAN communication (e.g. MQTT broker).
-        if (probePort(PROXY_PORT)) {
-            proxyAvailable = true;
+        // Independently probe all three proxy listeners
+        singboxAvailable = probePort(PROXY_PORT);
+        tailscaleAvailable = probePort(TAILSCALE_PROXY_PORT);
+        wireguardAvailable = probePort(WIREGUARD_PROXY_PORT);
+        proxyAvailable = singboxAvailable || tailscaleAvailable || wireguardAvailable;
+
+        // Prefer sing-box (8119) for general egress.
+        // For intranet/tunnels, prefer WireGuard (8541) over Tailscale (8539)
+        // because WireGuard bridges EasyTier and local NAS LAN.
+        if (singboxAvailable) {
             proxyPort = PROXY_PORT;
             logger.info("Proxy probe: sing-box available on port " + PROXY_PORT);
-        } else if (probePort(TAILSCALE_PROXY_PORT)) {
-            proxyAvailable = true;
-            proxyPort = TAILSCALE_PROXY_PORT;
-            logger.info("Proxy probe: Tailscale proxy available on port " + TAILSCALE_PROXY_PORT);
-        } else if (probePort(WIREGUARD_PROXY_PORT)) {
-            proxyAvailable = true;
+        } else if (wireguardAvailable) {
             proxyPort = WIREGUARD_PROXY_PORT;
             logger.info("Proxy probe: WireGuard proxy available on port " + WIREGUARD_PROXY_PORT);
+        } else if (tailscaleAvailable) {
+            proxyPort = TAILSCALE_PROXY_PORT;
+            logger.info("Proxy probe: Tailscale proxy available on port " + TAILSCALE_PROXY_PORT);
         } else {
-            proxyAvailable = false;
+            proxyPort = PROXY_PORT;
         }
 
         return proxyAvailable;
@@ -144,11 +160,89 @@ public class ProxyHelper {
     }
 
     /**
-     * Get the proxy port number.
+     * Get the default active proxy port number.
      * Used by MqttPublisherService to set JVM-level socksProxyPort for WebSocket connections.
      */
     public static int getProxyPort() {
         return proxyPort;
+    }
+
+    /**
+     * Get the best proxy port for the given destination host / IP.
+     * Directs Tailscale IPs (100.x) to Tailscale (8539), intranet (10.x, 192.168.x) to WireGuard (8541),
+     * and public hosts to sing-box (8119).
+     */
+    public static int getProxyPort(String host) {
+        return getProxyPortForHost(host);
+    }
+
+    public static int getProxyPortForHost(String host) {
+        ensureProbed();
+        if (host != null && !host.isEmpty()) {
+            if (isTailscaleHost(host)) {
+                if (tailscaleAvailable) return TAILSCALE_PROXY_PORT;
+            } else if (isIntranetHost(host)) {
+                if (wireguardAvailable) return WIREGUARD_PROXY_PORT;
+                if (tailscaleAvailable) return TAILSCALE_PROXY_PORT;
+            }
+        }
+        if (singboxAvailable) return PROXY_PORT;
+        if (wireguardAvailable) return WIREGUARD_PROXY_PORT;
+        if (tailscaleAvailable) return TAILSCALE_PROXY_PORT;
+        return proxyPort;
+    }
+
+    public static boolean isProxyAvailable(String host) {
+        return isProxyAvailableForHost(host);
+    }
+
+    public static boolean isProxyAvailableForHost(String host) {
+        ensureProbed();
+        if (host == null || host.isEmpty()) {
+            return proxyAvailable;
+        }
+        if (isTailscaleHost(host)) {
+            return tailscaleAvailable || wireguardAvailable;
+        }
+        if (isIntranetHost(host)) {
+            return wireguardAvailable || tailscaleAvailable;
+        }
+        // Public host requires an outbound egress proxy like sing-box
+        return singboxAvailable;
+    }
+
+    public static boolean isTailscaleHost(String host) {
+        if (host == null || host.isEmpty()) return false;
+        String h = host.trim().toLowerCase(java.util.Locale.ROOT);
+        if (h.endsWith(".ts.net")) return true;
+        if (h.startsWith("100.")) {
+            String[] parts = h.split("\\.");
+            if (parts.length == 4) {
+                try {
+                    int second = Integer.parseInt(parts[1]);
+                    return second >= 64 && second <= 127;
+                } catch (NumberFormatException ignored) {}
+            }
+            return true;
+        }
+        return false;
+    }
+
+    public static boolean isIntranetHost(String host) {
+        if (host == null || host.isEmpty()) return false;
+        String h = host.trim().toLowerCase(java.util.Locale.ROOT);
+        if (h.startsWith("10.") || h.startsWith("192.168.")) return true;
+        if (h.endsWith(".local") || h.endsWith(".lan")) return true;
+        if (h.startsWith("172.")) {
+            String[] parts = h.split("\\.");
+            if (parts.length >= 2) {
+                try {
+                    int second = Integer.parseInt(parts[1]);
+                    return second >= 16 && second <= 31;
+                } catch (NumberFormatException ignored) {}
+            }
+        }
+        return false;
     }
 
     /**
@@ -177,6 +271,9 @@ public class ProxyHelper {
      */
     public static void invalidateCache() {
         proxyAvailable = false;
+        singboxAvailable = false;
+        tailscaleAvailable = false;
+        wireguardAvailable = false;
         proxyChecked = false;
     }
 
@@ -216,16 +313,28 @@ public class ProxyHelper {
      * a true outbound proxy like sing-box (8119) is available.
      */
     public static Proxy getHttpProxy() {
-        if (isProxyAvailable()) {
-            // Proxy TYPE must match the resolved backend port:
-            //  - Tailscale (8539) is a `tailscaled --socks5-server` that ONLY speaks
-            //    SOCKS5 and REJECTS HTTP CONNECT → it needs Proxy.Type.SOCKS.
-            //  - WireGuard (8541) is wgproxy's SOCKS5 listener (CONNECT only, no auth) → SOCKS too.
-            //  - sing-box (8119) is a "mixed" inbound; v26.8 reached it via HTTP CONNECT
-            //    and that is the PROVEN path. The blanket SOCKS swap (added for the
-            //    Tailscale case) regressed sing-box: route/geocode POSTs to the BYOK
-            //    endpoint began failing whenever sing-box was engaged. Restore HTTP for
-            //    the sing-box port; keep SOCKS only for the Tailscale port that requires it.
+        return getHttpProxy(null);
+    }
+
+    public static Proxy getHttpProxy(String host) {
+        ensureProbed();
+        if (host != null && !host.isEmpty()) {
+            if (isTailscaleHost(host)) {
+                if (tailscaleAvailable) {
+                    return new Proxy(Proxy.Type.SOCKS, new InetSocketAddress(PROXY_HOST, TAILSCALE_PROXY_PORT));
+                }
+            } else if (isIntranetHost(host)) {
+                if (wireguardAvailable) {
+                    return new Proxy(Proxy.Type.SOCKS, new InetSocketAddress(PROXY_HOST, WIREGUARD_PROXY_PORT));
+                } else if (tailscaleAvailable) {
+                    return new Proxy(Proxy.Type.SOCKS, new InetSocketAddress(PROXY_HOST, TAILSCALE_PROXY_PORT));
+                }
+            }
+        }
+        if (singboxAvailable) {
+            return new Proxy(Proxy.Type.HTTP, new InetSocketAddress(PROXY_HOST, PROXY_PORT));
+        }
+        if (host == null && proxyAvailable) {
             Proxy.Type type = (proxyPort == TAILSCALE_PROXY_PORT || proxyPort == WIREGUARD_PROXY_PORT)
                     ? Proxy.Type.SOCKS
                     : Proxy.Type.HTTP;
@@ -239,7 +348,8 @@ public class ProxyHelper {
      * Returns false if only Tailscale or WireGuard (internal tunnel proxies) is running.
      */
     public static boolean isPublicProxyAvailable() {
-        return isProxyAvailable() && proxyPort != TAILSCALE_PROXY_PORT && proxyPort != WIREGUARD_PROXY_PORT;
+        ensureProbed();
+        return singboxAvailable;
     }
 
     /**
@@ -326,30 +436,40 @@ public class ProxyHelper {
      * If proxy is not available, returns the default SocketFactory (direct connection).
      */
     public static SocketFactory getMqttSocketFactory() {
-        if (isProxyAvailable()) {
-            return new ProxiedSocketFactory();
+        return getMqttSocketFactory(null);
+    }
+
+    public static SocketFactory getMqttSocketFactory(String host) {
+        if (isProxyAvailableForHost(host)) {
+            int port = getProxyPortForHost(host);
+            return new ProxiedSocketFactory(port);
         }
         return SocketFactory.getDefault();
     }
 
     /**
-     * Get an SSLSocketFactory that routes through the sing-box SOCKS proxy.
+     * Get an SSLSocketFactory that routes through the appropriate SOCKS proxy.
      *
      * This is the hard part: we create a raw SOCKS-proxied TCP socket first,
      * then overlay TLS on top of it using SSLSocketFactory.createSocket(Socket, host, port, autoClose).
      * This lets Paho see an SSLSocketFactory (so it performs the TLS handshake) while the
-     * underlying transport is routed through sing-box.
+     * underlying transport is routed through the proxy.
      *
      * @param trustAll if true, accepts any server certificate (for self-signed / Home Assistant)
      */
     public static SSLSocketFactory getProxiedSslSocketFactory(boolean trustAll) {
+        return getProxiedSslSocketFactory(null, trustAll);
+    }
+
+    public static SSLSocketFactory getProxiedSslSocketFactory(String host, boolean trustAll) {
         try {
             SSLSocketFactory baseSslFactory = trustAll
                     ? getTrustAllSslFactory()
                     : (SSLSocketFactory) SSLSocketFactory.getDefault();
 
-            if (isProxyAvailable()) {
-                return new ProxiedSslSocketFactory(baseSslFactory);
+            if (isProxyAvailableForHost(host)) {
+                int port = getProxyPortForHost(host);
+                return new ProxiedSslSocketFactory(baseSslFactory, port);
             }
             return baseSslFactory;
         } catch (Exception e) {
@@ -389,11 +509,27 @@ public class ProxyHelper {
      */
     static class ProxiedSocketFactory extends SocketFactory {
 
+        private final int configuredPort;
         private final Proxy proxy;
 
         ProxiedSocketFactory() {
+            this(proxyPort);
+        }
+
+        ProxiedSocketFactory(int port) {
+            this.configuredPort = port;
             this.proxy = new Proxy(Proxy.Type.SOCKS,
-                    new InetSocketAddress(PROXY_HOST, proxyPort));
+                    new InetSocketAddress(PROXY_HOST, port));
+        }
+
+        private Proxy resolveProxyForHost(String host) {
+            if (host != null && !host.isEmpty()) {
+                int resolved = getProxyPortForHost(host);
+                if (resolved != this.configuredPort) {
+                    return new Proxy(Proxy.Type.SOCKS, new InetSocketAddress(PROXY_HOST, resolved));
+                }
+            }
+            return this.proxy;
         }
 
         @Override
@@ -403,7 +539,7 @@ public class ProxyHelper {
 
         @Override
         public Socket createSocket(String host, int port) throws java.io.IOException {
-            Socket socket = new Socket(proxy);
+            Socket socket = new Socket(resolveProxyForHost(host));
             socket.connect(new InetSocketAddress(host, port));
             return socket;
         }
@@ -411,7 +547,7 @@ public class ProxyHelper {
         @Override
         public Socket createSocket(String host, int port, java.net.InetAddress localHost, int localPort)
                 throws java.io.IOException {
-            Socket socket = new Socket(proxy);
+            Socket socket = new Socket(resolveProxyForHost(host));
             socket.bind(new InetSocketAddress(localHost, localPort));
             socket.connect(new InetSocketAddress(host, port));
             return socket;
@@ -419,7 +555,7 @@ public class ProxyHelper {
 
         @Override
         public Socket createSocket(java.net.InetAddress host, int port) throws java.io.IOException {
-            Socket socket = new Socket(proxy);
+            Socket socket = new Socket(resolveProxyForHost(host != null ? host.getHostAddress() : null));
             socket.connect(new InetSocketAddress(host, port));
             return socket;
         }
@@ -428,7 +564,7 @@ public class ProxyHelper {
         public Socket createSocket(java.net.InetAddress address, int port,
                                    java.net.InetAddress localAddress, int localPort)
                 throws java.io.IOException {
-            Socket socket = new Socket(proxy);
+            Socket socket = new Socket(resolveProxyForHost(address != null ? address.getHostAddress() : null));
             socket.bind(new InetSocketAddress(localAddress, localPort));
             socket.connect(new InetSocketAddress(address, port));
             return socket;
@@ -436,21 +572,37 @@ public class ProxyHelper {
     }
 
     /**
-     * SSLSocketFactory that creates TLS sockets routed through the sing-box SOCKS proxy.
+     * SSLSocketFactory that creates TLS sockets routed through the appropriate SOCKS proxy.
      *
      * Strategy: create a raw SOCKS-proxied TCP socket, then layer TLS on top using
      * SSLSocketFactory.createSocket(Socket, host, port, autoClose). This gives Paho
-     * a proper SSLSocket for the TLS handshake while the underlying bytes flow through sing-box.
+     * a proper SSLSocket for the TLS handshake while the underlying bytes flow through the proxy.
      */
     static class ProxiedSslSocketFactory extends SSLSocketFactory {
 
         private final SSLSocketFactory sslFactory;
+        private final int configuredPort;
         private final Proxy proxy;
 
         ProxiedSslSocketFactory(SSLSocketFactory sslFactory) {
+            this(sslFactory, proxyPort);
+        }
+
+        ProxiedSslSocketFactory(SSLSocketFactory sslFactory, int port) {
             this.sslFactory = sslFactory;
+            this.configuredPort = port;
             this.proxy = new Proxy(Proxy.Type.SOCKS,
-                    new InetSocketAddress(PROXY_HOST, proxyPort));
+                    new InetSocketAddress(PROXY_HOST, port));
+        }
+
+        private Proxy resolveProxyForHost(String host) {
+            if (host != null && !host.isEmpty()) {
+                int resolved = getProxyPortForHost(host);
+                if (resolved != this.configuredPort) {
+                    return new Proxy(Proxy.Type.SOCKS, new InetSocketAddress(PROXY_HOST, resolved));
+                }
+            }
+            return this.proxy;
         }
 
         /**
@@ -472,7 +624,7 @@ public class ProxyHelper {
         @Override
         public Socket createSocket(String host, int port) throws java.io.IOException {
             // 1. Create raw TCP socket through SOCKS proxy
-            Socket tunnel = new Socket(proxy);
+            Socket tunnel = new Socket(resolveProxyForHost(host));
             tunnel.connect(new InetSocketAddress(host, port));
             // 2. Layer TLS on top of the connected tunnel
             return sslFactory.createSocket(tunnel, host, port, true);
@@ -481,7 +633,7 @@ public class ProxyHelper {
         @Override
         public Socket createSocket(String host, int port, java.net.InetAddress localHost, int localPort)
                 throws java.io.IOException {
-            Socket tunnel = new Socket(proxy);
+            Socket tunnel = new Socket(resolveProxyForHost(host));
             tunnel.bind(new InetSocketAddress(localHost, localPort));
             tunnel.connect(new InetSocketAddress(host, port));
             return sslFactory.createSocket(tunnel, host, port, true);
@@ -489,7 +641,7 @@ public class ProxyHelper {
 
         @Override
         public Socket createSocket(java.net.InetAddress host, int port) throws java.io.IOException {
-            Socket tunnel = new Socket(proxy);
+            Socket tunnel = new Socket(resolveProxyForHost(host != null ? host.getHostAddress() : null));
             tunnel.connect(new InetSocketAddress(host, port));
             return sslFactory.createSocket(tunnel, host.getHostName(), port, true);
         }
@@ -498,7 +650,7 @@ public class ProxyHelper {
         public Socket createSocket(java.net.InetAddress address, int port,
                                    java.net.InetAddress localAddress, int localPort)
                 throws java.io.IOException {
-            Socket tunnel = new Socket(proxy);
+            Socket tunnel = new Socket(resolveProxyForHost(address != null ? address.getHostAddress() : null));
             tunnel.bind(new InetSocketAddress(localAddress, localPort));
             tunnel.connect(new InetSocketAddress(address, port));
             return sslFactory.createSocket(tunnel, address.getHostName(), port, true);

@@ -292,7 +292,10 @@ public final class BydCloudMqttSubscriber implements MqttCallback {
             boolean isAuthFailure =
                     msg.contains("token expired")
                     || msg.contains("Login failed")
-                    || msg.contains(" 401 ") || msg.contains(" 403 ");
+                    || msg.contains(" 401 ") || msg.contains(" 403 ")
+                    || msg.contains("已断开连接")
+                    || msg.contains("Not authorized")
+                    || (consecutiveFailures >= 3 && isChina);
             boolean isTransientService = msg.contains("1005")
                     || msg.contains("1008")
                     || msg.contains("1009")

@@ -56,7 +56,7 @@ jobs:
           KEY_PASSWORD: ${{ secrets.RELEASE_KEY_PASSWORD }}
         # assembleDebug: keeps debug flags (no R8 shrink) but now uses our fixed keystore
         # instead of the random per-runner debug keystore → consistent fingerprint every run.
-        run: ./gradlew assembleDebug -PoverdriveVersionName=49.9.15 -PoverdriveVersionCode=49915 -PoverdriveUpdateChannel=alpha --stacktrace --no-daemon
+        run: ./gradlew assembleDebug -PoverdriveVersionName=49.9.16 -PoverdriveVersionCode=49916 -PoverdriveUpdateChannel=alpha --stacktrace --no-daemon
 
       - name: Verify APK signature fingerprint
         run: |
@@ -79,7 +79,7 @@ jobs:
           mkdir -p release-assets
           APK_FILE=$(find app/build/outputs/apk -name "*.apk" | head -1)
           echo "Found built APK: $APK_FILE"
-          cp "$APK_FILE" release-assets/Overdrive-v49.9.15-cn-sec.apk
+          cp "$APK_FILE" release-assets/Overdrive-v49.9.16-cn-sec.apk
           ls -lh release-assets/
 
       - name: Upload APK Artifact
@@ -93,19 +93,24 @@ jobs:
         uses: softprops/action-gh-release@v2
         if: github.ref == 'refs/heads/main'
         with:
-          tag_name: v49.9.15-cn-sec
-          name: OverDrive v49.9.15 - 驻车极低功耗治理：H2碎片整理抑制与酷我音乐熄火强杀
+          tag_name: v49.9.16-cn-sec
+          name: OverDrive v49.9.16 - 车机高可用与网络拓扑感知治理
           body: |
-            ## OverDrive v49.9.15 定制版
+            ## OverDrive v49.9.16 定制版
 
-            ### 🔋 H2 MVStore 驻车后台碎片整理空转抑制 (节能突破)
-            - **根除 MVStore 空转**：针对录像库、通知库等所有 8 个 H2 嵌入式数据库，将 `AUTO_COMPACT_FILL_RATE` 从 50 调优为 0；
-            - **立省 ~25%~30% CPU**：彻底消灭驻车停放期间 H2 后台写入线程 (`rdings_h2.mv.db`) 持续占用 25% CPU 循环整理磁盘块的暗耗；
-            - **文件安全性**：正常写入事务与关闭校验不受影响，避免驻车待机无效发热与电池消耗。
+            ### 🔋 12V 小电瓶低电量企微告警直推
+            - **低电量主动推送**：`BatteryPowerMonitor` 在电压处于 Warning (<11.5V) 或 Critical (<10.5V) 时直推企微；
+            - **智能防抖与恶化秒推**：30 分钟限频防抖，但当由 Warning 恶化至 Critical 时即时突破限制秒推；
+            - **0.5V 迟滞回差自愈**：小电瓶补电回升至 12.0V 时自动复位告警状态，杜绝边缘颠簸刷屏。
 
-            ### 🎵 酷我音乐车机版熄火自动强杀 (`cn.kuwo.kwmusiccar`)
-            - **熄火释放**：在 `ParkingDrainTracker.handleAccOff` 熄火处理中，将酷我音乐追加至强杀名单；
-            - **内存与心跳释放**：车辆熄火驻车瞬间立即回收 ~70MB 内存与后台心跳轮询，杜绝非必要后台唤醒。
-          files: release-assets/Overdrive-v49.9.15-cn-sec.apk
+            ### 🌐 MQTT 目标感知智能分流 (Destination-Aware Routing)
+            - **精准网段路由**：`ProxyHelper` 实现基于目标 Host 分流，Tailscale 目标 (100.x) 走 8539，内网/局域网目标 (10.126.x, 10.14.x, 192.168.x) 走 WireGuard 8541；
+            - **内网 Broker 互通修复**：打破 Tailscale 盲抢占，解决 EasyTier/WireGuard 私网 Broker 无法通过 Tailscale 路由的断连问题；
+            - **公网智能回退**：仅在 sing-box (8119) 存活时代理公网请求，否则直连，消除 SOCKS 0x01 连接报错。
+
+            ### 🔄 比亚迪云端 MQTT 断线死锁突破
+            - **中文认证识别**：`BydCloudMqttSubscriber` 支持识别车机底层中文“已断开连接”和“Not authorized”；
+            - **连续失败强制重登**：连续 3 次连接失败时强制触发系统重新登录，打破 5 分钟死锁状态。
+          files: release-assets/Overdrive-v49.9.16-cn-sec.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

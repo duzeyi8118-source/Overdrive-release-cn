@@ -215,6 +215,27 @@ public class MqttConnectionConfig {
         return "••••" + password.substring(password.length() - 2);
     }
 
+    /**
+     * Extracts host / IP from brokerUrl (without protocol, port or path).
+     */
+    public String getHost() {
+        if (brokerUrl == null || brokerUrl.isEmpty()) return "";
+        String s = brokerUrl.trim();
+        int protoIdx = s.indexOf("://");
+        if (protoIdx != -1) {
+            s = s.substring(protoIdx + 3);
+        }
+        int slashIdx = s.indexOf('/');
+        if (slashIdx != -1) {
+            s = s.substring(0, slashIdx);
+        }
+        int colonIdx = s.indexOf(':');
+        if (colonIdx != -1) {
+            s = s.substring(0, colonIdx);
+        }
+        return s;
+    }
+
     // ==================== SERIALIZATION ====================
 
     /**

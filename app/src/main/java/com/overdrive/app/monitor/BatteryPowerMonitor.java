@@ -21,6 +21,11 @@ public class BatteryPowerMonitor extends BaseDeviceMonitor<BatteryPowerData> {
     // consumes voltage from the same poll loop for MCU sleep/wake hysteresis,
     // and V2's hysteresis windows are minute-scale.
     private static final long POLL_INTERVAL_MS = 60_000;
+    // Debounce window for low battery notifications (30 minutes)
+    private static final long ALERT_DEBOUNCE_MS = 30 * 60 * 1000L;
+    private long lastAlertTimeMs = 0;
+    private boolean lastAlertWasCritical = false;
+    private boolean alertActive = false;
     
     public BatteryPowerMonitor() {
         super("BatteryPowerMonitor");
@@ -108,6 +113,7 @@ public class BatteryPowerMonitor extends BaseDeviceMonitor<BatteryPowerData> {
                     }
                     
                     cachedData.set(newData);
+                    checkAndNotifyLowBattery(newData);
 
                     // Fan out to BatteryVoltageMonitorV2 (acc_sentry-process MCU
                     // sleep/wake hysteresis). V2 lives in this same process,
@@ -170,5 +176,57 @@ public class BatteryPowerMonitor extends BaseDeviceMonitor<BatteryPowerData> {
     public long getLastUpdateTime() {
         BatteryPowerData data = cachedData.get();
         return data != null ? data.timestamp : 0;
+    }
+
+    /**
+     * Check if voltage is in low/critical state and notify owner via WeChat Work.
+     * Includes a 30-minute debounce window and allows immediate escalation from Warning to Critical.
+     * Resets automatically once battery recovers above 12.0V (0.5V hysteresis).
+     */
+    private void checkAndNotifyLowBattery(BatteryPowerData data) {
+        if (data == null || !data.isValidRange()) {
+            return;
+        }
+
+        long now = System.currentTimeMillis();
+        boolean shouldAlert = false;
+
+        if (data.isCritical) {
+            // Critical (< 10.5V): Alert if interval passed, or escalated from Warning
+            if (!alertActive || !lastAlertWasCritical || (now - lastAlertTimeMs >= ALERT_DEBOUNCE_MS)) {
+                shouldAlert = true;
+                lastAlertWasCritical = true;
+                alertActive = true;
+            }
+        } else if (data.isWarning) {
+            // Warning (< 11.5V): Alert if interval passed and didn't recently fire Critical
+            if (!alertActive || (!lastAlertWasCritical && now - lastAlertTimeMs >= ALERT_DEBOUNCE_MS)) {
+                shouldAlert = true;
+                lastAlertWasCritical = false;
+                alertActive = true;
+            }
+        } else {
+            // Normal range (>= 11.5V): hysteresis reset at 12.0V
+            if (alertActive && data.voltageVolts >= 12.0) {
+                alertActive = false;
+                lastAlertWasCritical = false;
+                log("12V battery voltage recovered to " + String.format(java.util.Locale.CHINA, "%.2fV", data.voltageVolts));
+            }
+            return;
+        }
+
+        if (shouldAlert) {
+            lastAlertTimeMs = now;
+            String level = data.isCritical ? "严重亏电（< 10.5V）" : "低电量预警（< 11.5V）";
+            String details = "当前电压：" + String.format(java.util.Locale.CHINA, "%.2fV", data.voltageVolts)
+                    + "\n• 告警等级：" + level
+                    + "\n• 建议：请尽快启动车辆或检查车载电器，避免小电瓶亏电无法上电";
+            try {
+                com.overdrive.app.wecom.WeComNotifier.notifyCritical("LOW_BATTERY", details);
+                log("Dispatched WeCom low battery critical notification: " + level);
+            } catch (Throwable t) {
+                logError("Failed to dispatch WeCom notification for low battery", t);
+            }
+        }
     }
 }

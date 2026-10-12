@@ -153,14 +153,15 @@ public class MqttPublisherService implements MqttCallback {
         // instant the proxy binds. Bounded by PROXY_WARMUP_GRACE_MS so a genuinely dead proxy can't
         // permanently refuse a directly-reachable broker: after the grace window we fall through and
         // try a direct dial as a last resort.
-        if (ProxyHelper.isProxyExpected() && !ProxyHelper.isProxyAvailable()) {
+        String brokerHost = config.getHost();
+        if (ProxyHelper.isProxyExpected() && !ProxyHelper.isProxyAvailable(brokerHost)) {
             long now = System.currentTimeMillis();
             if (proxyWaitStartMs == 0L) proxyWaitStartMs = now;
             long waitedMs = now - proxyWaitStartMs;
             if (waitedMs < PROXY_WARMUP_GRACE_MS) {
                 connected = false;
                 lastError = "Proxy enabled but not reachable yet (127.0.0.1:"
-                        + ProxyHelper.getExpectedProxyPort() + ") — deferring connect until proxy is up";
+                        + ProxyHelper.getProxyPort(brokerHost) + ") — deferring connect until proxy is up";
                 if (!loggedProxyWait) {
                     logger.warn(lastError);
                     loggedProxyWait = true;
@@ -222,7 +223,7 @@ public class MqttPublisherService implements MqttCallback {
             boolean setSocksProps = false;
             boolean clearSocksProps = false;
 
-            if (ProxyHelper.isProxyAvailable()) {
+            if (ProxyHelper.isProxyAvailable(brokerHost)) {
                 if (isWebSocket && isSsl) {
                     // WSS + Proxy: Paho 1.2.0+ has a bug (eclipse/paho.mqtt.java#573) where
                     // WebSocketSecureNetworkModule bypasses the SocketFactory and calls
@@ -230,7 +231,7 @@ public class MqttPublisherService implements MqttCallback {
                     // never gets invoked, so the SOCKS tunnel is never established.
                     //
                     // Workaround: set JVM-level SOCKS proxy properties so that ALL sockets
-                    // (including Paho's internal new Socket()) route through sing-box.
+                    // (including Paho's internal new Socket()) route through the target proxy.
                     // Then provide the appropriate SSLSocketFactory for the TLS layer only.
                     setSocksProps = true;
                     if (config.trustAllCerts) {
@@ -242,13 +243,13 @@ public class MqttPublisherService implements MqttCallback {
                 } else if (isSsl) {
                     // SSL (non-WebSocket) + Proxy: our ProxiedSslSocketFactory works correctly
                     // because Paho's SSLNetworkModule calls factory.createSocket(host, port).
-                    options.setSocketFactory(ProxyHelper.getProxiedSslSocketFactory(config.trustAllCerts));
+                    options.setSocketFactory(ProxyHelper.getProxiedSslSocketFactory(brokerHost, config.trustAllCerts));
                 } else if (isWebSocket) {
                     // WS (plain) + Proxy: same Paho bug applies — use system SOCKS properties.
                     setSocksProps = true;
                 } else {
                     // Plain TCP + Proxy: ProxiedSocketFactory works fine.
-                    options.setSocketFactory(ProxyHelper.getMqttSocketFactory());
+                    options.setSocketFactory(ProxyHelper.getMqttSocketFactory(brokerHost));
                 }
             } else {
                 // No proxy — leftover system SOCKS properties from a previous WS+proxy
@@ -277,7 +278,7 @@ public class MqttPublisherService implements MqttCallback {
             options.setWill(lwtTopic, lwtPayload, 1, true);
 
             logger.info("Connecting to " + brokerUri + " as " + effectiveClientId
-                    + " (proxy=" + ProxyHelper.isProxyAvailable()
+                    + " (proxy=" + ProxyHelper.isProxyAvailable(brokerHost)
                     + ", ssl=" + isSsl
                     + ", ws=" + isWebSocket
                     + ", trustAll=" + config.trustAllCerts + ")");
@@ -293,7 +294,7 @@ public class MqttPublisherService implements MqttCallback {
                 synchronized (ProxyHelper.SOCKS_PROPS_LOCK) {
                     if (setSocksProps) {
                         System.setProperty("socksProxyHost", "127.0.0.1");
-                        System.setProperty("socksProxyPort", String.valueOf(ProxyHelper.getProxyPort()));
+                        System.setProperty("socksProxyPort", String.valueOf(ProxyHelper.getProxyPort(brokerHost)));
                     } else {
                         System.clearProperty("socksProxyHost");
                         System.clearProperty("socksProxyPort");
