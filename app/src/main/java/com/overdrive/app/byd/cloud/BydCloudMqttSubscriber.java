@@ -193,6 +193,7 @@ public final class BydCloudMqttSubscriber implements MqttCallback {
         // connect()/subscribe() failed — it is only assigned to the mqttClient
         // field on full success, so disconnectQuietly() can't reach it.
         MqttClient mc = null;
+        boolean isChina = client.getConfig() != null && client.getConfig().isChinaRegion();
 
         try {
             lastConnectAttemptMs = System.currentTimeMillis();
@@ -241,7 +242,7 @@ public final class BydCloudMqttSubscriber implements MqttCallback {
             // other route in the same attempt. Whichever leg wins sets the
             // preference for the next attempt.
             // CN optimization: China servers connect DIRECTLY without going through proxy first.
-            boolean isChina = client.getConfig() != null && client.getConfig().isChinaRegion();
+            isChina = client.getConfig() != null && client.getConfig().isChinaRegion();
             boolean proxyActive = !isChina && ProxyHelper.isProxyAvailable();
             boolean firstViaProxy = proxyActive && !preferDirectEmqRoute;
             logger.info("Connecting to BYD EMQ: " + brokerUri + " topic=" + topic
