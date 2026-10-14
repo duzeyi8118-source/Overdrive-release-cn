@@ -3807,12 +3807,15 @@ var VC = {
                     if (unsupported) {
                         coolBtn.setAttribute('disabled', 'true');
                         coolBtn.classList.add('disabled');
-                        coolBtn.title = 'Ventilated seat not available on this trim';
+                        coolBtn.title = (BYD && BYD.i18n && BYD.i18n.t)
+                            ? BYD.i18n.t('vehicle.ventilated_not_available')
+                            : '该配置车型不支持座椅通风';
                     } else {
                         coolBtn.removeAttribute('disabled');
                         coolBtn.classList.remove('disabled');
                         coolBtn.title = ci === 0
-                            ? 'Driver Seat Cool' : 'Passenger Seat Cool';
+                            ? ((BYD && BYD.i18n && BYD.i18n.t) ? BYD.i18n.t('vehicle.driver_seat_cool') : '主驾座椅通风')
+                            : ((BYD && BYD.i18n && BYD.i18n.t) ? BYD.i18n.t('vehicle.passenger_seat_cool') : '副驾座椅通风');
                     }
                 }
             }

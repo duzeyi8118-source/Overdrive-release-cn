@@ -1850,17 +1850,27 @@ BYD.events = {
     async createIncidentPack(recordingKey) {
         const rec = this.findRecording(recordingKey);
         if (!rec || !rec.id || !/^[a-f0-9]{32}$/i.test(rec.id)) return;
-        const body = 'OverDrive sends only filtered event metadata to your configured AI provider. '
-            + 'The video stays local and is added only to the downloaded evidence pack.';
+        const title = (BYD.i18n && BYD.i18n.t)
+            ? BYD.i18n.t('events.evidence_pack_title')
+            : '创建事故取证包？';
+        const body = (BYD.i18n && BYD.i18n.t)
+            ? BYD.i18n.t('events.evidence_pack_body')
+            : 'OverDrive 仅向配置的 AI 服务提供商发送脱敏后的事件元数据。视频全程保存在本地，仅打包进下载的事故取证归档包中。';
+        const confirmLabel = (BYD.i18n && BYD.i18n.t)
+            ? BYD.i18n.t('events.evidence_pack_confirm')
+            : '创建取证包';
+        const cancelLabel = (BYD.i18n && BYD.i18n.t)
+            ? BYD.i18n.t('common.cancel')
+            : '取消';
         const confirmed = window.BYD && BYD.utils
                 && BYD.utils.confirmDialog
             ? await BYD.utils.confirmDialog({
-                title: 'Create evidence pack?',
+                title: title,
                 body: body,
-                confirmLabel: 'Create pack',
-                cancelLabel: 'Cancel'
+                confirmLabel: confirmLabel,
+                cancelLabel: cancelLabel
             })
-            : confirm('Create an incident evidence pack? ' + body);
+            : confirm(title + '\n\n' + body);
         if (!confirmed) return;
         try {
             const response = await fetch('/api/genai/incidents', {
@@ -1873,11 +1883,17 @@ BYD.events = {
             });
             const data = await response.json().catch(() => ({}));
             if (!response.ok || data.success === false) {
-                throw new Error(data.error || 'Could not create evidence pack');
+                const defaultErr = (BYD.i18n && BYD.i18n.t)
+                    ? BYD.i18n.t('events.evidence_pack_create_failed')
+                    : '无法创建事故取证包';
+                throw new Error(data.error || defaultErr);
             }
             const packId = String(data.id || data.packId || '');
             if (!/^[a-f0-9-]{36}$/i.test(packId)) {
-                throw new Error('The daemon returned an invalid pack id');
+                const invalidErr = (BYD.i18n && BYD.i18n.t)
+                    ? BYD.i18n.t('events.evidence_pack_invalid_id')
+                    : '守护进程返回了无效的取证包 ID';
+                throw new Error(invalidErr);
             }
             if (BYD.core && BYD.core.toast) {
                 const msg = (BYD.i18n && BYD.i18n.t) ? BYD.i18n.t('events.evidence_pack_ready') : '取证归档包已准备就绪';

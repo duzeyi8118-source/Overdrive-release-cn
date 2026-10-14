@@ -2536,7 +2536,7 @@
                     var open = document.createElement('button');
                     open.type = 'button';
                     open.className = 'btn btn-secondary';
-                    open.textContent = 'Open details';
+                    open.textContent = t('assistant.open_details', '查看详情');
                     (function (target) {
                         open.addEventListener('click', function () {
                             window.location.href = target;
@@ -2551,7 +2551,7 @@
                 var note = document.createElement('div');
                 note.className = 'ai-result-meta';
                 note.textContent =
-                    'Results were capped; narrow the time range for an exact search.';
+                    t('assistant.results_capped', '搜索结果已达上限，缩小时间范围可获取更精准的结果。');
                 wrap.appendChild(note);
             }
             var warnings = meta && meta.warnings

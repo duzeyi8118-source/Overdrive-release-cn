@@ -1918,7 +1918,12 @@
     "selected_count_initial": "0 selected",
     "page_initial": "Page 1 of 1",
     "calendar_title_initial": "Calendar",
-    "evidence_pack_ready": "Evidence pack ready"
+    "evidence_pack_ready": "Evidence pack ready",
+    "evidence_pack_title": "Create evidence pack?",
+    "evidence_pack_body": "OverDrive sends only filtered event metadata to your configured AI provider. The video stays local and is added only to the downloaded evidence pack.",
+    "evidence_pack_confirm": "Create pack",
+    "evidence_pack_create_failed": "Could not create evidence pack",
+    "evidence_pack_invalid_id": "The daemon returned an invalid pack id"
   },
   "surveillance": {
     "tab_general": "General",
@@ -2723,7 +2728,7 @@
     "section_schedule": "Schedule",
     "section_charge_cap": "Charge limit",
     "start_charge": "Start now",
-    "section_ac_current": "AC current",
+    "section_ac_current": "AC charging current",
     "ac_max": "Max"
   },
   "performance": {
@@ -3154,7 +3159,13 @@
     "ivi_reboot_failed": "IVI reboot failed",
     "climate_duration": "持续运行时长",
     "windows_vent": "车窗缝隙通风",
-    "windows_close": "一键关闭全部车窗"
+    "windows_close": "一键关闭全部车窗",
+    "ventilated_not_available": "Ventilated seat not available on this trim",
+    "driver_seat_cool": "Driver Seat Ventilation",
+    "passenger_seat_cool": "Passenger Seat Ventilation",
+    "climate_booking_time": "Preconditioning time",
+    "charge_cap_slider": "Charge limit",
+    "charge_current_limit": "AC charging current limit"
   },
   "roi": {
     "editing": "EDITING",
@@ -3243,7 +3254,11 @@
     "deterrent_confirm_ok": "Activate",
     "deterrent_horn_sent": "Horn and lights activated",
     "deterrent_flash_sent": "Lights flashed",
-    "deterrent_failed": "Could not send the command"
+    "deterrent_failed": "Could not send the command",
+    "selector": "Camera selector",
+    "view": "View",
+    "record": "Record",
+    "tap_view_record": "Tap View or Record"
   },
   "map": {
     "your_vehicle": "Your Vehicle",
@@ -3491,7 +3506,8 @@
     "tyre_alerts_desc": "Send a Telegram message when a tyre goes outside your configured pressure range, or when the TPMS reports a leak. Uses the limits set under Tyre pressure limits.",
     "parking_messages": "Parking messages",
     "parking_messages_desc": "Send \"Parked\" (place, GPS freshness, sentry state, four-camera still) and \"Back at car\" (time away, events, neighbours that came or went). Requires Parking Intelligence under Surveillance settings.",
-    "always_on_note": "The daemon is enabled on the native Daemons screen, so it keeps running whether or not this toggle is on — including while parked. Turn it off there to stop it."
+    "always_on_note": "The daemon is enabled on the native Daemons screen, so it keeps running whether or not this toggle is on — including while parked. Turn it off there to stop it.",
+    "token_toggle": "Show / hide token"
   },
   "dashboard": {
     "heading": "Dashboard",
@@ -3600,7 +3616,8 @@
     "action_vehicle_control": "车辆控制",
     "tunnel_tile_failed": "穿透异常",
     "tunnel_tile_stopping": "正在停止…",
-    "view_all": "查看全部"
+    "view_all": "查看全部",
+    "drag_reorder": "Drag to reorder"
   },
   "oem_dashcam": {
     "title": "OEM Dashcam",
@@ -5369,5 +5386,9 @@
     "tab_limits": "Limits",
     "tab_activity": "Activity",
     "r_offline: No internet connection": "无互联网连接"
+  },
+  "assistant": {
+    "open_details": "Open details",
+    "results_capped": "Results were capped; narrow the time range for an exact search."
   }
 }

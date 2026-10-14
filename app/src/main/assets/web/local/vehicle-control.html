@@ -61,7 +61,7 @@
                     </div>
 
                     <!-- Floating mobile nav button -->
-                    <button class="vc-nav-btn" onclick="toggleSidebar()" title="Menu">
+                    <button class="vc-nav-btn" onclick="toggleSidebar()" title="菜单" data-i18n-attr="title:nav.menu">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="18" y2="18"/>
                         </svg>
@@ -274,7 +274,7 @@
                                 <div class="vc-block-row">
                                     <div class="vc-block vc-block--stepper">
                                         <span class="vc-block-title" data-i18n="vehicle.precondition_time">预约开启时间</span>
-                                        <input type="time" id="climateBookingTime" class="vc-time" value="07:30" aria-label="Preconditioning time" />
+                                        <input type="time" id="climateBookingTime" class="vc-time" value="07:30" aria-label="预约出发空调时间" data-i18n-attr="aria-label:vehicle.climate_booking_time" />
                                     </div>
                                     <div class="vc-block vc-block--stepper vc-block--wide">
                                         <span class="vc-block-title" data-i18n="common.duration">时长</span>
@@ -564,19 +564,19 @@
                                         <span class="vc-readout" id="chargeCapReadout">—</span>
                                         <button class="vc-charge-switch" id="btnChargeCapToggle" title="充电上限" data-i18n-attr="title:vehicle_control.section_charge_cap">On</button>
                                     </div>
-                                    <input type="range" id="chargeCapSlider" class="vc-soc-slider" min="50" max="100" step="5" value="50" aria-label="Charge limit" />
+                                    <input type="range" id="chargeCapSlider" class="vc-soc-slider" min="50" max="100" step="5" value="50" aria-label="充电上限百分比" data-i18n-attr="aria-label:vehicle.charge_cap_slider" />
                                 </section>
                                 <section class="vc-block vc-block--divider" id="acChargeCurrentSection">
                                     <div class="vc-block-head">
-                                        <span class="vc-block-title" data-i18n="vehicle_control.section_ac_current">空调电流</span>
+                                        <span class="vc-block-title" data-i18n="vehicle_control.section_ac_current">交流慢充电流</span>
                                     </div>
                                     <div class="vc-segmented vc-segmented-full" id="acChargeCurrentSegmented"
-                                         aria-label="AC charging current limit">
+                                         aria-label="交流慢充电流限制" data-i18n-attr="aria-label:vehicle.charge_current_limit">
                                         <button class="vc-seg" data-state="1" disabled>6 A</button>
                                         <button class="vc-seg" data-state="2" disabled>8 A</button>
                                         <button class="vc-seg" data-state="3" disabled>10 A</button>
                                         <button class="vc-seg" data-state="4" disabled>16 A</button>
-                                        <button class="vc-seg" data-state="5" disabled data-i18n="vehicle_control.ac_max">强力制冷 (MAX A/C)</button>
+                                        <button class="vc-seg" data-state="5" disabled data-i18n="vehicle_control.ac_max">最大 (MAX)</button>
                                     </div>
                                 </section>
                             </div>

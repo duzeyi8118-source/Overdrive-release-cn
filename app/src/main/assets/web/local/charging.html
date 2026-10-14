@@ -1281,7 +1281,7 @@
                             </div>
                             <div class="ch-detail-subtitle" id="detailSubtitle"></div>
                         </div>
-                        <button id="detailDeleteBtn" class="ch-detail-delete-btn" onclick="CHARGING.deleteCurrent()" title="Delete session">
+                        <button id="detailDeleteBtn" class="ch-detail-delete-btn" onclick="CHARGING.deleteCurrent()" title="删除此充电记录" data-i18n-attr="title:charge.delete_session_title">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 6h18"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6"/><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
                             <span data-i18n="charge.delete_session_title">删除此充电记录</span>
                         </button>
@@ -1295,7 +1295,7 @@
                         </div>
                         <div class="ch-detail-overview-item ch-detail-overview-item--soc">
                             <svg class="ch-detail-overview-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="5" y="5" width="14" height="17" rx="2"/><path d="M9 2h6v3M9 10h6M9 14h6"/></svg>
-                            <div class="ch-detail-overview-copy"><div class="ch-detail-soc-top"><div class="ch-detail-kicker" data-i18n="charge.hero_soc">电池电量 (SoC)</div><div class="ch-detail-caption" id="detailSocCaption">Start → End</div></div><div class="ch-detail-value" id="detailSocValue">--</div><div class="ch-detail-soc-track"><span class="ch-detail-soc-fill" id="detailSocFill"></span></div></div>
+                            <div class="ch-detail-overview-copy"><div class="ch-detail-soc-top"><div class="ch-detail-kicker" data-i18n="charge.hero_soc">电池电量 (SoC)</div><div class="ch-detail-caption" id="detailSocCaption" data-i18n="charge.detail_start_end">开始 → 结束</div></div><div class="ch-detail-value" id="detailSocValue">--</div><div class="ch-detail-soc-track"><span class="ch-detail-soc-fill" id="detailSocFill"></span></div></div>
                         </div>
                         <div class="ch-detail-overview-item ch-detail-overview-item--location" id="detailLocRow" style="display:none;">
                             <svg class="ch-detail-overview-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 21s-6-5.5-6-10a6 6 0 0 1 12 0c0 4.5-6 10-6 10z"/><circle cx="12" cy="11" r="2"/></svg>

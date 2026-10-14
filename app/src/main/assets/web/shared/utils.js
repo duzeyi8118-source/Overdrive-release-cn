@@ -144,15 +144,20 @@ const BYD = {
             }
 
             // Update buttons
+            var stopLabel = '⏹ ' + ((BYD.i18n && BYD.i18n.t) ? BYD.i18n.t('common.stop') : '停止');
+            var viewLabel = '👁 ' + ((BYD.i18n && BYD.i18n.t) ? BYD.i18n.t('liveview.view') : '查看');
+            var recLabel = '⏺ ' + ((BYD.i18n && BYD.i18n.t) ? BYD.i18n.t('liveview.record') : '录制');
+            var tapLabel = (BYD.i18n && BYD.i18n.t) ? BYD.i18n.t('liveview.tap_view_record') : '点击查看或录制';
+
             if (viewBtn) {
                 viewBtn.className = 'btn btn-view' + (isViewing ? ' on' : '');
-                viewBtn.textContent = isViewing ? '⏹ Stop' : '👁 View';
+                viewBtn.textContent = isViewing ? stopLabel : viewLabel;
                 viewBtn.disabled = isRecording;
             }
 
             if (recBtn) {
                 recBtn.className = 'btn btn-rec' + (isRecording ? ' on' : '');
-                recBtn.textContent = isRecording ? '⏹ Stop' : '⏺ Record';
+                recBtn.textContent = isRecording ? stopLabel : recLabel;
                 recBtn.disabled = isViewing;
             }
 
@@ -161,7 +166,7 @@ const BYD = {
                 if (isActive && !box.querySelector('img')) {
                     box.innerHTML = `<img src="/stream/${camId}" id="img${camId}" alt="Camera ${camId}"/>`;
                 } else if (!isActive && box.querySelector('img')) {
-                    box.innerHTML = '<div class="placeholder">Tap View or Record</div>';
+                    box.innerHTML = '<div class="placeholder" data-i18n="liveview.tap_view_record">' + tapLabel + '</div>';
                 }
             }
         },

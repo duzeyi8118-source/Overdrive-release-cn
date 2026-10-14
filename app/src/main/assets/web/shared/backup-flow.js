@@ -101,7 +101,7 @@
         var sec = document.createElement('section');
         sec.className = 'about-section';
         sec.innerHTML =
-            '<h3 class="about-subhead" data-i18n="backup.section_title">Backup &amp; Restore</h3>' +
+            '<h3 class="about-subhead" data-i18n="backup.section_title">' + escapeHtml(t('backup.section_title', '备份与恢复')) + '</h3>' +
             '<p class="about-section-sub" data-i18n="backup.section_sub">' +
                 escapeHtml(t('backup.section_sub',
                     'Save your Overdrive settings to a file, or restore them on this same head unit. The file includes your credentials — keep it private.')) +
@@ -112,8 +112,8 @@
                   '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>' +
                 '</svg>' +
                 '<div class="tier-text">' +
-                  '<p class="tier-title" data-i18n="backup.export_title">Export settings</p>' +
-                  '<p class="tier-value" data-i18n="backup.export_value">Download a backup file of your current settings.</p>' +
+                  '<p class="tier-title" data-i18n="backup.export_title">' + escapeHtml(t('backup.export_title', '导出设置')) + '</p>' +
+                  '<p class="tier-value" data-i18n="backup.export_value">' + escapeHtml(t('backup.export_value', '下载当前配置的备份文件。')) + '</p>' +
                 '</div>' +
                 '<svg class="tier-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>' +
               '</button>' +
@@ -122,8 +122,8 @@
                   '<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>' +
                 '</svg>' +
                 '<div class="tier-text">' +
-                  '<p class="tier-title" data-i18n="backup.import_title">Restore settings</p>' +
-                  '<p class="tier-value" data-i18n="backup.import_value">Load a backup file made on this head unit.</p>' +
+                  '<p class="tier-title" data-i18n="backup.import_title">' + escapeHtml(t('backup.import_title', '恢复设置')) + '</p>' +
+                  '<p class="tier-value" data-i18n="backup.import_value">' + escapeHtml(t('backup.import_value', '导入在本车机上生成的备份文件。')) + '</p>' +
                 '</div>' +
                 '<svg class="tier-chev" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>' +
               '</button>' +
@@ -132,7 +132,7 @@
               '<input type="checkbox" id="bkInclTrips">' +
               '<span class="bk-check" aria-hidden="true"></span>' +
               '<span class="bk-opt-text">' +
-                '<b data-i18n="backup.trips_opt_title">Include trip history</b>' +
+                '<b data-i18n="backup.trips_opt_title">' + escapeHtml(t('backup.trips_opt_title', '包含历史行程记录')) + '</b>' +
                 '<span data-i18n="backup.trips_opt_desc">' +
                   escapeHtml(t('backup.trips_opt_desc',
                     'Adds your trip stats (distance, energy, cost, scores, start/end locations) to the export. Detailed per-trip telemetry is not included. The file will contain your location history — keep it private.')) +

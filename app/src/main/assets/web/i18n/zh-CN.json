@@ -1677,7 +1677,12 @@
     "selected_count_initial": "0 选择",
     "page_initial": "第一个页",
     "calendar_title_initial": "时间表",
-    "evidence_pack_ready": "取证归档包已准备就绪"
+    "evidence_pack_ready": "取证归档包已准备就绪",
+    "evidence_pack_title": "创建事故取证包？",
+    "evidence_pack_body": "OverDrive 仅向配置的 AI 服务提供商发送脱敏后的事件元数据。视频全程保存在本地，仅打包进下载的事故取证归档包中。",
+    "evidence_pack_confirm": "创建取证包",
+    "evidence_pack_create_failed": "无法创建事故取证包",
+    "evidence_pack_invalid_id": "守护进程返回了无效的取证包 ID"
   },
   "surveillance": {
     "tab_general": "常规",
@@ -2482,8 +2487,8 @@
     "section_schedule": "计划",
     "section_charge_cap": "充电上限",
     "start_charge": "立即开始",
-    "section_ac_current": "空调电流",
-    "ac_max": "强力制冷 (MAX A/C)"
+    "section_ac_current": "交流慢充电流",
+    "ac_max": "最大 (MAX)"
   },
   "performance": {
     "tab_battery": "电池",
@@ -2913,7 +2918,13 @@
     "ivi_reboot_body": "车机重启期间，中控屏幕与 OverDrive 服务将短暂不可用。",
     "ivi_reboot_btn": "重启车机",
     "ivi_reboot_sent": "已请求重启车机",
-    "ivi_reboot_failed": "重启车机失败"
+    "ivi_reboot_failed": "重启车机失败",
+    "ventilated_not_available": "该配置车型不支持座椅通风",
+    "driver_seat_cool": "主驾座椅通风",
+    "passenger_seat_cool": "副驾座椅通风",
+    "climate_booking_time": "预约出发空调时间",
+    "charge_cap_slider": "充电上限百分比",
+    "charge_current_limit": "交流慢充电流限制"
   },
   "roi": {
     "editing": "编辑",
@@ -3002,7 +3013,11 @@
     "listening_paused": "监听已暂停",
     "listener_starting": "正在开启监听…",
     "listener_unavailable": "车内收音监听当前不可用",
-    "decoder_fallback": "正在为此设备自动切换兼容的视频解码器…"
+    "decoder_fallback": "正在为此设备自动切换兼容的视频解码器…",
+    "selector": "摄像头选择器",
+    "view": "查看",
+    "record": "录制",
+    "tap_view_record": "点击查看或录制"
   },
   "map": {
     "your_vehicle": "车辆位置",
@@ -3250,7 +3265,8 @@
     "tyre_alerts_desc": "当轮胎胎压超出设置范围或 TPMS 报告漏气时发送 Telegram 告警消息。基于胎压限制中的阈值判定。",
     "always_on_note": "该守护进程已在原生「守护进程」页面启用，因此无论此开关是否打开都会持续运行——包括驻车时。如需停止，请到该页面关闭。",
     "parking_messages": "停车与返车通知",
-    "parking_messages_desc": "在车辆停车熄火以及回到车旁时，通过 Telegram 发送包含位置、车位及照片的通知。"
+    "parking_messages_desc": "在车辆停车熄火以及回到车旁时，通过 Telegram 发送包含位置、车位及照片的通知。",
+    "token_toggle": "显示/隐藏令牌"
   },
   "dashboard": {
     "heading": "仪表盘",
@@ -3359,7 +3375,8 @@
     "glance_windows_closed": "车窗全关",
     "glance_windows_open": "{n} 扇未关",
     "range_breakdown": "纯电 {ev} · 燃油 {fuel}",
-    "cmd_parking": "停车记录"
+    "cmd_parking": "停车记录",
+    "drag_reorder": "拖拽调整卡片顺序"
   },
   "oem_dashcam": {
     "title": "原厂行车记录仪",
@@ -5369,5 +5386,9 @@
     "tab_backup": "备份规则",
     "tab_limits": "配额与限制",
     "tab_activity": "同步动态"
+  },
+  "assistant": {
+    "open_details": "查看详情",
+    "results_capped": "搜索结果已达上限，缩小时间范围可获取更精准的结果。"
   }
 }
