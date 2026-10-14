@@ -56,7 +56,7 @@ jobs:
           KEY_PASSWORD: ${{ secrets.RELEASE_KEY_PASSWORD }}
         # assembleDebug: keeps debug flags (no R8 shrink) but now uses our fixed keystore
         # instead of the random per-runner debug keystore → consistent fingerprint every run.
-        run: ./gradlew assembleDebug -PoverdriveVersionName=49.9.16 -PoverdriveVersionCode=49916 -PoverdriveUpdateChannel=alpha --stacktrace --no-daemon
+        run: ./gradlew assembleDebug -PoverdriveVersionName=49.9.17 -PoverdriveVersionCode=49917 -PoverdriveUpdateChannel=alpha --stacktrace --no-daemon
 
       - name: Verify APK signature fingerprint
         run: |
@@ -79,7 +79,7 @@ jobs:
           mkdir -p release-assets
           APK_FILE=$(find app/build/outputs/apk -name "*.apk" | head -1)
           echo "Found built APK: $APK_FILE"
-          cp "$APK_FILE" release-assets/Overdrive-v49.9.16-cn-sec.apk
+          cp "$APK_FILE" release-assets/Overdrive-v49.9.17-cn-sec.apk
           ls -lh release-assets/
 
       - name: Upload APK Artifact
@@ -93,24 +93,28 @@ jobs:
         uses: softprops/action-gh-release@v2
         if: github.ref == 'refs/heads/main'
         with:
-          tag_name: v49.9.16-cn-sec
-          name: OverDrive v49.9.16 - 车机高可用与网络拓扑感知治理
+          tag_name: v49.9.17-cn-sec
+          name: OverDrive v49.9.17 - 守护进程看门狗自愈、车端预约充电降级与稳定性加固
           body: |
-            ## OverDrive v49.9.16 定制版
+            ## OverDrive v49.9.17 定制版
 
-            ### 🔋 12V 小电瓶低电量企微告警直推
-            - **低电量主动推送**：`BatteryPowerMonitor` 在电压处于 Warning (<11.5V) 或 Critical (<10.5V) 时直推企微；
-            - **智能防抖与恶化秒推**：30 分钟限频防抖，但当由 Warning 恶化至 Critical 时即时突破限制秒推；
-            - **0.5V 迟滞回差自愈**：小电瓶补电回升至 12.0V 时自动复位告警状态，杜绝边缘颠簸刷屏。
+            ### 🛡️ 守护进程看门狗死锁自愈与崩溃防御 (4b8672c7)
+            - **硬关机僵尸锁自愈**：车辆异常熄火断电后遗留的看门狗锁目录，在冷启动时自动校验 PID 存活性并强行抢占自愈，彻底根除守护进程假死不自启 Bug；
+            - **ROM 动态兼容**：消除无 `bmmcamera.jar` 的系统因类路径拼接导致的 `SIGABRT (exit 134)` 崩溃。
 
-            ### 🌐 MQTT 目标感知智能分流 (Destination-Aware Routing)
-            - **精准网段路由**：`ProxyHelper` 实现基于目标 Host 分流，Tailscale 目标 (100.x) 走 8539，内网/局域网目标 (10.126.x, 10.14.x, 192.168.x) 走 WireGuard 8541；
-            - **内网 Broker 互通修复**：打破 Tailscale 盲抢占，解决 EasyTier/WireGuard 私网 Broker 无法通过 Tailscale 路由的断连问题；
-            - **公网智能回退**：仅在 sing-box (8119) 存活时代理公网请求，否则直连，消除 SOCKS 0x01 连接报错。
+            ### ⚡ 车机本地预约充电降级闭环 (PR #311, #315, #319)
+            - **无网本地预约**：脱离云端依赖，通过底层 `setCarPlan` 和 BMS 状态验证在车机端独立实现智能预约充电；
+            - **BMS 状态恢复保障**：取消预约时若 BMS 仍停留在延迟状态，自动触发即时临时窗口激活高压充电。
 
-            ### 🔄 比亚迪云端 MQTT 断线死锁突破
-            - **中文认证识别**：`BydCloudMqttSubscriber` 支持识别车机底层中文“已断开连接”和“Not authorized”；
-            - **连续失败强制重登**：连续 3 次连接失败时强制触发系统重新登录，打破 5 分钟死锁状态。
-          files: release-assets/Overdrive-v49.9.16-cn-sec.apk
+            ### 🔋 仪表盘与配置数据容错修复 (PR #341)
+            - **浮点数字符串归一化**：自动兼容处理逗号与句点小数点，避免在特殊语言环境下电池容量无法保存。
+
+            ### 📨 驻车结束回车消息折行优化 (PR #332)
+            - **结构化通知卡片**：回到车上（Back-at-car）通知将驻车时长、哨兵事件数与能耗独立分行排版，提升可读性。
+
+            ### 🌐 隧道环境与代理优化 (69b27982, 6a0ed74c)
+            - **原生目录执行**：Cloudflared 二进制强制自 `nativeLibraryDir` 执行，规避部分存储分区 `noexec` 权限拦截；
+            - **代理探活严谨化**：改为基于 8119 端口真实监听状态探测，避免进程名误匹配导致死循环。
+          files: release-assets/Overdrive-v49.9.17-cn-sec.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
