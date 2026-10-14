@@ -55,7 +55,11 @@ jobs:
           KEY_ALIAS: ${{ secrets.RELEASE_KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.RELEASE_KEY_PASSWORD }}
         # assembleDebug: keeps debug flags (no R8 shrink) but now uses our fixed keystore
-        run: ./gradlew assembleDebug -PoverdriveVersionName=49.9.22 -PoverdriveVersionCode=49922 -PoverdriveUpdateChannel=alpha --stacktrace --no-daemon
+        run: |
+          VERSION=$(grep 'versionName = ' app/build.gradle.kts | head -1 | sed -E 's/.*"([^"]+)".*/\1/')
+          VERSION_CODE=$(grep 'versionCode = ' app/build.gradle.kts | head -1 | sed -E 's/.*[?]: ([0-9]+).*/\1/')
+          echo "Building OverDrive version: $VERSION (versionCode: $VERSION_CODE)"
+          ./gradlew assembleDebug -PoverdriveVersionName="$VERSION" -PoverdriveVersionCode="$VERSION_CODE" -PoverdriveUpdateChannel=alpha --stacktrace --no-daemon
 
       - name: Verify APK signature fingerprint
         run: |
