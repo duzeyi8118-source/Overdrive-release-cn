@@ -10636,6 +10636,10 @@ public class StorageManager {
                             skippedActive++;
                             continue;
                         }
+                        if (com.overdrive.app.safekeep.SafeKeepLocksManager.isLocked(f)) {
+                            // SafeKeep locked video, protect against overwrite
+                            continue;
+                        }
                         boolean wiped = f.delete();
                         if (!wiped) wiped = deleteFileViaShell(f);
                         if (wiped) {

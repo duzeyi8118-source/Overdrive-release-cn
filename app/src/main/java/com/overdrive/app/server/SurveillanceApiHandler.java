@@ -108,6 +108,10 @@ public class SurveillanceApiHandler {
             }
             return true;
         }
+        if (cleanPath.equals("/api/surveillance/impact") && method.equals("POST")) {
+            handleImpact(out, body);
+            return true;
+        }
         return false;
     }
 
@@ -3261,5 +3265,24 @@ public class SurveillanceApiHandler {
         } catch (NumberFormatException e) {
             return defaultValue;
         }
+    }
+
+    private static void handleImpact(OutputStream out, String body) throws Exception {
+        JSONObject req = new JSONObject(body != null && !body.isEmpty() ? body : "{}");
+        double peak = req.optDouble("peak", -1.0);
+        if (peak <= 0 || Double.isNaN(peak)) {
+            JSONObject err = new JSONObject();
+            err.put("success", false);
+            err.put("error", "peak must be a positive number of m/s²");
+            HttpResponse.sendJson(out, err.toString());
+            return;
+        }
+        com.overdrive.app.logging.DaemonLogger logger = com.overdrive.app.surveillance.impact.ParkedImpactController.logger;
+        logger.info("Impact reported: peak=" + peak + " m/s²");
+
+        JSONObject resp = new JSONObject();
+        resp.put("success", true);
+        resp.put("handled", true);
+        HttpResponse.sendJson(out, resp.toString());
     }
 }

@@ -781,6 +781,14 @@ public class HttpServer {
                 if (!serveStaticFile(out, "local/telegram.html")) {
                     HttpResponse.sendError(out, 404, "telegram.html not found");
                 }
+            } else if (path.equals("/safekeep.html") || path.equals("/safekeep")) {
+                if (!serveStaticFile(out, "local/safekeep.html")) {
+                    HttpResponse.sendError(out, 404, "safekeep.html not found");
+                }
+            } else if (path.equals("/widgets.html") || path.equals("/widgets")) {
+                if (!serveStaticFile(out, "local/widgets.html")) {
+                    HttpResponse.sendError(out, 404, "widgets.html not found");
+                }
             } else if (path.equals("/byd-cloud.html") || path.equals("/byd-cloud")) {
                 if (!serveStaticFile(out, "local/byd-cloud.html")) {
                     HttpResponse.sendError(out, 404, "byd-cloud.html not found");
@@ -1135,6 +1143,16 @@ public class HttpServer {
         // shell. The HTTP daemon runs as UID shell so direct writes work.
         if (path.startsWith("/api/telegram/")) {
             return TelegramApiHandler.handle(method, path, body, out);
+        }
+
+        // Glass Widgets API (sync, foreground check, live telemetry, automations, arrange)
+        if (path.startsWith("/api/widgets/")) {
+            return GlassWidgetsApiHandler.handle(out, method, path);
+        }
+
+        // SafeKeep API (locks, clips, status, upload)
+        if (path.startsWith("/api/safekeep/")) {
+            return SafeKeepApiHandler.handle(out, method, path, body);
         }
 
         // WeCom / Webhook delivery config API

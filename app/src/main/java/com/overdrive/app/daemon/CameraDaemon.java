@@ -779,6 +779,11 @@ public class CameraDaemon {
         new Thread(httpServer::start, "HttpServer").start();
         new Thread(ipcServer, "SurveillanceIPC").start();
         new Thread(aacIngestServer, "AacIngest").start();
+        try {
+            com.overdrive.app.surveillance.impact.ParkedImpactController.startMonitoring();
+        } catch (Throwable t) {
+            log("Parked impact controller startup failed: " + t.getMessage());
+        }
 
         if (leavingDiLink5) {
             Thread avmCleanup = new Thread(() -> {

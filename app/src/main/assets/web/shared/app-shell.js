@@ -54,6 +54,7 @@
         { href: 'live-view.html',       i18n: 'nav.live_view',       label: '实时画面',       svg: '<path d="M2 8V6a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-6"/><path d="M2 12a9 9 0 0 0 8 8"/><circle cx="2" cy="12" r="2"/>' },
         { href: 'communicate.html',     i18n: 'nav.communicate',     label: '远程通信',     svg: '<path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3Z"/><path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v3M8 22h8"/>' },
         { href: 'events.html',          i18n: 'nav.recordings',      label: '录像',      svg: '<path d="m22 8-6 4 6 4V8Z"/><rect width="14" height="12" x="2" y="6" rx="2"/>' },
+        { href: 'safekeep.html',        i18n: 'nav.safekeep',        label: '防冲锁存',    svg: '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="m9 12 2 2 4-4"/>' },
         // Parking Intelligence: sessions ("where did I park, what happened").
         { href: 'parking.html',         i18n: 'nav.parking',         label: '停车',         svg: '<rect x="3" y="3" width="18" height="18" rx="3"/><path d="M9 17V7h4a3 3 0 0 1 0 6H9"/>', svgExtra: 'stroke-linecap="round" stroke-linejoin="round"' },
 
@@ -66,6 +67,7 @@
         { href: 'seat-positions.html',  i18n: 'nav.seat_positions',  label: '座椅记忆',  svg: '<g transform="translate(0 24) scale(.025)"><path fill="currentColor" stroke="none" d="M560-160H320q-33 0-56.5-23.5T240-240v-400q0-17 11.5-28.5T280-680q17 0 28.5 11.5T320-640v400h240q17 0 28.5 11.5T600-200q0 17-11.5 28.5T560-160ZM460-720q-33 0-56.5-23.5T380-800q0-33 23.5-56.5T460-880q33 0 56.5 23.5T540-800q0 33-23.5 56.5T460-720Zm180 600v-160H440q-33 0-56.5-23.5T360-360v-220q0-42 29-71t71-29q42 0 71 29t29 71v180h80q33 0 56.5 23.5T720-320v200q0 17-11.5 28.5T680-80q-17 0-28.5-11.5T640-120Z"/></g>' },
         { href: 'automations.html',     i18n: 'nav.automations',     label: '自动化',     svg: '<rect width="8" height="8" x="3" y="3" rx="2"/><path d="M7 11v4a2 2 0 0 0 2 2h4"/><rect width="8" height="8" x="13" y="13" rx="2"/>' },
         { href: 'key-mapping.html',     i18n: 'nav.key_mapping',     label: '按键映射',     svg: '<rect width="20" height="14" x="2" y="5" rx="2"/><path d="M6 9h.01M10 9h.01M14 9h.01M18 9h.01M7 13h.01M17 13h.01M11 13h2"/>', svgExtra: 'stroke-linecap="round" stroke-linejoin="round"' },
+        { href: 'widgets.html',         i18n: 'nav.widgets',         label: '桌面微件',     svg: '<rect x="3" y="3" width="8" height="8" rx="2"/><rect x="13" y="3" width="8" height="8" rx="2"/><rect x="3" y="13" width="8" height="8" rx="2"/><rect x="13" y="13" width="8" height="8" rx="2"/>' },
 
         // ===== Integrations group ===== — mirrors the native Integrations
         // sub-page (Telegram, MQTT, BYD Cloud).

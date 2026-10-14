@@ -699,6 +699,20 @@
                 android:resource="@xml/accessibility_service_config" />
         </service>
 
+        <!-- Glass Widgets desktop overlay service -->
+        <service
+            android:name="com.overdrive.app.overlay.GlassWidgetsOverlayService"
+            android:foregroundServiceType="specialUse|dataSync"
+            android:exported="true"
+            android:permission="android.permission.DUMP" />
+
+        <!-- Parked surveillance impact sensor background service -->
+        <service
+            android:name="com.overdrive.app.surveillance.impact.ParkedImpactSensorService"
+            android:foregroundServiceType="specialUse|dataSync"
+            android:exported="true"
+            android:permission="android.permission.DUMP" />
+
         <!-- FileProvider for sharing video files -->
         <provider
             android:name="androidx.core.content.FileProvider"

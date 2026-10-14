@@ -2046,6 +2046,15 @@ public class VehicleControlApiHandler {
                 cmd = new VehicleCommandRouter.LightsCommand(enabled.booleanValue());
             } else if ("ambientColour".equals(target)) {
                 Integer value = jsonInteger(req, "value");
+                if (value == null && req.has("hex")) {
+                    String hex = jsonString(req, "hex");
+                    for (int i = 0; i < com.overdrive.app.byd.light.LightConstants.PALETTE_31.length; i++) {
+                        if (com.overdrive.app.byd.light.LightConstants.PALETTE_31[i].equalsIgnoreCase(hex)) {
+                            value = i + 1;
+                            break;
+                        }
+                    }
+                }
                 if (value == null || value.intValue() < 1 || value.intValue() > 31) {
                     response.put("success", false);
                     response.put("error", "ambientColour value must be 1-31");
@@ -2289,6 +2298,11 @@ public class VehicleControlApiHandler {
         try {
             JSONObject req = new JSONObject(body);
             String target = jsonString(req, "target");
+            if ("media_duck".equals(target)) {
+                JSONObject duckResp = MediaDuckControl.handleCommand(req);
+                HttpResponse.sendJson(out, duckResp.toString());
+                return;
+            }
             // Volume is an ABSOLUTE step index (0..stream max, ~40 for media on this head
             // unit — matching the car's own volume button), NOT a 0-100 percentage; its
             // upper bound is the real stream max, enforced by clamping in
