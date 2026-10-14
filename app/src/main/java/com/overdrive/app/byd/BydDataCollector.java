@@ -15160,6 +15160,37 @@ public class BydDataCollector {
         return DOOR_STATE_INVALID;
     }
 
+    public boolean isDriverDoorLocked() {
+        int s = readDoorLockState();
+        return s == DOOR_STATE_LOCK || s == DOOR_STATE_INVALID;
+    }
+
+    public boolean setAllDoorsLock(boolean lock) {
+        if (isDiLink5Vehicle() && doorLockDevice != null) {
+            try {
+                DiLink5DoorLockControl.ReflectivePort port = new DiLink5DoorLockControl.ReflectivePort(doorLockDevice);
+                DiLink5DoorLockControl.Result res = DiLink5DoorLockControl.execute(port, lock, () -> isTracking(), () -> true);
+                if (res != null && res.success) {
+                    return true;
+                }
+            } catch (Throwable t) {
+                logger.warn("DiLink5DoorLockControl failed: " + t.getMessage());
+            }
+        }
+        if (lock) {
+            return RemoteKeyControl.sendKey(context, RemoteKeyControl.CODE_LOCK);
+        } else {
+            boolean first = RemoteKeyControl.sendKeyDirect(context, RemoteKeyControl.CODE_UNLOCK);
+            try { Thread.sleep(500L); } catch (InterruptedException ignored) { Thread.currentThread().interrupt(); }
+            boolean second = RemoteKeyControl.sendKeyDirect(context, RemoteKeyControl.CODE_UNLOCK);
+            return first || second;
+        }
+    }
+
+    public Context getContext() {
+        return context;
+    }
+
     // UNLOCK-direction debounce for collectLockState, mirroring CameraDaemon's unlock poll:
     // the OTA getLFDoorLockState rail emits transient/bluff DOOR_STATE_UNLOCK reads on this
     // hardware, so a single one must NOT fire an "unlocked" automation. Require 2 consecutive

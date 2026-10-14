@@ -540,9 +540,10 @@ public class HttpServer {
             String method = parts[0];
             String path = parts[1];
             
-            // Extend timeout for slow BYD cloud API calls (login + verify can take 10-15s)
+            // Extend timeout for slow BYD cloud API calls (login + verify can take 10-15s) and remote-access long-poll
             if (path.startsWith("/api/bydcloud") || path.startsWith("/api/vehicle/lock") || 
-                path.startsWith("/api/vehicle/unlock") || path.startsWith("/api/vehicle/flash")) {
+                path.startsWith("/api/vehicle/unlock") || path.startsWith("/api/vehicle/flash") ||
+                path.startsWith("/api/remote-access/status")) {
                 client.setSoTimeout(60000);
             }
             
@@ -771,6 +772,10 @@ public class HttpServer {
             } else if (path.equals("/vehicle-control.html") || path.equals("/vehicle-control")) {
                 if (!serveStaticFile(out, "local/vehicle-control.html")) {
                     HttpResponse.sendError(out, 404, "vehicle-control.html not found");
+                }
+            } else if (path.equals("/remote-access.html") || path.equals("/remote-access")) {
+                if (!serveStaticFile(out, "local/remote-access.html")) {
+                    HttpResponse.sendError(out, 404, "remote-access.html not found");
                 }
             } else if (path.equals("/telegram.html") || path.equals("/telegram")) {
                 if (!serveStaticFile(out, "local/telegram.html")) {
@@ -1050,6 +1055,11 @@ public class HttpServer {
         // BYD Cloud API
         if (path.startsWith("/api/bydcloud")) {
             return BydCloudApiHandler.handle(method, path, body, out);
+        }
+
+        // Remote Access / Bluetooth Proximity API
+        if (path.startsWith("/api/remote-access")) {
+            return RemoteAccessApiHandler.handle(method, path, body, out);
         }
         
         // Streaming API

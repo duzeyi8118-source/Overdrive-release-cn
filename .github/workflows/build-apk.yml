@@ -56,7 +56,7 @@ jobs:
           KEY_PASSWORD: ${{ secrets.RELEASE_KEY_PASSWORD }}
         # assembleDebug: keeps debug flags (no R8 shrink) but now uses our fixed keystore
         # instead of the random per-runner debug keystore → consistent fingerprint every run.
-        run: ./gradlew assembleDebug -PoverdriveVersionName=49.9.17 -PoverdriveVersionCode=49917 -PoverdriveUpdateChannel=alpha --stacktrace --no-daemon
+        run: ./gradlew assembleDebug -PoverdriveVersionName=49.9.18 -PoverdriveVersionCode=49918 -PoverdriveUpdateChannel=alpha --stacktrace --no-daemon
 
       - name: Verify APK signature fingerprint
         run: |
@@ -79,7 +79,7 @@ jobs:
           mkdir -p release-assets
           APK_FILE=$(find app/build/outputs/apk -name "*.apk" | head -1)
           echo "Found built APK: $APK_FILE"
-          cp "$APK_FILE" release-assets/Overdrive-v49.9.17-cn-sec.apk
+          cp "$APK_FILE" release-assets/Overdrive-v49.9.18-cn-sec.apk
           ls -lh release-assets/
 
       - name: Upload APK Artifact
@@ -93,28 +93,28 @@ jobs:
         uses: softprops/action-gh-release@v2
         if: github.ref == 'refs/heads/main'
         with:
-          tag_name: v49.9.17-cn-sec
-          name: OverDrive v49.9.17 - 守护进程看门狗自愈、车端预约充电降级与稳定性加固
+          tag_name: v49.9.18-cn-sec
+          name: OverDrive v49.9.18 - 蓝牙靠近自动解闭锁、本地车控脱离云端与电池健康度展示
           body: |
-            ## OverDrive v49.9.17 定制版
+            ## OverDrive v49.9.18 定制版 (三大核心特性合入)
 
-            ### 🛡️ 守护进程看门狗死锁自愈与崩溃防御 (4b8672c7)
-            - **硬关机僵尸锁自愈**：车辆异常熄火断电后遗留的看门狗锁目录，在冷启动时自动校验 PID 存活性并强行抢占自愈，彻底根除守护进程假死不自启 Bug；
-            - **ROM 动态兼容**：消除无 `bmmcamera.jar` 的系统因类路径拼接导致的 `SIGABRT (exit 134)` 崩溃。
+            ### 📶 1. 蓝牙靠近自动解闭锁 (Proximity Access & 3D Radar)
+            - **无感蓝牙靠近解闭锁**：基于车机原生蓝牙对已配对手机进行 RSSI 空间信号测距，实现人到自动解锁、离车自动落锁；
+            - **双滞后区间滤波算法**：引入双时间滑动窗口与多重停留防抖（Dwell Time），彻底杜绝边缘信号波动导致的频繁反复误跳锁；
+            - **全功能控制面板与 3D 雷达**：挂载“靠近感知”独立管理面板，支持实时 3D 距离雷达、平滑信号曲线、学习模式（Dry-Run）及自定义距离校准；
+            - **全量地道简中本地化**：针对 `remote_access` 模块 88 个条目进行了高标准车机术语校准，杜绝机翻与英文遗漏。
 
-            ### ⚡ 车机本地预约充电降级闭环 (PR #311, #315, #319)
-            - **无网本地预约**：脱离云端依赖，通过底层 `setCarPlan` 和 BMS 状态验证在车机端独立实现智能预约充电；
-            - **BMS 状态恢复保障**：取消预约时若 BMS 仍停留在延迟状态，自动触发即时临时窗口激活高压充电。
+            ### 🚗 2. 本地车控全面脱离云端 (Local Deterrents & Controls)
+            - **毫秒级本地直控**：车门解锁、落锁、闪灯威慑与寻车指令升级为本地 SDK 优先（`SDK_FIRST`），彻底摆脱对比亚迪云端 API 的依赖；
+            - **全系车型三级自适应**：
+              - DiLink 5 原生平台：反射注入通过 `BYDAutoDoorLockDevice.setAllDoorsLock` 执行并进行双重读回确认；
+              - DiLink 3/4 全系车型：通过 OEM 底层系统服务直发 26 字节钥匙报文，无网状态亦可秒级直发；
+              - 备选通道：通过 `PermissiveContext` 绕过 Android 客户端权限检查直写特征码保底；
+            - **离线与断网可用**：车机无流量、无网络或云端凭据失效时，所有车控按钮保持可用且操作响应立即生效。
 
-            ### 🔋 仪表盘与配置数据容错修复 (PR #341)
-            - **浮点数字符串归一化**：自动兼容处理逗号与句点小数点，避免在特殊语言环境下电池容量无法保存。
-
-            ### 📨 驻车结束回车消息折行优化 (PR #332)
-            - **结构化通知卡片**：回到车上（Back-at-car）通知将驻车时长、哨兵事件数与能耗独立分行排版，提升可读性。
-
-            ### 🌐 隧道环境与代理优化 (69b27982, 6a0ed74c)
-            - **原生目录执行**：Cloudflared 二进制强制自 `nativeLibraryDir` 执行，规避部分存储分区 `noexec` 权限拦截；
-            - **代理探活严谨化**：改为基于 8119 端口真实监听状态探测，避免进程名误匹配导致死循环。
-          files: release-assets/Overdrive-v49.9.17-cn-sec.apk
+            ### 🔋 3. 动力电池健康度展示 (Battery SOH & Degradation Trend)
+            - **原生电池 SOH 读取**：采集底层 `STATISTIC_BATTERY_HEALTHY_INDEX` 特征值并在车辆状态、充电面板中实时展示；
+            - **长期电池衰减趋势**：本地数据库完整记录历史 SOH 变化并绘制趋势曲线图，直观掌握动力电池健康状态。
+          files: release-assets/Overdrive-v49.9.18-cn-sec.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

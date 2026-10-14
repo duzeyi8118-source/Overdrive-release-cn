@@ -1,6 +1,7 @@
 package com.overdrive.app.byd.routing;
 
 import com.overdrive.app.byd.BydDataCollector;
+import com.overdrive.app.byd.RemoteKeyControl;
 import com.overdrive.app.byd.BydVehicleData;
 import com.overdrive.app.byd.cloud.BydCloudClient;
 import com.overdrive.app.byd.cloud.BydCloudConfig;
@@ -435,58 +436,70 @@ public final class VehicleCommandRouter {
 
     public static final class LockCommand extends VehicleCommand {
         public String name() { return "lock"; }
-        public Capability cloudCapability() { return Capability.REQUIRED; }
-        public Capability sdkCapability() { return Capability.NONE; }
-        public RoutePreference defaultPreference() { return RoutePreference.CLOUD_ONLY; }
+        public Capability cloudCapability() { return Capability.AVAILABLE; }
+        public Capability sdkCapability() { return Capability.AVAILABLE; }
+        public RoutePreference defaultPreference() { return RoutePreference.SDK_FIRST; }
         public CloudOutcome executeViaCloud(BydCloudClient client, String vin) throws Exception {
             return remoteCommand(client, vin, "LOCKDOOR", null);
         }
+        public boolean executeViaSdk(BydDataCollector c) {
+            return c.setAllDoorsLock(true);
+        }
         public CloudCapabilities.Feature cloudFeature() { return CloudCapabilities.Feature.LOCK; }
-        public boolean requiresKnownCloudFeature() { return true; }
+        public boolean requiresKnownCloudFeature() { return false; }
         public MotionSafety motionSafety() { return MotionSafety.BLOCK_WHILE_MOVING; }
         public String motionSafetyGuardKey() { return DrivingSafetyGuard.GUARD_DOOR_LOCKS; }
     }
 
     public static final class UnlockCommand extends VehicleCommand {
         public String name() { return "unlock"; }
-        public Capability cloudCapability() { return Capability.REQUIRED; }
-        public Capability sdkCapability() { return Capability.NONE; }
-        public RoutePreference defaultPreference() { return RoutePreference.CLOUD_ONLY; }
+        public Capability cloudCapability() { return Capability.AVAILABLE; }
+        public Capability sdkCapability() { return Capability.AVAILABLE; }
+        public RoutePreference defaultPreference() { return RoutePreference.SDK_FIRST; }
         public CloudOutcome executeViaCloud(BydCloudClient client, String vin) throws Exception {
             return remoteCommand(client, vin, "OPENDOOR", null);
         }
+        public boolean executeViaSdk(BydDataCollector c) {
+            return c.setAllDoorsLock(false);
+        }
         public CloudCapabilities.Feature cloudFeature() { return CloudCapabilities.Feature.UNLOCK; }
-        public boolean requiresKnownCloudFeature() { return true; }
+        public boolean requiresKnownCloudFeature() { return false; }
         public MotionSafety motionSafety() { return MotionSafety.BLOCK_WHILE_MOVING; }
         public String motionSafetyGuardKey() { return DrivingSafetyGuard.GUARD_DOOR_LOCKS; }
     }
 
-    /** Horn + lights — BYD cloud only (no SDK FINDCAR primitive on this gen). */
+    /** Horn + lights — SDK direct rail preferred; BYD cloud fallback. */
     public static final class FindCarCommand extends VehicleCommand {
         public String name() { return "find-car"; }
-        public Capability cloudCapability() { return Capability.REQUIRED; }
-        public Capability sdkCapability() { return Capability.NONE; }
-        public RoutePreference defaultPreference() { return RoutePreference.CLOUD_ONLY; }
+        public Capability cloudCapability() { return Capability.AVAILABLE; }
+        public Capability sdkCapability() { return Capability.AVAILABLE; }
+        public RoutePreference defaultPreference() { return RoutePreference.SDK_FIRST; }
         public boolean isLatencySensitive() { return true; }
         public CloudOutcome executeViaCloud(BydCloudClient client, String vin) throws Exception {
             return remoteCommand(client, vin, "FINDCAR", null);
         }
+        public boolean executeViaSdk(BydDataCollector c) {
+            return RemoteKeyControl.sendKey(c.getContext(), RemoteKeyControl.CODE_FIND_CAR);
+        }
         public CloudCapabilities.Feature cloudFeature() { return CloudCapabilities.Feature.FIND_CAR; }
-        public boolean requiresKnownCloudFeature() { return true; }
+        public boolean requiresKnownCloudFeature() { return false; }
     }
 
-    /** Lights-only flash — BYD cloud only (no SDK flash primitive on this gen). */
+    /** Lights-only flash — SDK direct rail preferred; BYD cloud fallback. */
     public static final class FlashLightsCommand extends VehicleCommand {
         public String name() { return "flash"; }
-        public Capability cloudCapability() { return Capability.REQUIRED; }
-        public Capability sdkCapability() { return Capability.NONE; }
-        public RoutePreference defaultPreference() { return RoutePreference.CLOUD_ONLY; }
+        public Capability cloudCapability() { return Capability.AVAILABLE; }
+        public Capability sdkCapability() { return Capability.AVAILABLE; }
+        public RoutePreference defaultPreference() { return RoutePreference.SDK_FIRST; }
         public boolean isLatencySensitive() { return true; }
         public CloudOutcome executeViaCloud(BydCloudClient client, String vin) throws Exception {
             return remoteCommand(client, vin, "FLASHLIGHTNOWHISTLE", null);
         }
+        public boolean executeViaSdk(BydDataCollector c) {
+            return RemoteKeyControl.sendKey(c.getContext(), RemoteKeyControl.CODE_FLASH_LIGHTS);
+        }
         public CloudCapabilities.Feature cloudFeature() { return CloudCapabilities.Feature.FLASH_LIGHTS; }
-        public boolean requiresKnownCloudFeature() { return true; }
+        public boolean requiresKnownCloudFeature() { return false; }
     }
 
     public static final class ClimateOnCommand extends VehicleCommand {
