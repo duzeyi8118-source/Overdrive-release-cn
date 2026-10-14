@@ -205,7 +205,7 @@
                     <div class="card-header">
                         <div class="card-title">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="12" rx="2"/><line x1="8" y1="20" x2="16" y2="20"/><line x1="12" y1="16" x2="12" y2="20"/></svg>
-                            <span data-i18n="road_sense.map_cluster_title">集群预测</span>
+                            <span data-i18n="road_sense.map_cluster_title">仪表屏地图投屏</span>
                         </div>
                         <span class="status-badge inactive" id="rsClusterBadge" data-i18n="road_sense.map_cluster_off">关闭</span>
                     </div>
@@ -793,14 +793,14 @@
                              Driver-cluster target is selected — picks the OEM projection
                              surface that matches your cluster panel. -->
                         <div class="setting-row" id="bsClusterLayoutRow" style="display:none;"><div class="setting-info">
-                                <div class="setting-name" data-i18n="road_sense.bs_cluster_layout">集群布局</div>
+                                <div class="setting-name" data-i18n="road_sense.bs_cluster_layout">仪表屏布局</div>
                                 <div class="setting-desc" data-i18n="road_sense.bs_cluster_layout_desc">匹配你的液晶仪表盘尺寸。若投屏画面出现拉伸或裁剪，请尝试切换其他分辨率布局。</div>
                             </div>
                             <div class="setting-control">
                                 <select id="bsClusterLayout" class="text-input" onchange="RoadSenseSettings.bsSetClusterLayout(this.value)">
-                                    <option value="31" data-i18n="road_sense.bs_layout_1025">10.25”组</option>
-                                    <option value="30" data-i18n="road_sense.bs_layout_123">12.3” 组</option>
-                                    <option value="29" data-i18n="road_sense.bs_layout_88">8.8个群组</option>
+                                    <option value="31" data-i18n="road_sense.bs_layout_1025">10.25 英寸仪表屏</option>
+                                    <option value="30" data-i18n="road_sense.bs_layout_123">12.3 英寸仪表屏</option>
+                                    <option value="29" data-i18n="road_sense.bs_layout_88">8.8 英寸仪表屏</option>
                                 </select>
                             </div>
                         </div>
@@ -817,7 +817,7 @@
                             <div class="setting-control" style="display:flex;flex-wrap:wrap;">
                                 <button class="btn btn-secondary" id="bsCornerLTl" style="margin:0 8px 8px 0;" onclick="RoadSenseSettings.bsSetCorner('left', 'tl')" data-i18n="road_sense.bs_corner_tl">左上</button>
                                 <button class="btn btn-secondary" id="bsCornerLTr" style="margin:0 8px 8px 0;" onclick="RoadSenseSettings.bsSetCorner('left', 'tr')" data-i18n="road_sense.bs_corner_tr">右上</button>
-                                <button class="btn btn-secondary" id="bsCornerLBl" style="margin:0 8px 8px 0;" onclick="RoadSenseSettings.bsSetCorner('left', 'bl')" data-i18n="road_sense.bs_corner_bl">左下角</button>
+                                <button class="btn btn-secondary" id="bsCornerLBl" style="margin:0 8px 8px 0;" onclick="RoadSenseSettings.bsSetCorner('left', 'bl')" data-i18n="road_sense.bs_corner_bl">左下</button>
                                 <button class="btn btn-secondary" id="bsCornerLBr" style="margin:0 8px 8px 0;" onclick="RoadSenseSettings.bsSetCorner('left', 'br')" data-i18n="road_sense.bs_corner_br">右下</button>
                                 <button class="btn btn-secondary" id="bsCornerLCenter" style="margin:0 0 8px 0;" onclick="RoadSenseSettings.bsSetCorner('left', 'center')" data-i18n="road_sense.bs_corner_center">居中</button>
                             </div>
@@ -826,7 +826,7 @@
                             <div class="setting-control" style="display:flex;flex-wrap:wrap;">
                                 <button class="btn btn-secondary" id="bsCornerRTl" style="margin:0 8px 8px 0;" onclick="RoadSenseSettings.bsSetCorner('right', 'tl')" data-i18n="road_sense.bs_corner_tl">左上</button>
                                 <button class="btn btn-secondary" id="bsCornerRTr" style="margin:0 8px 8px 0;" onclick="RoadSenseSettings.bsSetCorner('right', 'tr')" data-i18n="road_sense.bs_corner_tr">右上</button>
-                                <button class="btn btn-secondary" id="bsCornerRBl" style="margin:0 8px 8px 0;" onclick="RoadSenseSettings.bsSetCorner('right', 'bl')" data-i18n="road_sense.bs_corner_bl">左下角</button>
+                                <button class="btn btn-secondary" id="bsCornerRBl" style="margin:0 8px 8px 0;" onclick="RoadSenseSettings.bsSetCorner('right', 'bl')" data-i18n="road_sense.bs_corner_bl">左下</button>
                                 <button class="btn btn-secondary" id="bsCornerRBr" style="margin:0 8px 8px 0;" onclick="RoadSenseSettings.bsSetCorner('right', 'br')" data-i18n="road_sense.bs_corner_br">右下</button>
                                 <button class="btn btn-secondary" id="bsCornerRCenter" style="margin:0 0 8px 0;" onclick="RoadSenseSettings.bsSetCorner('right', 'center')" data-i18n="road_sense.bs_corner_center">居中</button>
                             </div>

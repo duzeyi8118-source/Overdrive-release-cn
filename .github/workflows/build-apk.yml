@@ -77,8 +77,10 @@ jobs:
         run: |
           mkdir -p release-assets
           APK_FILE=$(find app/build/outputs/apk -name "*.apk" | head -1)
-          echo "Found built APK: $APK_FILE"
-          cp "$APK_FILE" release-assets/Overdrive-v49.9.22-cn-sec.apk
+          VERSION=$(grep 'versionName = ' app/build.gradle.kts | head -1 | sed -E 's/.*"([^"]+)".*/\1/')
+          echo "APP_VERSION=$VERSION" >> $GITHUB_ENV
+          echo "Found built APK ($VERSION): $APK_FILE"
+          cp "$APK_FILE" "release-assets/Overdrive-v${VERSION}-cn-sec.apk"
           ls -lh release-assets/
 
       - name: Upload APK Artifact
@@ -92,31 +94,30 @@ jobs:
         uses: softprops/action-gh-release@v2
         if: github.ref == 'refs/heads/main'
         with:
-          tag_name: v49.9.22-cn-sec
-          name: OverDrive v49.9.22 - 深度排查清理全库机翻与服务侧/原生层地毯式精校
+          tag_name: "v${{ env.APP_VERSION }}-cn-sec"
+          name: "OverDrive v${{ env.APP_VERSION }} - 全库车规级汉化深度精校与零闪烁优化"
           body: |
-            ## OverDrive v49.9.22 定制版 (全库地毯式复查精校)
+            ## OverDrive v${{ env.APP_VERSION }} 定制版 (车规级汉化深度精校)
 
-            ### 🇨🇳 1. 彻底清除服务侧与自动化规则荒谬机翻 (Server i18n & Automations)
-            - **动力总成与驾驶**：修正“驱动器和能量列车”为“驾驶与动力总成”、“驱动器模式”为“驾驶模式”；
-            - **空调进气与座舱**：修正“空中重新计算”为“空气内循环”、“重新计算”为“内循环”、“新鲜空气：”为“外循环”、“空中摄入量”为“进气模式”、“引导轮加热器”为“方向盘加热”、“小屋光”为“座舱阅读灯”、“仅限粉丝模式”为“纯通风模式”；
-            - **底盘与脚感**：修正“美福特”为“舒适”、“设置制动画功能”为“设置制动踏板脚感”；
-            - **主动安全与雷达**：修正“盲人点警告”为“盲区预警”、“设置后交叉流量警告”为“设置后方横向来车预警 (RCTA)”、“设置后台交叉流量制表”为“设置后方横向来车制动 (RCTB)”、“设置前台交叉流制图”为“设置前方横向来车制动 (FCTB)”、“设置紧急通道保持中”为“设置紧急车道保持 (ELKA)”、“设置通道助手”为“设置车道辅助”、“设置门打开警告”为“设置开门预警 (DOW)”、“设置前向碰撞警告”为“设置前向碰撞预警 (FCW)”。
+            ### 🇨🇳 1. 重大车规级术语纠偏
+            - **交流慢充电流纠偏**：修正充电设置中将 Alternating Current (AC) 误翻为“空调电流”与“强力制冷 (MAX A/C)”的严重错误，正确命名为“交流慢充电流”与“最大 (MAX)”；
+            - **仪表屏尺寸与投屏**：修正 RoadSense 盲区影像与导航中将 Instrument Cluster 误翻为“集群布局”、“集群预测”、“8.8个群组”等机翻，规范为“仪表屏布局”、“仪表屏地图投屏”、“8.8 英寸仪表屏”、“10.25 英寸仪表屏”、“12.3 英寸仪表屏”；
+            - **核心车控功能**：修正“电池热量”为标准车规“电池加热”。
 
-            ### 🔋 2. 深度精校 ABRP 遥测与通知系统 (ABRP & Notifications)
-            - **ABRP 核心术语重写**：修正“责任的状态”为“电池剩余电量 (SOC)”、“输入”为“上传次数”、“删除的标志”为“访问令牌已删除”、“现场电测”为“实时遥测”、“停车场”为“已驻车”、“开车”为“行驶中”、“快速充电DC”为“直流快充中”、“永远不会”为“从未”；
-            - **推送设置与设备管理**：修正“无名设备”为“未命名设备”、“最后见到的{time}”为“最近活跃于 {time}”、“永远不会”为“从未”，规范统一“仪表盘”。
+            ### 🛡️ 2. 全库弹窗与交互文案 100% 汉化
+            - **AI 事故取证包 (`events.js`)**：创建取证包提示、脱敏免责声明与操作按钮全量接入车规双语字典；
+            - **座椅通风悬浮提示 (`vehicle-control.js`)**：支持/不支持通风车型的悬浮气泡提示全面汉化；
+            - **语音助手与卡片 (`genai.js`)**：搜索结果卡片“查看详情”与结果截断说明汉化；
+            - **摄像头控制 (`utils.js`)**：停止/查看/录制动态按钮与占位提示汉化；
+            - **备份与恢复 (`backup-flow.js`)**：消除动态 DOM 插入时的全英文残留。
 
-            ### 📱 3. 蓝牙靠近感应解闭锁、防冲锁存与桌面微件动态汉化 (Proximity & Widgets)
-            - **靠近感应 (Remote Access)**：手机/实体钥匙 50+ 项状态原因、实时诊断、滤波时钟、雷达标题、落锁/解锁确认及标定提示全量实现地道中文本地化；
-            - **首屏直出与防抖**：修正 SafeKeep、Widgets、Telegram 页面中原本残留的英文兜底标签，实现 100% 零闪烁中文直出。
+            ### ⚡ 3. 首屏直出零闪烁 (Zero-FOUC) 与无障碍体验
+            - 彻底消除了 ABRP（“从未”、“共 0 条，失败 0 条”）、充电记录（“开始 → 结束”）、行程分析（“多开一段距离以计算”、“已存储 0 个行程”）、性能监控（“应用/系统/核”）等首屏未渲染前的英文字符串；
+            - 规范了仪表盘、摄像头选择器、密码/令牌显隐等各处 `aria-label` 与 `title` 属性。
 
-            ### 🔋 4. Android 原生层与 SOH 弹窗严谨校准 (Native Strings & SOH)
-            - **电池容量范围校准**：修正 Android 原生弹窗中“容量必须为15-120kWh”错误为“容量必须在 5 - 120 kWh 之间”，兼容混动 PHEV 小电池包；
-            - **实测帧与路况导航**：修正“电池包容量框架不匹配”为“电池包容量与实测帧不一致”、“关闭路由 - 重新计算…”为“偏离路线，正在重新规划…”。
-
-            ### 🛡️ 5. 门禁与兼容性 100% 达标
-            - 严格通过 `scripts/i18n_check.py` 门禁测试 (missing=0, stale=0, variant clean, 0 errors)。
-          files: release-assets/Overdrive-v49.9.22-cn-sec.apk
+            ### 🔒 4. 门禁验证与安全发布
+            - 严格通过 `scripts/i18n_check.py` 门禁（5190 个词条完全对称，0 errors，variant clean）；
+            - APK 采用独立车机永久密钥签名，安全防冲。
+          files: release-assets/*.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
