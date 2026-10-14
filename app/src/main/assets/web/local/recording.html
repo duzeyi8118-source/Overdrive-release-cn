@@ -55,7 +55,7 @@
             </div>
 
             <header class="page-header">
-                <h1 class="page-title" data-i18n="recording.page_title">录像设置</h1>
+                <h1 class="page-title" data-i18n="recording.page_title">行车录像</h1>
             </header>
 
             <div class="page-body">
@@ -109,7 +109,7 @@
                                         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>
                                     </span>
                                     <span class="mode-body">
-                                        <span class="mode-name" data-i18n="recording.mode_none_name">无（默认）</span>
+                                        <span class="mode-name" data-i18n="recording.mode_none_name">关闭</span>
                                         <span class="mode-desc" data-i18n="recording.mode_none_desc">关闭录像 — 最大程度节省电量与系统资源</span>
                                     </span>
                                     <span class="mode-radio" aria-hidden="true"></span>
@@ -123,8 +123,8 @@
                                         <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m22 8-6 4 6 4V8Z"/><rect width="14" height="12" x="2" y="6" rx="2"/><circle cx="9" cy="12" r="1.5" fill="currentColor"/></svg>
                                     </span>
                                     <span class="mode-body">
-                                        <span class="mode-name" data-i18n="recording.mode_continuous_name">连续</span>
-                                        <span class="mode-desc" data-i18n="recording.mode_continuous_desc">只要摄像头处于工作状态就持续录像</span>
+                                        <span class="mode-name" data-i18n="recording.mode_continuous_name">持续录像</span>
+                                        <span class="mode-desc" data-i18n="recording.mode_continuous_desc">只要摄像头工作就全程持续录像</span>
                                     </span>
                                     <span class="mode-radio" aria-hidden="true"></span>
                                 </div>
@@ -138,7 +138,7 @@
                                     </span>
                                     <span class="mode-body">
                                         <span class="mode-name" data-i18n="recording.mode_drive_name">仅行驶时录像</span>
-                                        <span class="mode-desc" data-i18n="recording.mode_drive_desc">仅在行驶时录像（D/R/S/M 挡）</span>
+                                        <span class="mode-desc" data-i18n="recording.mode_drive_desc">仅在挂挡行驶时录像（D/R/S/M 挡）</span>
                                     </span>
                                     <span class="mode-radio" aria-hidden="true"></span>
                                 </div>
@@ -221,12 +221,12 @@
                         <div class="setting-row">
                             <div class="setting-info">
                                 <div class="setting-name" data-i18n="recording.trigger_sensitivity">触发灵敏度</div>
-                                <div class="setting-desc" data-i18n="recording.trigger_sensitivity_desc">何时开始录制视频</div>
+                                <div class="setting-desc" data-i18n="recording.trigger_sensitivity_desc">雷达触发近距防护录像的距离阈值</div>
                             </div>
                             <div class="setting-control">
                                 <select class="select-input" id="triggerLevel" onchange="RecSettings.markDirty()">
-                                    <option value="RED" data-i18n="recording.trigger_red">🔴 仅靠近 (0-0.5m)</option>
-                                    <option value="YELLOW_RED" data-i18n="recording.trigger_yellow_red"> 平均+接近 (0-0.8m)</option>
+                                    <option value="RED" data-i18n="recording.trigger_red">🔴 仅近距离 (0-0.5m)</option>
+                                    <option value="YELLOW_RED" data-i18n="recording.trigger_yellow_red">🟡 中距 + 近距 (0-0.8m)</option>
                                 </select>
                             </div>
                         </div>
@@ -259,10 +259,10 @@
                                 <span class="timeline-label"><span data-i18n="recording.timeline_pre">事件前 (预录)</span> <span id="timelinePre">5s</span></span>
                             </div>
                             <div class="timeline-segment event">
-                                <span class="timeline-label" data-i18n="recording.timeline_event">️事件</span>
+                                <span class="timeline-label" data-i18n="recording.timeline_event">⚠️ 事件</span>
                             </div>
                             <div class="timeline-segment post">
-                                <span class="timeline-label"><span data-i18n="recording.timeline_post">POST</span> <span id="timelinePost">10s</span></span>
+                                <span class="timeline-label"><span data-i18n="recording.timeline_post">事件后 (延时)</span> <span id="timelinePost">10s</span></span>
                             </div>
                         </div>
                         <div class="info-box-note">
@@ -506,7 +506,7 @@
                                 <div class="setting-name">
                                     <span data-i18n="recording.codec">视频编码格式</span>
                                 </div>
-                                <div class="setting-desc" data-i18n="recording.codec_desc">H.265 产生50%较小的文件</div>
+                                <div class="setting-desc" data-i18n="recording.codec_desc">H.265 编码可节省约 50% 存储空间</div>
                             </div>
                             <div class="setting-control">
                                 <div class="btn-group" id="codecBtns">
@@ -810,7 +810,7 @@
                         <div class="info-box-warning" id="cdrRecommendBanner" style="display:none;">
                             <svg class="info-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
                             <div class="info-row" style="color:var(--warning);">
-                                <span class="label" data-i18n="recording.cdr_recommend_label_v2">建议</span>
+                                <span class="label" data-i18n="recording.cdr_recommend_label_v2">推荐</span>
                                 <span class="value" data-i18n="recording.cdr_recommend_text">OverDrive 正在使用 SD 卡——建议开启自动清理以确保存储空间充足</span>
                             </div>
                         </div>

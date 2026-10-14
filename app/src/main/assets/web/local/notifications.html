@@ -849,7 +849,7 @@
                             <div class="notif-row">
                                 <div class="notif-row-text">
                                     <div class="notif-row-label" data-i18n="notif.tyre_unit">胎压显示单位</div>
-                                    <div class="notif-row-note" data-i18n="notif.tyre_unit_note">仪表板和预警通知中胎压的呈现单位。下方限额均以 kPa 为基准。</div>
+                                    <div class="notif-row-note" data-i18n="notif.tyre_unit_note">仪表盘和预警通知中胎压的呈现单位。下方限额均以 kPa 为基准。</div>
                                 </div>
                                 <div class="notif-seg notif-seg-compact" id="tyreUnitSeg" role="radiogroup" aria-label="胎压显示单位">
                                     <button type="button" class="notif-seg-btn" data-unit="kpa" role="radio" aria-checked="false">kPa</button>
@@ -874,7 +874,7 @@
                             </div>
                             <div class="notif-row">
                                 <div class="notif-row-text">
-                                    <div class="notif-row-label" data-i18n="notif.tyre_rear">后方轴</div>
+                                    <div class="notif-row-label" data-i18n="notif.tyre_rear">后轴</div>
                                     <div class="notif-row-note" data-i18n="notif.tyre_axle_note">正常范围——最小值和最大值。</div>
                                     <div class="notif-row-conv" id="tyreRearConv">&nbsp;</div>
                                 </div>
@@ -911,7 +911,7 @@
                     <div class="notif-section" id="permissionSection" data-tab="push">
                         <h2 data-i18n="notif.push_delivery">推送</h2>
                         <p class="notif-section-sub" data-i18n="notif.push_delivery_sub">
-                            在当前使用的设备上启用提醒推送。每台安装了仪表板的手机都需要在此单独启用一次。
+                            在当前使用的设备上启用提醒推送。每台安装了仪表盘的手机都需要在此单独启用一次。
                         </p>
                         <!-- Origin + backend warnings are PUSH-ONLY: they
                              explain why the per-device push subscribe button
@@ -919,7 +919,7 @@
                              Telegram or Devices tabs (those have nothing to
                              do with the Web Push origin requirement). -->
                         <div id="originBanner" class="notif-status warn" style="display:none;margin-bottom:14px;" data-i18n="notif.origin_banner">
-                            推送通知需要 Zrok 或反向代理支持。Cloudflare 快速隧道每次重启都会变更地址，会导致所有推送订阅失效；Tailscale 以纯 HTTP 方式提供服务，除非配合反向代理，否则无法用于 Web Push。请先在手机上通过已预留的 Zrok 或反向代理地址打开仪表板，将其添加到主屏幕，然后返回此处启用。
+                            推送通知需要 Zrok 或反向代理支持。Cloudflare 快速隧道每次重启都会变更地址，会导致所有推送订阅失效；Tailscale 以纯 HTTP 方式提供服务，除非配合反向代理，否则无法用于 Web Push。请先在手机上通过已预留的 Zrok 或反向代理地址打开仪表盘，将其添加到主屏幕，然后返回此处启用。
                         </div>
                         <div id="backendBanner" class="notif-status warn" style="display:none;margin-bottom:14px;" data-i18n="notif.backend_banner">
                             推送通知后端尚未初始化。请在守护进程界面预留一个 Zrok 地址，然后重启守护进程以启用推送投递。
@@ -929,7 +929,7 @@
                                 <div id="permissionState" class="notif-permission-state"></div>
                                 <div class="notif-action-row">
                                     <button class="notif-btn" id="enableBtn" data-i18n="notif.enable_btn">在此设备上启用</button>
-                                    <button class="notif-btn" id="testBtn" data-i18n="notif.test_btn">发送测试</button>
+                                    <button class="notif-btn" id="testBtn" data-i18n="notif.test_btn">发送测试通知</button>
                                     <button class="notif-btn danger" id="disableBtn" style="display:none;" data-i18n="notif.disable_btn">在此设备上禁用</button>
                                 </div>
                             </div>
@@ -963,7 +963,7 @@
                                 <button type="button" class="notif-seg-btn" data-sev="warn" role="radio" aria-checked="false" data-i18n="notif.min_warn">警告及以上</button>
                                 <button type="button" class="notif-seg-btn" data-sev="critical" role="radio" aria-checked="false" data-i18n="notif.min_critical">仅严重故障</button>
                             </div>
-                            <div class="notif-seg-hint" id="minSeverityHint" data-i18n="notif.enable_first">首先启用该设备上的通知.</div>
+                            <div class="notif-seg-hint" id="minSeverityHint" data-i18n="notif.enable_first">请先在此设备上启用通知权限。</div>
                         </div>
                     </div>
 
@@ -1023,7 +1023,7 @@
                                             <span class="status-dot" style="background:#FFB75A;"></span>
                                             <span data-i18n="surveillance.tier_alert">警告</span>
                                         </div>
-                                        <div class="notif-row-note" data-i18n="surveillance.tier_alert_desc">接近的人或距离值得注意的车辆</div>
+                                        <div class="notif-row-note" data-i18n="surveillance.tier_alert_desc">人员靠近，或有车辆近距离经过</div>
                                     </div>
                                     <label class="toggle-switch">
                                         <input type="checkbox" id="wecomTierAlerts" onchange="WeComPrefs.save()">
@@ -1036,7 +1036,7 @@
                                             <span class="status-dot" style="background:#FF6B6B;"></span>
                                             <span data-i18n="surveillance.tier_critical">紧急</span>
                                         </div>
-                                        <div class="notif-row-note" data-i18n="surveillance.tier_critical_desc">极近距离的人 — 可能的篡改 / 徘徊</div>
+                                        <div class="notif-row-note" data-i18n="surveillance.tier_critical_desc">极近距离人员 — 疑似触碰车辆或长时间徘徊</div>
                                     </div>
                                     <label class="toggle-switch">
                                         <input type="checkbox" id="wecomTierCritical" onchange="WeComPrefs.save()">
@@ -1159,7 +1159,7 @@
                                             <span class="status-dot" style="background:#FFB75A;"></span>
                                             <span data-i18n="surveillance.tier_alert">警告</span>
                                         </div>
-                                        <div class="notif-row-note" data-i18n="surveillance.tier_alert_desc">接近的人或距离值得注意的车辆</div>
+                                        <div class="notif-row-note" data-i18n="surveillance.tier_alert_desc">人员靠近，或有车辆近距离经过</div>
                                     </div>
                                     <label class="toggle-switch">
                                         <input type="checkbox" id="v2TelegramAlerts" disabled onchange="SurvSettings.updateTelegramTiers()">
@@ -1172,7 +1172,7 @@
                                             <span class="status-dot" style="background:#FF6B6B;"></span>
                                             <span data-i18n="surveillance.tier_critical">紧急</span>
                                         </div>
-                                        <div class="notif-row-note" data-i18n="surveillance.tier_critical_desc">极近距离的人 — 可能的篡改 / 徘徊</div>
+                                        <div class="notif-row-note" data-i18n="surveillance.tier_critical_desc">极近距离人员 — 疑似触碰车辆或长时间徘徊</div>
                                     </div>
                                     <label class="toggle-switch">
                                         <input type="checkbox" id="v2TelegramCritical" disabled onchange="SurvSettings.updateTelegramTiers()">
@@ -1239,7 +1239,7 @@
                                  and battery-health messages. -->
                             <div class="notif-row">
                                 <div class="notif-row-text">
-                                    <div class="notif-row-label" data-i18n="telegram.tyre_alerts">轮胎压力警报</div>
+                                    <div class="notif-row-label" data-i18n="telegram.tyre_alerts">胎压报警通知</div>
                                     <div class="notif-row-note" data-i18n="telegram.tyre_alerts_desc">当轮胎胎压超出设置范围或 TPMS 报告漏气时发送 Telegram 告警消息。基于胎压限制中的阈值判定。</div>
                                 </div>
                                 <label class="toggle-switch">
@@ -1271,7 +1271,7 @@
                             每台启用过推送通知的手机都会显示在此处。点击“移除”即可注销该设备。上方针对本设备的停用开关只会在本地取消当前浏览器的订阅，而“移除”仅作用于服务端。
                         </p>
                         <div class="notif-card" id="devicesCard">
-                            <div class="empty-state" id="devicesEmpty" data-i18n="notif.no_devices">目前还没有任何设备登记.</div>
+                            <div class="empty-state" id="devicesEmpty" data-i18n="notif.no_devices">暂无已注册设备。</div>
                         </div>
                     </div>
                 </div>

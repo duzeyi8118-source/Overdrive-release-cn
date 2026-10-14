@@ -1444,7 +1444,7 @@
                                         <span id="costPerKmUnit" style="font-size:12px;color:var(--text-muted);margin-top:2px;">/km</span>
                                     </div>
                                 </div>
-                                <div id="costPerKwhInfo" style="font-size:12px;color:var(--text-muted);text-align:center;" data-i18n="trip.card.drive_more_to_calc">多开一段距离以计算</div>
+                                <div id="costPerKwhInfo" style="font-size:12px;color:var(--text-muted);text-align:center;" data-i18n="trip.card.drive_more_to_calc">累计更多行程数据后自动计算</div>
                                 <div id="costFormulaCapsule" class="cost-formula-capsule" style="display:none;"></div>
                             </div>
                         </div>
@@ -1940,9 +1940,9 @@
                         </div>
                         <div id="tripMap"></div>
                         <div class="map-speed-legend">
-                            <span><span class="legend-dot" style="background:var(--success)"></span> <span id="routeSpeedLow" data-i18n="trip.route.speed_low">&lt;40 km/h</span></span>
+                            <span><span class="legend-dot" style="background:var(--success)"></span> <span id="routeSpeedLow" data-i18n="trip.route.speed_low"><40 km/h</span></span>
                             <span><span class="legend-dot" style="background:var(--warning)"></span> <span id="routeSpeedMid" data-i18n="trip.route.speed_mid">40–80 km/h</span></span>
-                            <span><span class="legend-dot" style="background:var(--danger)"></span> <span id="routeSpeedHigh" data-i18n="trip.route.speed_high">&gt;80 km/h</span></span>
+                            <span><span class="legend-dot" style="background:var(--danger)"></span> <span id="routeSpeedHigh" data-i18n="trip.route.speed_high">>80 km/h</span></span>
                         </div>
                     </div>
 
@@ -1979,9 +1979,9 @@
                             <canvas id="speedHistogram"></canvas>
                         </div>
                         <div class="speed-hist-legend">
-                            <span><span class="legend-dot" style="background:var(--warning);width:8px;height:8px;border-radius:50%;display:inline-block"></span> <span id="speedDistLow" data-i18n="trip.speed_dist.low">低速 (&lt;40 km/h)</span></span>
+                            <span><span class="legend-dot" style="background:var(--warning);width:8px;height:8px;border-radius:50%;display:inline-block"></span> <span id="speedDistLow" data-i18n="trip.speed_dist.low">低速 (<40 km/h)</span></span>
                             <span><span class="legend-dot" style="background:var(--success);width:8px;height:8px;border-radius:50%;display:inline-block"></span> <span id="speedDistNormal" data-i18n="trip.speed_dist.normal">中速 (40-80 km/h)</span></span>
-                            <span><span class="legend-dot" style="background:var(--danger);width:8px;height:8px;border-radius:50%;display:inline-block"></span> <span id="speedDistHigh" data-i18n="trip.speed_dist.high">高速 (&gt;80 km/h)</span></span>
+                            <span><span class="legend-dot" style="background:var(--danger);width:8px;height:8px;border-radius:50%;display:inline-block"></span> <span id="speedDistHigh" data-i18n="trip.speed_dist.high">高速 (>80 km/h)</span></span>
                         </div>
                         <div class="speed-hist-summary" id="speedHistSummary"></div>
                     </div>

@@ -33,10 +33,10 @@ var RemoteAccess = (function () {
         var extraAge = state.bluetoothReceivedAt ? Math.max(0, Date.now() - state.bluetoothReceivedAt) : 0;
         var value = window.BYD && BYD.utils && BYD.utils.bluetoothStatus
             ? BYD.utils.bluetoothStatus(state.bluetooth, extraAge, state.bluetoothTransportStale)
-            : { state: 'unknown', label: 'Unknown', detail: 'Waiting for car Bluetooth status' };
+            : { state: 'unknown', label: tr('common_unknown', '未知'), detail: tr('bt_waiting_status', '等待车机蓝牙状态') };
         text('raBluetoothState', value.label);
         node.setAttribute('data-state', value.state);
-        node.setAttribute('aria-label', 'Car Bluetooth: ' + value.label + '. ' + value.detail);
+        node.setAttribute('aria-label', tr('bt_aria_fmt', '车载蓝牙：{label}。{detail}', { label: value.label, detail: value.detail }));
         node.title = value.detail;
     }
     function updateBluetoothStatus(radio, transportStale) {
@@ -70,9 +70,15 @@ var RemoteAccess = (function () {
         if (!finite(value)) return '—';
         return String(Math.round(value * 10) / 10).replace('-', '−');
     }
-    function tr(key, fallback) {
-        var value = window.BYD && BYD.i18n ? BYD.i18n.t('remote_access.' + key) : null;
-        return !value || value === 'remote_access.' + key ? fallback : value;
+    function tr(key, fallback, vars) {
+        var value = window.BYD && BYD.i18n ? BYD.i18n.t('remote_access.' + key, vars) : null;
+        if (!value || value === 'remote_access.' + key) {
+            value = fallback;
+            if (vars && typeof value === 'string') {
+                for (var k in vars) if (Object.prototype.hasOwnProperty.call(vars, k)) value = value.split('{' + k + '}').join(String(vars[k]));
+            }
+        }
+        return value;
     }
     function error(message) {
         text('raError', message || '');
@@ -149,8 +155,8 @@ var RemoteAccess = (function () {
         state.phones.forEach(function (device) {
             var option = document.createElement('option');
             option.value = device.address || '';
-            option.textContent = (device.name || 'Approved phone') + ' · ' + (device.address || '').slice(-5) +
-                (device.enabled === false ? ' · Disabled' : '');
+            option.textContent = (device.name || tr('approved_phone_fallback', '已授权手机')) + ' · ' + (device.address || '').slice(-5) +
+                (device.enabled === false ? ' · ' + tr('status_disabled', '已禁用') : '');
             if (option.value.toUpperCase() === String(wanted).toUpperCase()) { matched = true; wanted = option.value; }
             select.appendChild(option);
         });
@@ -164,7 +170,7 @@ var RemoteAccess = (function () {
         state.devices.forEach(function (device) {
             if (!device.address || profileFor(device.address)) return;
             var item = document.createElement('option'); item.value = device.address;
-            item.textContent = (device.name || 'Paired device') + ' · ' + device.address.slice(-5);
+            item.textContent = (device.name || tr('paired_device_fallback', '已配对设备')) + ' · ' + device.address.slice(-5);
             add.appendChild(item);
         });
         add.value = addWanted;
@@ -231,8 +237,8 @@ var RemoteAccess = (function () {
         var advanced = el('raAdvancedMode').checked;
         el('remoteAccessPage').classList.toggle('ra-advanced-mode', advanced);
         text('raCalibrationDetail', advanced && !(state.config && state.config.advancedMode) ?
-            'Save Advanced mode before capturing your phone signal.' :
-            'Captures fill this phone\'s draft thresholds. Edit them as needed, then Save rules.');
+            tr('calib_save_adv_first', '采集手机信号前请先保存高级模式。') :
+            tr('calib_draft_hint', '采集将填入当前手机的草稿门限。可根据需要微调，随后点击保存规则。'));
     }
     function toggleAdvanced() {
         var advanced = el('raAdvancedMode').checked;
@@ -290,26 +296,28 @@ var RemoteAccess = (function () {
         state.phones.forEach(function (profile) {
             var row = document.createElement('div'); row.className = 'ra-roster-row' + (profile.address === state.viewAddress ? ' is-selected' : '');
             var name = document.createElement('button'); name.type = 'button'; name.className = 'ra-roster-name'; name.disabled = state.saving;
-            var title = document.createElement('strong'); title.textContent = profile.name || 'Approved phone';
+            var fallbackPhoneName = tr('approved_phone_fallback', '已授权手机');
+            var title = document.createElement('strong'); title.textContent = profile.name || fallbackPhoneName;
             var signal = signalFor(profile.address);
             var detail = document.createElement('span');
             var age = estimatedAge(signal);
-            detail.textContent = !profile.enabled ? 'Disabled' : !state.enabled ? 'Monitoring off' :
-                signal.reason === 'save_phone_first' ? 'Save to start monitoring' :
-                !signal.connected ? 'Disconnected / awaiting connection' :
-                age === null || age > (state.config && state.config.staleMs || 5000) ? 'Unknown · reading unavailable' :
-                String(signal.state || 'UNKNOWN').toLowerCase() +
-                    (el('raAdvancedMode').checked ? ' · ' + signalText(signal.filteredRssi) + ' RSSI' : '');
+            var stateLabel = String(signal.state || '').toUpperCase() === 'NEAR' ? tr('status_nearby', '靠近') :
+                String(signal.state || '').toUpperCase() === 'AWAY' ? tr('status_away', '远离') : tr('common_unknown', '未知');
+            detail.textContent = !profile.enabled ? tr('status_disabled', '已禁用') : !state.enabled ? tr('monitoring_off', '监听已关闭') :
+                signal.reason === 'save_phone_first' ? tr('reason_save_phone_first', '请先保存以开始监听') :
+                !signal.connected ? tr('reason_disconnected', '已断开 / 等待连接') :
+                age === null || age > (state.config && state.config.staleMs || 5000) ? tr('reading_expired', '未知 · 信号读数不可用') :
+                stateLabel + (el('raAdvancedMode').checked ? ' · ' + signalText(signal.filteredRssi) + ' RSSI' : '');
             name.appendChild(title); name.appendChild(detail); name.addEventListener('click', function () { selectPhone(profile.address); });
             var toggle = document.createElement('label'); toggle.className = 'ra-switch';
             var input = document.createElement('input'); input.type = 'checkbox'; input.checked = profile.enabled; input.disabled = state.saving;
-            input.setAttribute('aria-label', 'Enable ' + (profile.name || 'approved phone'));
+            input.setAttribute('aria-label', tr('enable_phone_fmt', '启用 {name}', { name: profile.name || fallbackPhoneName }));
             var track = document.createElement('span'); track.className = 'ra-switch-track';
             var thumb = document.createElement('span'); thumb.className = 'ra-switch-thumb'; track.appendChild(thumb);
             input.addEventListener('change', function () { profile.enabled = input.checked; markDirty(); renderRoster(); });
             toggle.appendChild(input); toggle.appendChild(track);
             var remove = document.createElement('button'); remove.type = 'button'; remove.className = 'ra-roster-remove'; remove.textContent = '×'; remove.disabled = state.saving;
-            remove.setAttribute('aria-label', 'Remove ' + (profile.name || 'approved phone'));
+            remove.setAttribute('aria-label', tr('remove_phone_fmt', '移除 {name}', { name: profile.name || fallbackPhoneName }));
             remove.addEventListener('click', function () {
                 storeProfileThresholds();
                 state.phones = state.phones.filter(function (item) { return item.address !== profile.address; });
@@ -363,21 +371,21 @@ var RemoteAccess = (function () {
         }
         ['raNearThreshold', 'raAwayThreshold', 'raMedianSeconds', 'raDwellSeconds',
             'raNearWindowSeconds', 'raNearDwellSeconds', 'raCooldownSeconds'].forEach(function (id) {
-            if (el(id).value.trim() === '') throw new Error('Enter all signal and timing values.');
+            if (el(id).value.trim() === '') throw new Error(tr('err_enter_all_values', '请填写所有信号与时间门限参数。'));
         });
-        if (config.enabled && !config.keyFobEnabled && !config.phones.some(function (profile) { return profile.enabled; })) throw new Error('Enable keyfob detection or add and enable an approved phone before enabling proximity access.');
+        if (config.enabled && !config.keyFobEnabled && !config.phones.some(function (profile) { return profile.enabled; })) throw new Error(tr('err_enable_source_first', '在开启靠近感知前，请至少启用车钥匙感应或添加并启用一部授权手机。'));
         config.phones.forEach(function (profile) {
             if (!finite(profile.nearThreshold) || !finite(profile.awayThreshold) ||
                 Math.floor(profile.nearThreshold) !== profile.nearThreshold || Math.floor(profile.awayThreshold) !== profile.awayThreshold ||
                 profile.nearThreshold < -127 || profile.nearThreshold > 20 || profile.awayThreshold < -127 || profile.awayThreshold > 20 ||
-                profile.nearThreshold <= profile.awayThreshold) throw new Error('Check the saved signal thresholds for ' + (profile.name || 'each approved phone') + '. Nearby must be higher than away, within −127 to 20.');
+                profile.nearThreshold <= profile.awayThreshold) throw new Error(tr('err_threshold_order_phone', '请检查手机“{name}”的信号门限：靠近门限必须大于远离门限。', { name: profile.name || tr('approved_phone_fallback', '已授权手机') }));
         });
         if (!finite(config.nearThreshold) || !finite(config.awayThreshold) ||
             Math.floor(config.nearThreshold) !== config.nearThreshold || Math.floor(config.awayThreshold) !== config.awayThreshold ||
             config.nearThreshold < -127 || config.nearThreshold > 20 || config.awayThreshold < -127 || config.awayThreshold > 20) {
-            throw new Error('Signal thresholds must be whole numbers between −127 and 20.');
+            throw new Error(tr('err_threshold_range', '信号门限必须为 -127 至 20 之间的整数。'));
         }
-        if (config.nearThreshold <= config.awayThreshold) throw new Error('Nearby threshold must be higher than the away threshold.');
+        if (config.nearThreshold <= config.awayThreshold) throw new Error(tr('err_threshold_order', '靠近门限必须大于远离门限。'));
         if (!finite(config.windowMs) || config.windowMs < 4000 || config.windowMs > 60000 ||
             !finite(config.dwellMs) || config.dwellMs < 2000 || config.dwellMs > 30000 ||
             !finite(config.nearWindowMs) || config.nearWindowMs < 4000 || config.nearWindowMs > 60000 ||
@@ -633,7 +641,7 @@ var RemoteAccess = (function () {
             String(view.fob.sourceStatus).replace(/_/g, ' ') : '—');
         var lockDraft = el('raKeyFobEnabled').checked && el('raKeyFobLockEnabled').checked;
         el('raKeyFobDepartureRow').hidden = !lockDraft;
-        text('raKeyFobDeparture', !supports('keyFob') || !supports('keyFobLock') ? 'Unsupported on this car' :
+        text('raKeyFobDeparture', !supports('keyFob') || !supports('keyFobLock') ? tr('unsupported_car', '当前车型不支持') :
             !state.config || state.config.keyFobLockEnabled !== true ?
             tr('keyfob_lock_save_first', '请保存规则以应用') : !state.enabled ?
                 tr('keyfob_monitoring_off', '监听已关闭') : view.active && view.fob.departureKnown === true ?
@@ -668,7 +676,7 @@ var RemoteAccess = (function () {
                 age > (state.config && state.config.staleMs || 5000) ||
                 !finite(signal.timestampMs) || !finite(signal.rawRssi) || !finite(signal.filteredRssi) ||
                 (signal.sampleCount || 0) < 3) return;
-            var slot = slots[index], name = String(phone.name || signal.deviceName || 'Phone ' + (index + 1));
+            var slot = slots[index], name = String(phone.name || signal.deviceName || tr('phone_n_fmt', '手机 {n}', { n: index + 1 }));
             var shortName = name.replace(/\s+/g, ' ').trim();
             if (shortName.length > 9) shortName = shortName.slice(0, 8) + '…';
             var marker = svgNode('g', { 'class': 'ra-phone-marker', role: 'img',
@@ -972,7 +980,7 @@ var RemoteAccess = (function () {
         el('raFastUnlockDefaults').disabled = state.saving;
         updateUnlockTrigger();
         el('remoteAccessPage').classList.toggle('ra-enabled', state.enabled);
-        text('raMasterBadge', state.enabled ? 'Enabled' : data.runtime && data.runtime.cleanupPending ? 'Cleanup pending' : 'Disabled');
+        text('raMasterBadge', state.enabled ? tr('status_enabled', '已开启') : data.runtime && data.runtime.cleanupPending ? tr('status_cleanup', '正在退出…') : tr('status_disabled', '已关闭'));
         el('raMasterBadge').className = 'ra-badge' + (state.enabled ? ' is-on' : '');
         appendSample(currentSignal());
         renderSignal(); drawChart(); renderEvents(data.events); renderLock(data.lastAction);
@@ -1113,7 +1121,7 @@ var RemoteAccess = (function () {
         if (state.liveRequest) { var request = state.liveRequest; state.liveRequest = null; request.abort(); }
         if (!state.enabled || !visible()) disposeVehiclePreview();
         if (!visible()) abortVehicleArt();
-        setStreamLabel(state.enabled ? 'Live view paused' : 'Monitoring off', false);
+        setStreamLabel(state.enabled ? tr('stream_paused', '实时画面已暂停') : tr('monitoring_off', '监听已关闭'), false);
         renderPhoneMarkers();
         renderKeyFobMarker();
     }
@@ -1146,11 +1154,11 @@ var RemoteAccess = (function () {
             if (state.liveRequest === request) state.liveRequest = null;
             if (generation !== state.generation || !isLive()) return;
             if (success) {
-                state.failures = 0; setStreamLabel('Live', true);
+                state.failures = 0; setStreamLabel(tr('stream_live', '实时'), true);
                 schedulePoll(250, generation);
             } else {
                 state.failures++;
-                setStreamLabel('Reconnecting', false);
+                setStreamLabel(tr('stream_reconnecting', '正在重新连接…'), false);
                 renderSignal();
                 schedulePoll(Math.min(10000, 1500 * state.failures), generation);
             }
@@ -1183,7 +1191,7 @@ var RemoteAccess = (function () {
             if (mutation === state.mutation) acceptStatus(data, !state.dirty);
         }).catch(function (err) {
             if (mutation !== state.mutation) return;
-            error(err.message); setStreamLabel('Status unavailable', false);
+            error(err.message); setStreamLabel(tr('stream_unavailable', '状态不可用'), false);
         });
     }
     function refreshAll() {

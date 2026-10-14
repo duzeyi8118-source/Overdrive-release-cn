@@ -83,7 +83,7 @@
                             <ol class="recommend-steps">
                                 <li data-i18n="byd_cloud.recommend_step_1">在手机上打开比亚迪官方 App。</li>
                                 <li data-i18n="byd_cloud.recommend_step_2">进入车辆授权。</li>
-                                <li data-i18n="byd_cloud.recommend_step_3">按新授权.</li>
+                                <li data-i18n="byd_cloud.recommend_step_3">点击「新增授权」</li>
                                 <li data-i18n="byd_cloud.recommend_step_4">输入备用邮箱——必须与主账户邮箱不同。</li>
                                 <li data-i18n="byd_cloud.recommend_step_5">选择与你希望该授权文件保持有效时长相匹配的授权期限。</li>
                                 <li data-i18n="byd_cloud.recommend_step_6">退出 BYD App 登录，然后使用备用邮箱并通过验证码注册，设置好密码。</li>
@@ -118,7 +118,7 @@
                                     <option value="jp" data-i18n="surveillance.byd_region_jp">日本</option>
                                     <option value="kr" data-i18n="surveillance.byd_region_kr">韩国</option>
                                     <option value="sa" data-i18n="surveillance.byd_region_sa">沙特阿拉伯</option>
-                                    <option value="om" data-i18n="surveillance.byd_region_om">🇴🇲 奥曼</option>
+                                    <option value="om" data-i18n="surveillance.byd_region_om">🇴🇲 阿曼</option>
                                     <option value="kz" data-i18n="surveillance.byd_region_kz">🇰🇿 哈萨克斯坦</option>
                                     <option value="tr" data-i18n="surveillance.byd_region_tr">🇹🇷 土耳其</option>
                                     <option value="mx" data-i18n="surveillance.byd_region_mx">墨西哥</option>
@@ -133,7 +133,7 @@
                                     <!-- China uses BYD's separate mainland DiLink stack
                                          (WBSK transport + /app/auth/* endpoints,
                                          dilinksuperappserver-cn.byd.auto). -->
-                                    <option value="cn" data-i18n="surveillance.byd_region_cn">中国：中国（大陆）</option>
+                                    <option value="cn" data-i18n="surveillance.byd_region_cn">🇨🇳 中国大陆</option>
                                 </select>
                                 <label class="md-label" for="bydRegion" data-i18n="surveillance.byd_region">服务器区域</label>
                             </div>
@@ -238,8 +238,8 @@
                         <div id="bydCloudMergeSection">
                             <div class="setting-row" style="border-bottom:none;">
                                 <div class="setting-info">
-                                    <div class="setting-name" data-i18n="surveillance.byd_cloud_merge">使用云为车辆数据</div>
-                                    <div class="setting-desc" data-i18n="surveillance.byd_cloud_merge_desc">SOC,充电和气温从 BYD 云可能更准确地停车时</div>
+                                    <div class="setting-name" data-i18n="surveillance.byd_cloud_merge">使用云端车辆数据</div>
+                                    <div class="setting-desc" data-i18n="surveillance.byd_cloud_merge_desc">驻车时从比亚迪云端同步电量、充电与温度数据</div>
                                 </div>
                                 <div class="setting-control">
                                     <label class="toggle-switch">
@@ -265,7 +265,7 @@
                             <div class="setting-hint" style="margin-bottom:14px;" data-i18n="byd_cloud.clear_hint">从本机清除已保存的凭据。之后需重新输入比亚迪 App 账号密码及车控 PIN 码方可再次使用云端车控指令。</div>
                             <button class="btn btn-danger" onclick="BydCloud.clearCredentials()" style="width:100%;">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="width:16px;height:16px;"><path d="M3 6h18"/><path d="M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6"/><path d="M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2"/></svg>
-                                <span data-i18n="surveillance.byd_clear">清晰的证书</span>
+                                <span data-i18n="surveillance.byd_clear">清除凭据</span>
                             </button>
                         </div>
                     </div>

@@ -31,7 +31,9 @@
     "network_title": "Network & Hotspot - OverDrive",
     "communicate_title": "Communicate - OverDrive",
     "assistant_title": "Assistant - OverDrive",
-    "parking_title": "Parking - OverDrive"
+    "parking_title": "Parking - OverDrive",
+    "safekeep_title": "SafeKeep - OverDrive",
+    "widgets_title": "Glass Widgets - OverDrive"
   },
   "nav": {
     "dashboard": "Dashboard",
@@ -4870,7 +4872,27 @@
     "kf_reason_waiting_signal": "Waiting for a fresh vehicle keyfob event.",
     "kf_reason_waiting_fresh": "Listening for the next fresh keyfob event.",
     "kf_reason_event_stale": "The last keyfob event expired. Waiting for a fresh event.",
-    "kf_reason_unknown_event": "The vehicle event does not report keyfob presence."
+    "kf_reason_unknown_event": "The vehicle event does not report keyfob presence.",
+    "approved_phone_fallback": "Approved phone",
+    "paired_device_fallback": "Paired device",
+    "calib_save_adv_first": "Save Advanced mode before capturing your phone signal.",
+    "calib_draft_hint": "Captures fill this phone's draft thresholds. Edit them as needed, then Save rules.",
+    "bt_waiting_status": "Waiting for car Bluetooth status",
+    "bt_aria_fmt": "Car Bluetooth: {label}. {detail}",
+    "stream_paused": "Live view paused",
+    "stream_reconnecting": "Reconnecting…",
+    "stream_unavailable": "Status unavailable",
+    "err_enter_all_values": "Enter all signal and timing values.",
+    "err_enable_source_first": "Enable keyfob detection or add and enable an approved phone before enabling proximity access.",
+    "err_threshold_order_phone": "Check the saved signal thresholds for {name}. The nearby threshold must be higher than the away threshold.",
+    "err_threshold_order": "Nearby threshold must be higher than the away threshold.",
+    "unsupported_car": "Unsupported on this car",
+    "phone_n_fmt": "Phone {n}",
+    "enable_phone_fmt": "Enable {name}",
+    "remove_phone_fmt": "Remove {name}",
+    "status_cleanup": "Cleanup pending",
+    "stream_live": "Live",
+    "err_threshold_range": "Signal thresholds must be whole numbers between −127 and 20."
   },
   "widgets": {
     "page_title": "Widgets",
@@ -5384,7 +5406,14 @@
     "tab_storage": "Storage",
     "tab_backup": "What & when",
     "tab_limits": "Limits",
-    "tab_activity": "Activity"
+    "tab_activity": "Activity",
+    "power_off": "Off",
+    "power_acc": "Accessory",
+    "power_on": "On",
+    "charging_on": "Charging",
+    "charging_off": "Not charging",
+    "wifi_connected": "Connected",
+    "wifi_disconnected": "Disconnected"
   },
   "assistant": {
     "open_details": "Open details",

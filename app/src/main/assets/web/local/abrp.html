@@ -78,7 +78,7 @@
             </div>
 
             <header class="page-header">
-                <h1 class="page-title" data-i18n="abrp.page_title">ABRP 电测仪</h1>
+                <h1 class="page-title" data-i18n="abrp.page_title">ABRP 路线规划与遥测</h1>
                 <div class="header-actions">
                     <div class="header-badge">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
@@ -101,7 +101,7 @@
                         <div style="display:flex;align-items:center;gap:16px;margin-bottom:16px;">
                             <div style="flex:1;">
                                 <div style="font-size:36px;font-weight:700;font-family:'JetBrains Mono',monospace;color:var(--text-primary);line-height:1;" id="vehicleSoc">--%</div>
-                                <div style="font-size:12px;color:var(--text-secondary);margin-top:4px;" data-i18n="abrp.state_of_charge">责任的状态</div>
+                                <div style="font-size:12px;color:var(--text-secondary);margin-top:4px;" data-i18n="abrp.state_of_charge">电池剩余电量 (SOC)</div>
                             </div>
                             <div style="display:flex;flex-direction:column;gap:6px;text-align:right;">
                                 <div style="font-size:13px;color:var(--text-secondary);">
@@ -126,7 +126,7 @@
                             <span id="vehicleOdometer">-- km</span>
                             <span id="vehicleCharging" style="display:none;">
                                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:12px;height:12px;vertical-align:middle;color:var(--brand-primary);" aria-hidden="true"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-                                <span data-i18n="abrp.charging">充电</span>
+                                <span data-i18n="abrp.charging">充电中</span>
                             </span>
                             <span id="vehicleSoh">SOH: --%</span>
                         </div>
@@ -152,7 +152,7 @@
                         <div id="tokenInput">
                             <div class="token-input-row">
                                 <input type="password" id="abrpTokenField" placeholder="输入ABRP用户代码" data-i18n-attr="placeholder:abrp.token_placeholder">
-                                <button class="btn btn-primary" onclick="ABRP.saveToken()" data-i18n="abrp.save_test">保存和测试</button>
+                                <button class="btn btn-primary" onclick="ABRP.saveToken()" data-i18n="abrp.save_test">保存并测试</button>
                             </div>
                         </div>
                         <div id="tokenStatus" class="status-text"></div>
@@ -170,7 +170,7 @@
                     <div class="card-body">
                         <div class="setting-row">
                             <div class="setting-info">
-                                <div class="setting-name" data-i18n="abrp.enable_label">启用ABRP电测</div>
+                                <div class="setting-name" data-i18n="abrp.enable_label">启用 ABRP 实时遥测</div>
                                 <div class="setting-desc" data-i18n="abrp.enable_desc">将车辆实时数据发送至 A Better Route Planner (ABRP)。</div>
                             </div>
                             <div class="setting-control">
@@ -246,7 +246,7 @@
                                 <label style="font-size:12px;color:var(--text-secondary);" data-i18n="abrp.app_mode">启用时机</label>
                                 <select id="abrpAppMode" onchange="ABRP.saveDataSaving()" style="padding:10px 12px;background:var(--bg-elevated);border:1px solid var(--border-color);border-radius:8px;color:var(--text-primary);font-size:14px;">
                                     <option value="foreground" data-i18n="abrp.app_mode_foreground">ABRP 在中控前台显示（推荐）</option>
-                                    <option value="running" data-i18n="abrp.app_mode_running">ABRP 正在执行（包含背景）</option>
+                                    <option value="running" data-i18n="abrp.app_mode_running">ABRP 正在运行 (含后台)</option>
                                 </select>
                             </div>
                             <div style="margin-top:14px;">
@@ -265,7 +265,7 @@
                     <div class="card-header">
                         <div class="card-title">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
-                            <span data-i18n="abrp.live_telemetry">现场电测</span>
+                            <span data-i18n="abrp.live_telemetry">实时遥测</span>
                         </div>
                     </div>
                     <div class="card-body" style="padding:0;">

@@ -73,17 +73,17 @@
                                         <select id="qualitySelector" class="quality-menu__native" onchange="BYD.stream.setQuality(this.value)">
                                             <option value="ULTRA_LOW"  data-i18n="stream.quality_ultra_low">超低 (400k)</option>
                                             <option value="LOW"        data-i18n="stream.quality_low">低 (600k)</option>
-                                            <option value="MEDIUM"     selected data-i18n="stream.quality_medium">平均值 (1M)</option>
-                                            <option value="HIGH"       data-i18n="stream.quality_high">高1.5米</option>
+                                            <option value="MEDIUM"     selected data-i18n="stream.quality_medium">中 (1M)</option>
+                                            <option value="HIGH"       data-i18n="stream.quality_high">高 (1.5M)</option>
                                             <option value="ULTRA_HIGH" data-i18n="stream.quality_ultra_high">超高 (2.5M)</option>
-                                            <option value="SMOOTH"     data-i18n="stream.quality_smooth">流 (3.5M,25fps)</option>
+                                            <option value="SMOOTH"     data-i18n="stream.quality_smooth">流畅 (3.5M, 25fps)</option>
                                             <option value="MAX"        data-i18n="stream.quality_max">极限 (5M,30fps)</option>
                                         </select>
                                         <button type="button" class="quality-menu__trigger" id="qualityMenuTrigger"
                                                 aria-haspopup="listbox" aria-expanded="false"
                                                 data-i18n-attr="aria-label:recording.video_quality_title"
                                                 aria-label="视频质量">
-                                            <span class="quality-menu__value" id="qualityMenuValue">Medium (1M)</span>
+                                            <span class="quality-menu__value" id="qualityMenuValue" data-i18n="stream.quality_medium">中 (1M)</span>
                                             <svg class="quality-menu__chevron" viewBox="0 0 24 24" fill="none"
                                                  stroke="currentColor" stroke-width="2" aria-hidden="true">
                                                 <path d="m6 9 6 6 6-6"/>
@@ -203,7 +203,7 @@
                                     <div class="cam-hotspot cam-dvr" data-cam="6" style="display:none;" onclick="BYD.stream.selectCamera(6)">
                                         <div class="hotspot-pulse"></div>
                                         <div class="hotspot-ring"></div>
-                                        <span class="hotspot-label" data-i18n="stream.hotspot_oem_dashcam">虚拟机</span>
+                                        <span class="hotspot-label" data-i18n="stream.hotspot_oem_dashcam">原厂记录仪</span>
                                     </div>
                                     <div class="cam-hotspot" data-cam="3" onclick="BYD.stream.selectCamera(3)">
                                         <div class="hotspot-pulse"></div>

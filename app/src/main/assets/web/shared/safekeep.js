@@ -1353,6 +1353,25 @@ window.SK = (function () {
         return m[type] || type;
     }
 
+    function condOpts(def, type) {
+        if (!def || def.kind !== 'enum' || !def.opts) return (def && def.opts) || [];
+        return def.opts.map(function (opt) {
+            var val = opt[0], lbl = opt[1];
+            if (type === 'power') {
+                lbl = val === 'off' ? t('safekeep.power_off', '关闭 (OFF)') :
+                      val === 'acc' ? t('safekeep.power_acc', '电源接通 (ACC)') :
+                      val === 'on' ? t('safekeep.power_on', '车辆启动 (ON)') : lbl;
+            } else if (type === 'chargingState') {
+                lbl = val === 'on' ? t('safekeep.charging_on', '充电中') : t('safekeep.charging_off', '未充电');
+            } else if (type === 'wifiState') {
+                lbl = val === 'on' ? t('safekeep.wifi_connected', '已连接') : t('safekeep.wifi_disconnected', '未连接');
+            } else if (type === 'day') {
+                lbl = t('safekeep.day_' + val, lbl);
+            }
+            return [val, lbl];
+        });
+    }
+
     function renderConditions(laneId) {
         var box = $('skConds_' + laneId);
         if (!box) return;
@@ -1366,7 +1385,7 @@ window.SK = (function () {
                 ? [['eq', t('safekeep.is', 'is')], ['neq', t('safekeep.is_not', 'is not')]]
                 : [['eq', '='], ['neq', '≠'], ['gt', '>'], ['gte', '≥'], ['lt', '<'], ['lte', '≤']];
             var valHtml;
-            if (def.kind === 'enum') valHtml = select('skCV_' + laneId + '_' + i, def.opts, c.value);
+            if (def.kind === 'enum') valHtml = select('skCV_' + laneId + '_' + i, condOpts(def, c.type), c.value);
             else if (def.kind === 'time') valHtml = '<input type="time" class="text-input" id="skCV_' + laneId + '_' + i + '" value="' + minToTime(c.value) + '">';
             else if (def.kind === 'int') valHtml = '<input type="number" class="text-input" id="skCV_' + laneId + '_' + i + '" min="' + def.min + '" max="' + def.max + '" value="' + esc(c.value == null ? def.min : c.value) + '">';
             else valHtml = '<input class="text-input" id="skCV_' + laneId + '_' + i + '" value="' + esc(c.value || '') + '">';

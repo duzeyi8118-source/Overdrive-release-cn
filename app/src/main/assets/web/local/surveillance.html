@@ -75,12 +75,12 @@
                         <line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/>
                     </svg>
                 </button>
-                <span style="font-weight:600;" data-i18n="surveillance.mobile_title">哨兵安防</span>
+                <span style="font-weight:600;" data-i18n="surveillance.mobile_title">哨兵监控</span>
                 <div style="width:40px;"></div>
             </div>
 
             <header class="page-header">
-                <h1 class="page-title" data-i18n="surveillance.page_title">监控设置</h1>
+                <h1 class="page-title" data-i18n="surveillance.page_title">哨兵监控</h1>
                 <div class="header-actions">
                     <div class="header-badge">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
@@ -95,7 +95,7 @@
                     <div class="card-header">
                         <div class="card-title">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                            <span data-i18n="surveillance.mode">监控模式</span>
+                            <span data-i18n="surveillance.mode">哨兵模式</span>
                         </div>
                         <span class="status-badge inactive" id="survStatusBadge" data-i18n="status.off">关</span>
                     </div>
@@ -141,12 +141,12 @@
                         <div class="setting-row">
                             <div class="setting-info">
                                 <div class="setting-name" data-i18n="surveillance.arm_mode">布防模式</div>
-                                <div class="setting-desc" data-i18n="surveillance.arm_mode_desc">车辆熄火下电后的哨兵布防策略。两种模式均遵循已设置的安全地点与定时计划。</div>
+                                <div class="setting-desc" data-i18n="surveillance.arm_mode_desc">车辆熄火下电后的哨兵布防策略。两种模式均遵循安全地点与定时计划。</div>
                             </div>
                             <div class="setting-control">
                                 <div class="btn-group" id="armModeBtns">
-                                    <button class="btn-toggle" data-value="lock" onclick="SurvSettings.setArmMode('lock')" data-i18n="surveillance.arm_lock">锁定时</button>
-                                    <button class="btn-toggle" data-value="power" onclick="SurvSettings.setArmMode('power')" data-i18n="surveillance.arm_power">关闭电源时</button>
+                                    <button class="btn-toggle" data-value="lock" onclick="SurvSettings.setArmMode('lock')" data-i18n="surveillance.arm_lock">锁车时</button>
+                                    <button class="btn-toggle" data-value="power" onclick="SurvSettings.setArmMode('power')" data-i18n="surveillance.arm_power">熄火下电时</button>
                                 </div>
                             </div>
                         </div>
@@ -160,8 +160,8 @@
                             </div>
                             <div class="setting-control">
                                 <div class="btn-group" id="accOffModeBtns">
-                                    <button class="btn-toggle" data-value="smart" onclick="SurvSettings.setAccOffMode('smart')" data-i18n="surveillance.accoff_smart">聪明的</button>
-                                    <button class="btn-toggle" data-value="continuous" onclick="SurvSettings.setAccOffMode('continuous')" data-i18n="surveillance.accoff_continuous">连续</button>
+                                    <button class="btn-toggle" data-value="smart" onclick="SurvSettings.setAccOffMode('smart')" data-i18n="surveillance.accoff_smart">智能模式</button>
+                                    <button class="btn-toggle" data-value="continuous" onclick="SurvSettings.setAccOffMode('continuous')" data-i18n="surveillance.accoff_continuous">持续模式</button>
                                 </div>
                             </div>
                         </div>
@@ -302,7 +302,7 @@
                         <div class="info-box">
                             <div class="info-row"><span class="label" data-i18n="surveillance.status_label">状态</span><span class="value" id="survState" data-i18n="common.idle">空闲</span></div>
                             <div class="info-row">
-                                <span class="label" data-i18n="surveillance.events_today">今天的事件</span>
+                                <span class="label" data-i18n="surveillance.events_today">今日哨兵事件</span>
                                 <a href="events.html?filter=sentry" class="value link-value" id="eventsToday">0 →</a>
                             </div>
                         </div>
@@ -322,7 +322,7 @@
                         <div class="setting-row" style="border-bottom:none;">
                             <div class="setting-info">
                                 <div class="setting-name" data-i18n="surveillance.safe_disable">在安全地点停用哨兵</div>
-                                <div class="setting-desc" data-i18n="surveillance.safe_desc">在此处停车时不会启动摄像头。</div>
+                                <div class="setting-desc" data-i18n="surveillance.safe_desc">在已设置的安全地点停车时不会自动启动哨兵。</div>
                             </div>
                             <div class="setting-control">
                                 <label class="toggle-switch">
@@ -390,7 +390,7 @@
                         <!-- Environment Preset -->
                         <div class="setting-row">
                             <div class="setting-info">
-                                <div class="setting-name" data-i18n="surveillance.env_preset">环境预设</div>
+                                <div class="setting-name" data-i18n="surveillance.env_preset">环境模式</div>
                                 <div class="setting-desc" data-i18n="surveillance.env_desc">根据停车场景快速应用推荐配置</div>
                             </div>
                             <div class="setting-control">
@@ -422,14 +422,14 @@
                         <!-- Detection Zone -->
                         <div class="setting-row">
                             <div class="setting-info">
-                                <div class="setting-name" data-i18n="surveillance.det_zone">检测区</div>
-                                <div class="setting-desc" data-i18n="surveillance.det_zone_desc">距离车辆多远范围内的移动会触发警报</div>
+                                <div class="setting-name" data-i18n="surveillance.det_zone">检测范围</div>
+                                <div class="setting-desc" data-i18n="surveillance.det_zone_desc">距离车辆多远范围内的移动会触发报警</div>
                             </div>
                             <div class="setting-control">
                                 <div class="btn-group" id="detectionZoneBtns">
                                     <button class="btn-toggle" data-value="close" onclick="SurvSettings.setDetectionZone('close')" data-i18n="surveillance.det_close">近距离 (~3m)</button>
                                     <button class="btn-toggle active" data-value="normal" onclick="SurvSettings.setDetectionZone('normal')" data-i18n="surveillance.det_normal">标准 (~6m)</button>
-                                    <button class="btn-toggle" data-value="extended" onclick="SurvSettings.setDetectionZone('extended')" data-i18n="surveillance.det_extended">扩展 (整帧)</button>
+                                    <button class="btn-toggle" data-value="extended" onclick="SurvSettings.setDetectionZone('extended')" data-i18n="surveillance.det_extended">扩展 (全画幅)</button>
                                 </div>
                             </div>
                         </div>
@@ -501,7 +501,7 @@
                         <div class="setting-row">
                             <div class="setting-info">
                                 <div class="setting-name" data-i18n="surveillance.discard_empty_motion">丢弃无目标录像</div>
-                                <div class="setting-desc" data-i18n="surveillance.discard_empty_motion_desc">积极删除未追踪到真实人员或车辆的录像</div>
+                                <div class="setting-desc" data-i18n="surveillance.discard_empty_motion_desc">自动丢弃未追踪到真实人员或车辆的录像</div>
                             </div>
                             <div class="setting-control">
                                 <label class="toggle-switch">
@@ -515,7 +515,7 @@
                         <!-- Also discard at night (sub-toggle of the above) -->
                         <div class="setting-row" id="discardEmptyMotionNightRow" style="padding-left:16px;">
                             <div class="setting-info">
-                                <div class="setting-name" data-i18n="surveillance.discard_empty_motion_night">夜间也丢弃了</div>
+                                <div class="setting-name" data-i18n="surveillance.discard_empty_motion_night">夜间同样过滤</div>
                                 <div class="setting-desc" data-i18n="surveillance.discard_empty_motion_night_desc">改用运动轮廓而非亮度判断，将此过滤规则扩展到暗光场景。</div>
                             </div>
                             <div class="setting-control">
@@ -594,7 +594,7 @@
                                 </div>
                                 <div class="setting-control">
                                     <div class="slider-control">
-                                        <span class="slider-value" id="sideCamSensValue" data-i18n="surveillance.v2_sens_label.4">其他类型</span>
+                                        <span class="slider-value" id="sideCamSensValue" data-i18n="surveillance.v2_sens_label.4">4 — 较高</span>
                                         <input type="range" class="slider" id="sideCamSensSlider" min="1" max="5" value="4" oninput="SurvSettings.updateSideCamSens(this.value)">
                                     </div>
                                 </div>
@@ -607,7 +607,7 @@
                                     <div class="btn-group" id="sideCamZoneBtns">
                                         <button class="btn-toggle" data-value="close" onclick="SurvSettings.setSideCamZone('close')" data-i18n="surveillance.det_close">近距离 (~3m)</button>
                                         <button class="btn-toggle" data-value="normal" onclick="SurvSettings.setSideCamZone('normal')" data-i18n="surveillance.det_normal">标准 (~6m)</button>
-                                        <button class="btn-toggle active" data-value="extended" onclick="SurvSettings.setSideCamZone('extended')" data-i18n="surveillance.det_extended">扩展 (整帧)</button>
+                                        <button class="btn-toggle active" data-value="extended" onclick="SurvSettings.setSideCamZone('extended')" data-i18n="surveillance.det_extended">扩展 (全画幅)</button>
                                     </div>
                                 </div>
                             </div>
@@ -643,14 +643,14 @@
                     <div class="card-header">
                         <div class="card-title">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
-                            <span data-i18n="surveillance.developer">开发人员</span>
+                            <span data-i18n="surveillance.developer">开发者选项</span>
                         </div>
                     </div>
                     <div class="card-body">
                         <div class="setting-row">
                             <div class="setting-info">
                                 <div class="setting-name" data-i18n-attr="title:surveillance.motion_heatmap_title" title="在实时画面上以色块标出检测到移动的区域。" data-i18n="surveillance.motion_heatmap">运动热图</div>
-                                <div class="setting-desc" data-i18n="surveillance.motion_heatmap_desc">在流量上覆盖的运动检测区域</div>
+                                <div class="setting-desc" data-i18n="surveillance.motion_heatmap_desc">在实时画面上叠加动态检测热区</div>
                             </div>
                             <div class="setting-control">
                                 <label class="toggle-switch" data-i18n-attr="title:surveillance.motion_heatmap_title" title="在实时画面上以色块标出检测到移动的区域。">
@@ -1220,7 +1220,7 @@
                         </div>
                         <div class="timeline-visual">
                             <div class="timeline-segment timeline-pre" id="timelinePre" data-i18n="surveillance.timeline_pre">事件前 (预录)</div>
-                            <div class="timeline-segment timeline-event" data-i18n="surveillance.timeline_event">事件</div>
+                            <div class="timeline-segment timeline-event" data-i18n="surveillance.timeline_event">⚠️ 事件</div>
                             <div class="timeline-segment timeline-post" id="timelinePost" data-i18n="surveillance.timeline_post">事件后 (延时)</div>
                         </div>
                         <div class="timeline-labels">
@@ -1545,8 +1545,8 @@
                             </div>
                         </div>
                         <div class="slider-range-labels">
-                            <span id="survLimitMin" data-i18n="surveillance.limit_min_default">100 MB 的数量</span>
-                            <span id="survLimitMax" data-i18n="surveillance.limit_max_default">100 GB 的数量</span>
+                            <span id="survLimitMin" data-i18n="surveillance.limit_min_default">100 MB</span>
+                            <span id="survLimitMax" data-i18n="surveillance.limit_max_default">100 GB</span>
                         </div>
                         <!-- Combined-limit advisory — see recording.html for the
                              rationale; same shared renderer, same server payload. -->
@@ -1586,7 +1586,7 @@
                         <div class="info-box-warning" id="cdrRecommendBanner" style="display:none;">
                             <svg class="info-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
                             <div class="info-row" style="color:var(--warning);">
-                                <span class="label" data-i18n="recording.cdr_recommend_label_v2">建议</span>
+                                <span class="label" data-i18n="recording.cdr_recommend_label_v2">推荐</span>
                                 <span class="value" data-i18n="recording.cdr_recommend_text">OverDrive 正在使用 SD 卡——建议开启自动清理以确保存储空间充足</span>
                             </div>
                         </div>
@@ -1639,7 +1639,7 @@
                         <!-- Manual Cleanup Button -->
                         <button class="btn btn-danger" id="cdrCleanupNow" disabled style="width:100%;margin-top:12px;" onclick="SurvSettings.triggerCdrCleanup()">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="width:16px;height:16px;" aria-hidden="true"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
-                            <span data-i18n="recording.cdr_cleanup_now_v2">清理起来.</span>
+                            <span data-i18n="recording.cdr_cleanup_now_v2">立即清理</span>
                         </button>
                         <!-- Stats -->
                         <div class="info-box" style="margin-top:12px;">
