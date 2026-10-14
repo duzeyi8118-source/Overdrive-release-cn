@@ -414,7 +414,7 @@
     <string name="soh_dialog_frame_anchor_label">实测满电可用电量</string>
     <string name="soh_dialog_frame_anchor_format">满电状态下观测到 %1$.2f kWh（%2$d/%3$d 个样本）</string>
     <string name="soh_dialog_frame_anchor_pending_format">满电状态下观测到 %1$.2f kWh（正在采集 %2$d/%3$d 个样本）</string>
-    <string name="soh_dialog_frame_mismatch_title">电池包容量框架不匹配</string>
+    <string name="soh_dialog_frame_mismatch_title">电池包容量与实测帧不一致</string>
     <string name="soh_dialog_frame_mismatch_format">车辆在满电状态下上报 %1$.1f kWh，但电池包容量已设置为 %2$.1f kWh。上述数值可能只是口径不一致（标称容量与可用容量），并非真实衰减。建议填入 %1$.1f kWh，以与车辆上报值保持一致。</string>
     <string name="soh_dialog_use_observed_value">使用观测值</string>
     <string name="soh_dialog_use_observed_value_pending">保存中…</string>
@@ -477,7 +477,7 @@
     <string name="toast_camera_settings_saved_restarting">预览 预览 预览 预览 预览</string>
     <string name="toast_camera_settings_restart_failed">摄像头设置已保存，但守护进程重启失败，请稍后手动重启。</string>
     <string name="toast_failed_with_message_x">失败：%1$s</string>
-    <string name="toast_soh_reset_success">SOH估计重置 将从下一个数据中重新计算</string>
+    <string name="toast_soh_reset_success">SOH 估算模型已重置，将在接收到有效充放电数据后重新计算</string>
     <string name="toast_soh_reset_failed_no_daemon">重置失败 — 守护进程未响应且文件不可写</string>
     <string name="toast_soh_reset_failed_with_message">重置失败：%1$s</string>
     <string name="toast_select_at_least_one_category">选择至少一个类别</string>
@@ -944,7 +944,7 @@
     <string name="vehicle_dialog_detection">检测：%1$s</string>
     <string name="vehicle_dialog_detection_auto">自动</string>
     <string name="vehicle_dialog_detection_manual">手动</string>
-    <string name="vehicle_dialog_invalid_capacity">容量必须为15-120kWh</string>
+    <string name="vehicle_dialog_invalid_capacity">容量必须在 5 - 120 kWh 之间</string>
     <string name="vehicle_dialog_summary_effective">有效：%1$.1f kWh</string>
     <string name="vehicle_dialog_summary_calibration">上次标定：%1$.1f%%（%2$s）</string>
     <string name="vehicle_dialog_soh_unavailable">无法使用</string>
@@ -1139,9 +1139,9 @@
     <string name="roadsense_map_route_failed">找不到路线，请重试。</string>
     <string name="roadsense_map_need_key">在 RoadSense 设置中添加路由键以导航。</string>
     <string name="roadsense_map_route_key_rejected">路由键被拒绝。请在“RoadSense”设置中检查你的键值。</string>
-    <string name="roadsense_map_route_network">网络太慢无法找到路由。请检查你的连接，然后重试。</string>
+    <string name="roadsense_map_route_network">网络较慢未能规划路线，请检查网络连接后重试。</string>
     <string name="roadsense_map_route_http">路由服务错误 (%1$d)。请稍后再试。</string>
-    <string name="roadsense_map_rerouting">关闭路由 - 重新计算…</string>
+    <string name="roadsense_map_rerouting">偏离路线，正在重新规划…</string>
     <string name="roadsense_map_arrived">你已经抵达。</string>
     <string name="roadsense_map_nav_started">导航到 %1$s</string>
     <string name="roadsense_map_nav_ended">导航已结束</string>

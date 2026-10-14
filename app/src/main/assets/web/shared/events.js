@@ -1880,7 +1880,8 @@ BYD.events = {
                 throw new Error('The daemon returned an invalid pack id');
             }
             if (BYD.core && BYD.core.toast) {
-                BYD.core.toast('Evidence pack ready', 'success');
+                const msg = (BYD.i18n && BYD.i18n.t) ? BYD.i18n.t('events.evidence_pack_ready') : '取证归档包已准备就绪';
+                BYD.core.toast(msg || '取证归档包已准备就绪', 'success');
             }
             window.location.href = '/api/genai/incidents/'
                 + encodeURIComponent(packId) + '/download';

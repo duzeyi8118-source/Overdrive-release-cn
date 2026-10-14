@@ -467,56 +467,56 @@ var RemoteAccess = (function () {
 
     function reasonText(reason) {
         var reasons = {
-            disabled: 'No background monitoring', no_device: 'Choose and save a paired phone',
-            bluetooth_off: 'Car Bluetooth is off', disconnected: 'Phone disconnected · no departure assumed',
-            stale: 'Reading expired · automatic actions suspended',
-            waiting_for_signal: 'Waiting for a fresh phone reading', insufficient_samples: 'Collecting fresh samples',
-            unavailable: 'Bluetooth RSSI unavailable on this platform', settling: 'Waiting for a stable signal',
-            startup: 'Startup observation · no action', unarmed: 'Confirm departure to arm arrival',
-            radio_unavailable: 'Car Bluetooth is unavailable', reader_unavailable: 'Signal reader unavailable',
-            radio_off: 'Car Bluetooth is off', bluetooth_unavailable: 'Car Bluetooth is unavailable',
-            waiting_for_phone: 'Waiting for the selected phone to connect',
-            waiting_for_collector: 'Waiting for the car app to start monitoring',
-            collector_stale: 'Updates from the car app stopped · automatic actions disarmed',
-            paired_devices_unavailable: 'Waiting for the car to report its paired devices',
-            rssi_unavailable: 'Fresh Bluetooth signal strength is unavailable',
-            unsupported_platform: 'Bluetooth signal reading is unsupported on this platform',
-            vehicle_ineligible: 'Vehicle power off is not confirmed · automatic actions disarmed',
-            stable_near: 'Stable nearby signal', stable_away: 'Stable away signal',
-            stabilizing_near: 'Confirming a nearby signal', stabilizing_away: 'Confirming an away signal',
-            within_hysteresis: 'Signal is between thresholds · holding the current state',
-            save_phone_first: 'Save this approved phone to start monitoring it',
-            phone_disabled: 'This approved phone is disabled',
-            master_off: 'Proximity is disabled',
-            shared_bluetooth_off: 'Enable parked Bluetooth to reconnect your phone',
-            vehicle_on: 'Phone reconnect waits until vehicle power is off',
-            power_unknown: 'Waiting for confirmed vehicle power off',
-            vehicle_on_only: 'Parked reconnect is unavailable in Vehicle on only mode',
-            settings_changed: 'Phone settings changed · checking approved phones',
-            phone_not_trusted: 'Save and enable this approved phone to reconnect',
-            phone_not_paired: 'Pair this phone in the car\'s Bluetooth settings',
-            profile_loading: 'Preparing to reconnect your phone',
-            profile_timeout: 'Bluetooth connection service did not respond',
-            profile_busy: 'Another phone is active · keeping its connection',
-            other_bluetooth_active: 'Another Bluetooth device is active · keeping its connection',
-            bluetooth_busy: 'Bluetooth is busy · reconnect paused',
-            discovery_active: 'Bluetooth discovery is active · reconnect paused',
-            pairing_active: 'Bluetooth pairing is active · reconnect paused',
-            pairing_grace: 'Finishing Bluetooth setup · reconnect paused',
-            bluetooth_state_unavailable: 'Bluetooth state is unavailable · reconnect paused',
-            priority_disabled: 'Phone auto-connect is disabled in Bluetooth settings',
-            retry_backoff: 'Waiting before retrying the phone connection',
-            phone_turn: 'Waiting to reconnect this approved phone',
-            attempt_accepted: 'Reconnect requested · waiting for your phone',
-            attempt_rejected: 'Phone reconnect request was declined',
-            connection_timeout: 'Phone did not reconnect · waiting before retrying',
-            connection_failed: 'Phone did not connect · retrying shortly',
-            profile_unavailable: 'Phone reconnect is unavailable on this car',
-            connected: 'Phone connection restored · waiting for a fresh signal',
-            stopped: 'Phone reconnect stopped',
-            unexpected_profile: 'Phone reconnect service is unavailable'
+            disabled: tr('reason_disabled', '暂无后台监听'), no_device: tr('reason_no_device', '请选择并保存已配对手机'),
+            bluetooth_off: tr('reason_bluetooth_off', '车载蓝牙已关闭'), disconnected: tr('reason_disconnected', '手机未连接 · 暂不判定为远离'),
+            stale: tr('reason_stale', '信号数据已过期 · 暂停自动化车控'),
+            waiting_for_signal: tr('reason_waiting_signal', '等待最新手机信号'), insufficient_samples: tr('reason_collecting', '正在采集有效样本'),
+            unavailable: tr('reason_rssi_unavailable', '当前平台不支持蓝牙 RSSI 测距'), settling: tr('reason_settling', '等待信号稳定'),
+            startup: tr('reason_startup', '启动观察中 · 暂不执行动作'), unarmed: tr('reason_unarmed', '确认远离后方可激活靠近解锁'),
+            radio_unavailable: tr('reason_bluetooth_unavailable', '车载蓝牙不可用'), reader_unavailable: tr('reason_reader_unavailable', '信号采集服务不可用'),
+            radio_off: tr('reason_bluetooth_off', '车载蓝牙已关闭'), bluetooth_unavailable: tr('reason_bluetooth_unavailable', '车载蓝牙不可用'),
+            waiting_for_phone: tr('reason_waiting_phone', '等待所选手机连接'),
+            waiting_for_collector: tr('reason_waiting_collector', '等待车机服务启动监听'),
+            collector_stale: tr('reason_collector_stale', '车机监听服务停止更新 · 自动化已解除'),
+            paired_devices_unavailable: tr('reason_paired_unavailable', '等待车机上报已配对设备'),
+            rssi_unavailable: tr('reason_rssi_fresh_unavailable', '无法获取最新蓝牙信号强度'),
+            unsupported_platform: tr('reason_unsupported_platform', '当前平台不支持读取蓝牙信号'),
+            vehicle_ineligible: tr('reason_vehicle_ineligible', '未确认车辆完全熄火断电 · 自动化已解除'),
+            stable_near: tr('reason_stable_near', '稳定的靠近信号'), stable_away: tr('reason_stable_away', '稳定的远离信号'),
+            stabilizing_near: tr('reason_stabilizing_near', '正在确认靠近信号'), stabilizing_away: tr('reason_stabilizing_away', '正在确认远离信号'),
+            within_hysteresis: tr('reason_within_hysteresis', '信号处于滞后区间 · 保持当前状态'),
+            save_phone_first: tr('reason_save_phone_first', '请先保存此授权手机以开始监听'),
+            phone_disabled: tr('reason_phone_disabled', '此授权手机已停用'),
+            master_off: tr('reason_master_off', '靠近感知总开关已关闭'),
+            shared_bluetooth_off: tr('reason_shared_bt_off', '请开启驻车共享蓝牙以重连手机'),
+            vehicle_on: tr('reason_vehicle_on', '手机重连需等待车辆完全熄火断电'),
+            power_unknown: tr('reason_power_unknown', '等待确认车辆熄火断电'),
+            vehicle_on_only: tr('reason_vehicle_on_only', '“仅车辆启动时”模式下驻车重连不可用'),
+            settings_changed: tr('reason_settings_changed', '手机配置已更改 · 正在校验已授权手机'),
+            phone_not_trusted: tr('reason_phone_not_trusted', '保存并启用此授权手机后方可重连'),
+            phone_not_paired: tr('reason_phone_not_paired', '请先在车机系统蓝牙设置中配对该手机'),
+            profile_loading: tr('reason_profile_loading', '正在准备重连手机'),
+            profile_timeout: tr('reason_profile_timeout', '蓝牙连接服务响应超时'),
+            profile_busy: tr('reason_profile_busy', '另一部手机处于活跃连接 · 保持连接'),
+            other_bluetooth_active: tr('reason_other_bt_active', '其他蓝牙设备处于活跃连接 · 保持连接'),
+            bluetooth_busy: tr('reason_bt_busy', '蓝牙正忙 · 暂停重连'),
+            discovery_active: tr('reason_discovery_active', '正在扫描蓝牙设备 · 暂停重连'),
+            pairing_active: tr('reason_pairing_active', '正在进行蓝牙配对 · 暂停重连'),
+            pairing_grace: tr('reason_pairing_grace', '蓝牙设置即将完成 · 暂停重连'),
+            bluetooth_state_unavailable: tr('reason_bt_state_unavailable', '蓝牙状态不可用 · 暂停重连'),
+            priority_disabled: tr('reason_priority_disabled', '蓝牙设置中已关闭手机自动连接'),
+            retry_backoff: tr('reason_retry_backoff', '等待重连重试退避时间'),
+            phone_turn: tr('reason_phone_turn', '正在等待重连此授权手机'),
+            attempt_accepted: tr('reason_attempt_accepted', '已发送重连请求 · 等待手机响应'),
+            attempt_rejected: tr('reason_attempt_rejected', '手机拒绝了重连请求'),
+            connection_timeout: tr('reason_connection_timeout', '手机未在规定时间内重连 · 即将重试'),
+            connection_failed: tr('reason_connection_failed', '手机连接失败 · 稍后重试'),
+            profile_unavailable: tr('reason_profile_unavailable', '当前车型不支持蓝牙回连'),
+            connected: tr('reason_connected', '手机已恢复连接 · 等待最新信号'),
+            stopped: tr('reason_stopped', '手机重连已停止'),
+            unexpected_profile: tr('reason_unexpected_profile', '手机重连服务异常不可用')
         };
-        return reasons[reason] || String(reason || 'Waiting for a fresh reading').replace(/_/g, ' ');
+        return reasons[reason] || String(reason || tr('reason_waiting_fresh', '等待最新读数')).replace(/_/g, ' ');
     }
     function currentSignal() {
         return signalFor(state.viewAddress);
@@ -552,7 +552,7 @@ var RemoteAccess = (function () {
         var value = String(fob.state || 'UNKNOWN').toUpperCase();
         var label, detail, style;
         if (!supports('keyFob')) {
-            label = tr('keyfob_unavailable', '不可用'); detail = 'Keyfob proximity is unsupported on this car.'; style = 'unavailable';
+            label = tr('keyfob_unavailable', '不可用'); detail = tr('kf_reason_unsupported', '当前车型不支持车钥匙感应。'); style = 'unavailable';
         } else if (!el('raKeyFobEnabled').checked) {
             label = tr('keyfob_disabled', '已禁用'); detail = tr('keyfob_disabled_detail', '车钥匙靠近检测已禁用。'); style = 'disabled';
         } else if (!configured) {
@@ -586,38 +586,38 @@ var RemoteAccess = (function () {
             detail = tr('keyfob_waiting_event', '等待新的钥匙靠近事件。'); style = 'listening';
         }
         if (supports('keyFob') && !supports('keyFobLock') && el('raKeyFobEnabled').checked)
-            detail += ' Keyfob departure locking is unsupported on this car.';
+            detail += ' ' + tr('keyfob_lock_unsupported', '当前车型不支持钥匙远离落锁检测。可关闭已保存的规则。');
         return { fob: fob, age: age, active: active, fresh: fresh, state: value, label: label, detail: detail, style: style };
     }
     function keyFobReasonText(reason) {
         if (reason === 'vehicle_not_locked' && state.config && state.config.keyFobLockEnabled === true)
             return tr('keyfob_lock_state_waiting', '等待有效的车锁状态。');
         var labels = {
-            disabled: 'Keyfob detection is disabled.', master_off: 'Proximity is disabled.',
-            no_device: 'Waiting for the vehicle keyfob receiver.',
-            waiting_for_collector: 'Waiting for the car app to start keyfob monitoring.',
-            collector_stale: 'Updates from the car app stopped. Keyfob actions are suspended.',
-            scope_stale: 'Vehicle power or lock state expired. Keyfob actions are suspended.',
-            vehicle_ineligible: 'Vehicle power off is not confirmed. Keyfob actions are suspended.',
-            vehicle_on: 'Keyfob actions require confirmed vehicle power off.',
-            vehicle_not_off: 'Keyfob detection waits until vehicle power off is confirmed.',
-            vehicle_not_locked: 'Keyfob detection listens while the vehicle is locked and powered off.',
-            power_unknown: 'Waiting for confirmed vehicle power off.',
-            lock_unknown: 'Waiting for a valid vehicle lock state.',
-            departure_unknown: 'Keyfob departure has not been confirmed. Automatic locking is suspended.',
-            waiting_for_vehicle: 'Waiting for the vehicle to report power and lock state.',
-            stopped: 'Keyfob monitoring is stopped.',
-            revoked: 'Keyfob settings changed. Waiting for the current receiver.',
-            unsupported_platform: 'Keyfob detection is unavailable on this vehicle.',
-            unavailable: 'The vehicle keyfob receiver is unavailable.',
-            receiver_unavailable: 'The vehicle keyfob receiver is unavailable.',
-            table_unavailable: 'The vehicle keyfob event stream is unavailable.',
-            registration_failed: 'The vehicle keyfob listener could not start.',
-            cleanup_failed: 'The vehicle keyfob receiver could not stop cleanly. Actions are suspended.',
-            waiting_for_signal: 'Waiting for a fresh vehicle keyfob event.',
-            waiting_for_fresh_event: 'Listening for the next fresh keyfob event.',
-            event_stale: 'The last keyfob event expired. Waiting for a fresh event.',
-            unknown_event: 'The vehicle event does not report keyfob presence.'
+            disabled: tr('kf_reason_disabled', '车钥匙检测已禁用。'), master_off: tr('kf_reason_master_off', '靠近感知已关闭。'),
+            no_device: tr('kf_reason_no_device', '等待车载车钥匙接收模块。'),
+            waiting_for_collector: tr('kf_reason_waiting_collector', '等待车机服务启动车钥匙监听。'),
+            collector_stale: tr('kf_reason_collector_stale', '车机监听服务停止更新，车钥匙联动已暂停。'),
+            scope_stale: tr('kf_reason_scope_stale', '车辆电源或车锁状态已过期，车钥匙联动已暂停。'),
+            vehicle_ineligible: tr('kf_reason_vehicle_ineligible', '未确认车辆完全熄火断电，车钥匙联动已暂停。'),
+            vehicle_on: tr('kf_reason_vehicle_on', '车钥匙联动需确认车辆已完全熄火断电。'),
+            vehicle_not_off: tr('kf_reason_vehicle_not_off', '车钥匙检测需等待车辆确认完全熄火断电。'),
+            vehicle_not_locked: tr('kf_reason_vehicle_not_locked', '车钥匙检测仅在车辆锁闭且熄火断电时监听。'),
+            power_unknown: tr('kf_reason_power_unknown', '等待确认车辆熄火断电。'),
+            lock_unknown: tr('kf_reason_lock_unknown', '等待有效的车辆门锁状态。'),
+            departure_unknown: tr('kf_reason_departure_unknown', '尚未确认钥匙远离，自动落锁已暂停。'),
+            waiting_for_vehicle: tr('kf_reason_waiting_vehicle', '等待车辆上报电源与门锁状态。'),
+            stopped: tr('kf_reason_stopped', '车钥匙监听已停止。'),
+            revoked: tr('kf_reason_revoked', '车钥匙配置已变更，正在等待接收模块就绪。'),
+            unsupported_platform: tr('kf_reason_unsupported', '当前车型不支持车钥匙感应。'),
+            unavailable: tr('kf_reason_unavailable', '车载车钥匙接收模块不可用。'),
+            receiver_unavailable: tr('kf_reason_receiver_unavailable', '车载车钥匙接收模块不可用。'),
+            table_unavailable: tr('kf_reason_table_unavailable', '车载车钥匙事件流不可用。'),
+            registration_failed: tr('kf_reason_reg_failed', '车钥匙监听注册失败。'),
+            cleanup_failed: tr('kf_reason_cleanup_failed', '车钥匙接收模块未正常退出，联动动作已暂停。'),
+            waiting_for_signal: tr('kf_reason_waiting_signal', '等待最新车钥匙事件。'),
+            waiting_for_fresh_event: tr('kf_reason_waiting_fresh', '正在监听最新车钥匙事件。'),
+            event_stale: tr('kf_reason_event_stale', '上一条车钥匙事件已过期，等待新事件。'),
+            unknown_event: tr('kf_reason_unknown_event', '车载事件未包含车钥匙在场信息。')
         };
         return labels[reason] || tr('keyfob_waiting_source', '等待车身钥匙接收器响应。');
     }
@@ -729,26 +729,30 @@ var RemoteAccess = (function () {
         var reconnect = signal.reconnect || {};
         var reconnectReason = !connected && selectedDevice().enabled && signal.reason !== 'phone_disabled' && reconnect.reason;
         var proximity = !state.enabled ? 'DISABLED' : stale || !connected ? 'UNKNOWN' : String(signal.state || 'UNKNOWN').toUpperCase();
-        var label = proximity === 'NEAR' ? 'Nearby' : proximity === 'AWAY' ? 'Away' : proximity === 'DISABLED' ? 'Disabled' : 'Unknown';
-        var detail = !state.enabled ? 'No background monitoring' :
-            !connected ? reconnectReason === 'unsupported_platform' ? 'Phone reconnect is unsupported on this platform' :
+        var label = proximity === 'NEAR' ? tr('status_nearby', '靠近') :
+                    proximity === 'AWAY' ? tr('status_away', '远离') :
+                    proximity === 'DISABLED' ? tr('status_disabled', '已关闭') : tr('common_unknown', '未知');
+        var detail = !state.enabled ? tr('reason_disabled', '暂无后台监听') :
+            !connected ? reconnectReason === 'unsupported_platform' ? tr('reason_reconnect_unsupported', '当前平台不支持手机重连') :
                 reasonText(reconnectReason || signal.reason || 'disconnected') :
             stale ? reasonText('stale') : reasonText(signal.reason);
         if (state.enabled && connected && !stale && signal.candidate && signal.candidate !== signal.state && signal.candidate !== 'UNKNOWN') {
-            detail = 'Confirming ' + String(signal.candidate).toLowerCase() + ' · ' + Math.floor((signal.stableForMs || 0) / 1000) + 's stable';
+            var candText = signal.candidate === 'NEAR' ? tr('status_nearby', '靠近') : tr('status_away', '远离');
+            detail = tr('confirming_candidate', '正在确认{state} · 稳定 {sec} 秒', { state: candText, sec: Math.floor((signal.stableForMs || 0) / 1000) });
         } else if (state.enabled && connected && !stale && proximity === 'NEAR') {
-            detail = state.config && state.config.unlockTrigger === 'near' ? 'Stable nearby signal' :
-                signal.armed ? 'Stable nearby signal · arrival armed' : 'Stable nearby signal · confirm departure to arm arrival';
+            detail = state.config && state.config.unlockTrigger === 'near' ? tr('stable_nearby_signal', '稳定的靠近信号') :
+                signal.armed ? tr('stable_near_armed', '稳定的靠近信号 · 已进入布防') : tr('stable_near_unarmed', '稳定的靠近信号 · 确认远离后方可激活靠近解锁');
         } else if (state.enabled && connected && !stale && proximity === 'AWAY') {
-            detail = signal.armed ? 'Stable away signal · waiting for your return' : 'Stable away signal';
+            detail = signal.armed ? tr('stable_away_armed', '稳定的远离信号 · 等待返回') : tr('stable_away_signal', '稳定的远离信号');
         }
         if (state.enabled && signal.reason === 'vehicle_ineligible') detail = reasonText(signal.reason);
         if (!el('raAdvancedMode').checked && state.enabled && connected && !stale &&
             signal.candidate && signal.candidate !== signal.state && signal.candidate !== 'UNKNOWN') {
-            detail = 'Confirming the phone is ' + (signal.candidate === 'NEAR' ? 'nearby' : 'away');
+            var candState = signal.candidate === 'NEAR' ? tr('status_nearby', '靠近') : tr('status_away', '远离');
+            detail = tr('confirming_candidate', '正在确认手机处于{state}状态', { state: candState, sec: '' });
         }
         if (!supports('bluetooth') && state.enabled) {
-            label = 'Unavailable'; detail = 'Phone proximity is unsupported on this car.'; proximity = 'UNKNOWN';
+            label = tr('common.unavailable', '不可用'); detail = tr('phone_proximity_unsupported', '当前车型不支持手机靠近感应。'); proximity = 'UNKNOWN';
         }
         var fobOnly = state.config && state.config.keyFobEnabled === true &&
             !profilesFromConfig(state.config).some(function (phone) { return phone.enabled; });
@@ -756,9 +760,11 @@ var RemoteAccess = (function () {
             label = fob.label; detail = fob.detail;
             proximity = fob.fresh && fob.state === 'NEAR' ? 'NEAR' : 'UNKNOWN';
         }
-        text('raSignalTitle', !state.enabled ? 'Monitoring is disabled' : fobOnly ?
-            supports('keyFob') ? tr('keyfob_monitoring_title', '正在监听车钥匙信号') : 'Keyfob proximity unavailable' :
-            !supports('bluetooth') ? 'Phone proximity unavailable' : !connected ? 'Waiting for your phone' : 'Your phone is ' + label.toLowerCase());
+        text('raSignalTitle', !state.enabled ? tr('monitoring_disabled_title', '监听已关闭') : fobOnly ?
+            supports('keyFob') ? tr('keyfob_monitoring_title', '正在监听车钥匙信号') : tr('keyfob_unavailable_title', '车钥匙感应不可用') :
+            !supports('bluetooth') ? tr('phone_proximity_unavailable', '手机靠近感应不可用') :
+            !connected ? tr('waiting_for_phone_title', '等待手机连接') :
+            tr('phone_is_state', '手机处于{state}状态', { state: label }));
         text('raProximityState', label);
         text('raProximityDetail', detail);
         el('raRadar').setAttribute('data-state', proximity.toLowerCase());
@@ -767,22 +773,26 @@ var RemoteAccess = (function () {
         var arrivalWindow = state.config && state.config.nearWindowMs || 4000;
         var departureWindow = state.config && state.config.windowMs || 15000;
         text('raFilterDetail', signal.filterKind === 'arrival' ?
-            'Unlock · last 3 / ' + arrivalWindow / 1000 + 's' :
-            'Lock · ' + departureWindow / 1000 + 's median');
-        text('raArrivalDiagnostics', 'Unlock: ' + (state.enabled ? signalText(signal.arrivalFilteredRssi) : '—') +
-            ' · ' + (state.enabled ? signal.nearSampleCount || 0 : 0) + '/3 fresh Near readings' +
-            ' · ' + Math.floor((state.enabled ? signal.nearStableForMs || 0 : 0) / 1000) + 's confirmed');
-        text('raDepartureDiagnostics', 'Lock: ' + (state.enabled ? signalText(signal.departureFilteredRssi) : '—') +
-            ' · ' + departureWindow / 1000 + 's median');
+            tr('filter_unlock_detail', '解锁 · 近 3 次样本 / {sec} 秒窗口', { sec: arrivalWindow / 1000 }) :
+            tr('filter_lock_detail', '落锁 · {sec} 秒中位数滤波', { sec: departureWindow / 1000 }));
+        text('raArrivalDiagnostics', tr('diag_unlock_fmt', '解锁: {rssi} · {count}/3 次新鲜靠近读数 · 稳定 {sec} 秒', {
+            rssi: (state.enabled ? signalText(signal.arrivalFilteredRssi) : '—'),
+            count: (state.enabled ? signal.nearSampleCount || 0 : 0),
+            sec: Math.floor((state.enabled ? signal.nearStableForMs || 0 : 0) / 1000)
+        }));
+        text('raDepartureDiagnostics', tr('diag_lock_fmt', '落锁: {rssi} · {sec} 秒中位数滤波', {
+            rssi: (state.enabled ? signalText(signal.departureFilteredRssi) : '—'),
+            sec: departureWindow / 1000
+        }));
         text('raAgeValue', !state.enabled || age === null ? '—' : age < 1000 ? '<1s' : Math.floor(age / 1000) + 's');
-        text('raFreshDetail', !state.enabled ? 'No reading' : stale ? 'Expired / unavailable' : 'Fresh · ' + (signal.sampleCount || 0) + ' samples');
-        text('raConnectionState', state.viewAddress ? connected ? 'Connected' : 'Disconnected' : 'Not selected');
+        text('raFreshDetail', !state.enabled ? tr('no_reading', '暂无读数') : stale ? tr('reading_expired', '已过期 / 不可用') : tr('fresh_samples_fmt', '最新 · {count} 个样本', { count: signal.sampleCount || 0 }));
+        text('raConnectionState', state.viewAddress ? connected ? tr('connected_state', '已连接') : tr('disconnected_state', '未连接') : tr('not_selected', '未选择'));
         el('raConnectionDot').className = 'ra-status-dot' + (connected ? ' connected' : '');
         text('raDeviceAddress', state.viewAddress || '—');
         text('raArmedState', state.config && state.config.unlockTrigger === 'near' ?
             tr('departure_not_required', '无需前置远离事件') :
-            state.enabled && signal.armed && !stale && connected ? 'Armed for return' : 'Disarmed');
-        text('raModeLabel', state.config && state.config.dryRun === false ? 'Automatic actions' : 'Monitor preview');
+            state.enabled && signal.armed && !stale && connected ? tr('armed_for_return', '已就绪（等待返回）') : tr('disarmed', '未布防'));
+        text('raModeLabel', state.config && state.config.dryRun === false ? tr('mode_live', '实际控制') : tr('mode_learning', '校准学习'));
         renderPhoneMarkers();
         var captureReady = supports('bluetooth') && state.enabled && connected && !stale && selectedDevice().enabled &&
             el('raAdvancedMode').checked && state.config && state.config.advancedMode &&
@@ -791,21 +801,21 @@ var RemoteAccess = (function () {
         el('raCaptureAway').disabled = !captureReady;
         var runtime = state.status && state.status.runtime || {};
         text('raMasterDetail', !state.enabled ?
-            runtime.cleanupPending ? 'Settings disabled · collector shutdown is awaiting confirmation from the car app.' :
-            'Proximity actions and sampling are stopped. The shared parked Bluetooth setting remains independent.' :
+            runtime.cleanupPending ? tr('master_cleanup_pending', '设置已关闭 · 正在等待车机采集服务退出。') :
+            tr('master_disabled_desc', '靠近联动动作与信号采样已停止。驻车共享蓝牙设置不受影响。') :
             runtime.active || fob.active ? supports('keyFob') && state.config && state.config.keyFobEnabled === true ?
-                fobOnly ? 'Monitoring keyfob events. Automatic actions require confirmed vehicle power off.' :
-                'Monitoring approved phones and keyfob events. Automatic actions require confirmed vehicle power off.' :
-                'Monitoring approved phones. Automatic actions require confirmed vehicle power off.' :
-            fobOnly ? 'Enabled · ' + fob.detail :
-            'Enabled · ' + reasonText(runtime.reason || signal.reason));
+                fobOnly ? tr('master_monitoring_fob', '正在监听车钥匙事件。自动化动作需车辆完全熄火断电。') :
+                tr('master_monitoring_all', '正在监听授权手机与车钥匙事件。自动化动作需车辆完全熄火断电。') :
+                tr('master_monitoring_phones', '正在监听已授权手机。自动化动作需车辆完全熄火断电。') :
+            fobOnly ? tr('master_enabled_prefix', '已启用 · ') + fob.detail :
+            tr('master_enabled_prefix', '已启用 · ') + reasonText(runtime.reason || signal.reason));
         text('raRadioNote', !supports('bluetoothReconnect') ?
-            'Automatic phone reconnect is unsupported on this car. The shared parked Bluetooth setting remains available.' :
+            tr('bt_reconnect_unsupported', '当前车型不支持手机自动回连。驻车共享蓝牙功能仍可使用。') :
             state.config && state.config.keepBluetoothOn === true ?
             state.enabled ?
-                'Proximity makes limited reconnect attempts for saved, enabled paired phones while parked. It keeps any existing active phone connection. Signal strength is relative; it is not a distance measurement.' :
-                'The shared setting keeps Bluetooth on while parked. With Proximity off, it does not reconnect phones. Pair approved phones in the car\'s Bluetooth settings before enabling Proximity.' :
-            'The shared parked Bluetooth setting is off. Parked phone reconnect requires this setting and Proximity to be on. Pair approved phones in the car\'s Bluetooth settings first.');
+                tr('bt_proximity_reconnect_note', '车辆驻车熄火时，靠近感知将在有限次数内尝试回连已授权配对手机，并维持现有连接。信号强度仅作相对判定，非绝对物理距离。') :
+                tr('bt_shared_on_note', '驻车时保持蓝牙开启。靠近感知关闭时不会主动回连手机。请先在车机系统蓝牙中完成配对。') :
+            tr('bt_shared_off_note', '驻车共享蓝牙已关闭。驻车回连需同时开启该设置与靠近感知。请先在车机蓝牙设置中配对手机。'));
         renderRoster();
     }
     function setStreamLabel(label, live) {
@@ -851,25 +861,32 @@ var RemoteAccess = (function () {
         el('raChartAway').setAttribute('d', 'M48 ' + y(away) + 'H886');
         el('raNearLabel').setAttribute('y', Math.max(16, y(near) - 5));
         el('raAwayLabel').setAttribute('y', Math.min(172, y(away) + 13));
-        text('raNearLabel', 'Near ' + signalText(near));
-        text('raAwayLabel', 'Away ' + signalText(away));
+        text('raNearLabel', tr('label_near_thresh', '靠近阈值 ') + signalText(near));
+        text('raAwayLabel', tr('label_away_thresh', '远离阈值 ') + signalText(away));
         text('raChartMax', signalText(max)); text('raChartMin', signalText(min));
         el('raChartEmpty').hidden = samples.length > 0;
-        text('raChartEmpty', state.enabled ? 'Waiting for fresh readings from your selected phone.' : 'Enable proximity access to see live readings.');
-        text('raChartStatus', state.enabled ? samples.length + ' readings shown' : 'Monitoring off');
+        text('raChartEmpty', state.enabled ? tr('chart_waiting_readings', '等待所选手机上报最新读数…') : tr('chart_enable_prompt', '开启靠近感知后即可查看实时信号曲线。'));
+        text('raChartStatus', state.enabled ? tr('chart_readings_count', '已显示 {count} 条读数', { count: samples.length }) : tr('chart_monitoring_off', '监听已关闭'));
     }
     function eventLabel(event) {
         if (event.message) return event.message;
-        var labels = { arrival: 'Phone arrived', departure: 'Phone departed', dry_run: 'Learning observation',
-            accepted: 'Command sent · awaiting confirmation', confirmed: 'Vehicle state confirmed',
-            unconfirmed: 'Command sent · no state confirmation', blocked: 'Action blocked', failed: 'Action failed' };
-        return labels[event.type] || String(event.type || 'Activity').replace(/_/g, ' ');
+        var labels = {
+            arrival: tr('event_arrival', '手机靠近到达'),
+            departure: tr('event_departure', '手机远离离开'),
+            dry_run: tr('event_dry_run', '学习观察记录'),
+            accepted: tr('event_accepted', '指令已发送 · 等待确认'),
+            confirmed: tr('event_confirmed', '车辆状态已确认'),
+            unconfirmed: tr('event_unconfirmed', '指令已发送 · 状态未确认'),
+            blocked: tr('event_blocked', '动作被拦截'),
+            failed: tr('event_failed', '动作执行失败')
+        };
+        return labels[event.type] || String(event.type || tr('event_activity', '动态')).replace(/_/g, ' ');
     }
     function renderEvents(events) {
         var list = el('raEventList');
         while (list.firstChild) list.removeChild(list.firstChild);
         events = Array.isArray(events) ? events.slice(0, 40) : [];
-        text('raEventCount', events.length + (events.length === 1 ? ' event' : ' events'));
+        text('raEventCount', tr('events_count_fmt', '{count} 条记录', { count: events.length }));
         if (!events.length) {
             var empty = document.createElement('div'); empty.className = 'ra-history-empty';
             empty.textContent = tr('history_empty', '感应状态变化与车控动作记录将在此处显示。');
@@ -900,14 +917,15 @@ var RemoteAccess = (function () {
         });
     }
     function renderLock(lastAction) {
-        if (!lastAction || !lastAction.status) { text('raLockState', 'Unknown'); return; }
-        var action = lastAction.action === 'lock' || lastAction.action === 'lock_car' ? 'Lock' : 'Unlock';
+        if (!lastAction || !lastAction.status) { text('raLockState', tr('common_unknown', '未知')); return; }
+        var action = lastAction.action === 'lock' || lastAction.action === 'lock_car' ? tr('action_lock', '落锁') : tr('action_unlock', '解锁');
         var status = lastAction.status;
-        var label = status === 'confirmed' ? action + ' confirmed' :
-            status === 'accepted' ? action + ' sent · awaiting readback' :
-            status === 'unconfirmed' ? action + ' sent · unconfirmed' :
-            status === 'dry_run' ? action + ' observed · learning' :
-            status === 'blocked' ? action + ' blocked' : status === 'failed' ? action + ' failed' : 'Unknown';
+        var label = status === 'confirmed' ? action + tr('lock_st_confirmed', ' 已确认') :
+            status === 'accepted' ? action + tr('lock_st_sent_readback', ' 指令已发 · 等待回读') :
+            status === 'unconfirmed' ? action + tr('lock_st_unconfirmed', ' 指令已发 · 未确认') :
+            status === 'dry_run' ? action + tr('lock_st_dry_run', ' 动作触发 · 仅观察') :
+            status === 'blocked' ? action + tr('lock_st_blocked', ' 动作被拦截') :
+            status === 'failed' ? action + tr('lock_st_failed', ' 动作失败') : tr('common_unknown', '未知');
         text('raLockState', label);
         el('raLockState').title = [lastAction.reason, lastAction.confirmationScope].filter(Boolean).join(' · ');
     }
@@ -1180,7 +1198,7 @@ var RemoteAccess = (function () {
         error(''); setBusy(true); state.mutation++;
         api('/config', config).then(function (data) {
             state.dirty = false; state.advancedDraft = null; acceptStatus(data, true);
-            text('raSaveState', 'Saved on the vehicle'); toast('Proximity rules saved');
+            text('raSaveState', tr('saved_on_vehicle', '设置已保存在车机端。')); toast(tr('rules_saved', '靠近感应规则已保存'));
         }).catch(function (err) { error(err.message); }).then(function () { setBusy(false); });
     }
     function toggleBluetoothKeepAlive() {
@@ -1212,14 +1230,14 @@ var RemoteAccess = (function () {
         var device = selectedDevice();
         if (requested && !el('raKeyFobEnabled').checked && !state.phones.some(function (profile) { return profile.enabled; })) {
             el('raMasterToggle').checked = state.enabled;
-            error('Enable keyfob detection or add and enable an approved phone before enabling proximity access.'); return;
+            error(tr('err_enable_source', '请先开启车钥匙检测或添加并启用一部已授权手机，然后再开启靠近感知。')); return;
         }
         error(''); setBusy(true); state.mutation++;
         if (!requested) {
             stopLive();
             disposeVehiclePreview();
             el('remoteAccessPage').classList.remove('ra-live');
-            text('raMasterBadge', 'Stopping…');
+            text('raMasterBadge', tr('stopping', '正在停止…'));
         }
         var changes = { enabled: requested };
         if (requested) {
@@ -1242,14 +1260,17 @@ var RemoteAccess = (function () {
                     }
                     return false;
                 });
-                error(failure || (requested ? 'Proximity access could not start and remains disabled.' :
-                    'Proximity access is still enabled. The disable request was not applied.'));
+                error(failure || (requested ? tr('err_start_failed', '靠近感知启动失败，仍处于关闭状态。') :
+                    tr('err_disable_failed', '靠近感知仍处于开启状态，关闭请求未应用。')));
             } else {
-                toast(enabled ? 'Proximity access enabled' :
-                    data.runtime && data.runtime.cleanupPending ? 'Settings disabled · collector cleanup pending' : 'Proximity access disabled');
+                toast(enabled ? tr('proximity_enabled', '靠近感知已开启') :
+                    data.runtime && data.runtime.cleanupPending ? tr('disabled_cleanup_pending', '设置已关闭 · 等待采集服务退出') : tr('proximity_disabled', '靠近感知已关闭'));
             }
         }).catch(function (err) {
-            error('Could not ' + (requested ? 'enable' : 'disable') + ' proximity access: ' + err.message);
+            error(tr('err_toggle_failed', '无法{action}靠近感知: {error}', {
+                action: requested ? tr('common.enable', '开启') : tr('common.disable', '关闭'),
+                error: err.message
+            }));
             el('raMasterToggle').checked = state.enabled;
             if (state.enabled && visible()) startLive();
         }).then(function () { setBusy(false); renderSignal(); });
@@ -1268,7 +1289,7 @@ var RemoteAccess = (function () {
             state.captures[address][side] = data;
             profileFor(address)[side === 'near' ? 'nearThreshold' : 'awayThreshold'] = Math.round(data.value);
             if (address === state.viewAddress) loadProfileThresholds();
-            text('raCalibrationDetail', (side === 'near' ? 'Nearby' : 'Away') + ' capture added to the draft. Save rules to apply.');
+            text('raCalibrationDetail', (side === 'near' ? tr('status_nearby', '靠近') : tr('status_away', '远离')) + tr('capture_added_draft', ' 标定数据已加入草稿，请保存规则生效。'));
             markDirty();
         }).catch(function (err) { error(err.message); }).then(renderSignal);
     }
@@ -1277,7 +1298,7 @@ var RemoteAccess = (function () {
         ['near', 'away'].forEach(function (side) {
             var capture = captures[side];
             text(side === 'near' ? 'raNearCaptureValue' : 'raAwayCaptureValue',
-                capture ? signalText(capture.value) + ' · ' + capture.sampleCount + ' samples' : 'No saved capture');
+                capture ? signalText(capture.value) + tr('samples_count_fmt', ' · {count} 个样本', { count: capture.sampleCount }) : tr('no_saved_capture', '无已保存标定'));
         });
     }
     function pause() {

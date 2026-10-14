@@ -55,7 +55,7 @@ jobs:
           KEY_ALIAS: ${{ secrets.RELEASE_KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.RELEASE_KEY_PASSWORD }}
         # assembleDebug: keeps debug flags (no R8 shrink) but now uses our fixed keystore
-        run: ./gradlew assembleDebug -PoverdriveVersionName=49.9.21 -PoverdriveVersionCode=49921 -PoverdriveUpdateChannel=alpha --stacktrace --no-daemon
+        run: ./gradlew assembleDebug -PoverdriveVersionName=49.9.22 -PoverdriveVersionCode=49922 -PoverdriveUpdateChannel=alpha --stacktrace --no-daemon
 
       - name: Verify APK signature fingerprint
         run: |
@@ -78,7 +78,7 @@ jobs:
           mkdir -p release-assets
           APK_FILE=$(find app/build/outputs/apk -name "*.apk" | head -1)
           echo "Found built APK: $APK_FILE"
-          cp "$APK_FILE" release-assets/Overdrive-v49.9.21-cn-sec.apk
+          cp "$APK_FILE" release-assets/Overdrive-v49.9.22-cn-sec.apk
           ls -lh release-assets/
 
       - name: Upload APK Artifact
@@ -92,24 +92,31 @@ jobs:
         uses: softprops/action-gh-release@v2
         if: github.ref == 'refs/heads/main'
         with:
-          tag_name: v49.9.21-cn-sec
-          name: OverDrive v49.9.21 - 全量模块车规级深度汉化与灾难级机翻地毯式清零
+          tag_name: v49.9.22-cn-sec
+          name: OverDrive v49.9.22 - 深度排查清理全库机翻与服务侧/原生层地毯式精校
           body: |
-            ## OverDrive v49.9.21 定制版 (全量深度汉化与机翻全面清零)
+            ## OverDrive v49.9.22 定制版 (全库地毯式复查精校)
 
-            ### 🇨🇳 1. 彻底清除全库灾难级机翻 (160+ 词条地毯式精校)
-            - **车规级术语纠偏**：修正“阳光屋顶”为“天窗”、“阳光遮阳”为“遮阳帘”、“闪电失败”为“闪灯失败”、“锁已故障”为“闭锁失败”、“仅粉丝模式”为“纯通风模式”、“弹出感受器”为“制动踏板脚感”、“通道帮助”为“车道辅助”、“离境预防”为“车道偏离抑制”、“集群亮度”为“仪表盘亮度”、“重新计算”为“内循环”、“流量标志识别”为“交通标志识别”、“高1.5米”为“高 (1.5M)”、“双人”为“设备配对”；
-            - **SOH 动力电池健康度**：修正“产能”为“标称容量”、“模型”为“适配车型”、“电池包容量与帧数据不匹配”优化为“电池包容量与实测帧不一致”、“采用实测值”校准流程全贯通；
-            - **哨兵与录像系统**：彻底清除原 DOM 中预录被直出为“经济发展”、延录被直出为“邮件”的离谱历史机翻，修正“虚拟机”为“原厂记录仪”。
+            ### 🇨🇳 1. 彻底清除服务侧与自动化规则荒谬机翻 (Server i18n & Automations)
+            - **动力总成与驾驶**：修正“驱动器和能量列车”为“驾驶与动力总成”、“驱动器模式”为“驾驶模式”；
+            - **空调进气与座舱**：修正“空中重新计算”为“空气内循环”、“重新计算”为“内循环”、“新鲜空气：”为“外循环”、“空中摄入量”为“进气模式”、“引导轮加热器”为“方向盘加热”、“小屋光”为“座舱阅读灯”、“仅限粉丝模式”为“纯通风模式”；
+            - **底盘与脚感**：修正“美福特”为“舒适”、“设置制动画功能”为“设置制动踏板脚感”；
+            - **主动安全与雷达**：修正“盲人点警告”为“盲区预警”、“设置后交叉流量警告”为“设置后方横向来车预警 (RCTA)”、“设置后台交叉流量制表”为“设置后方横向来车制动 (RCTB)”、“设置前台交叉流制图”为“设置前方横向来车制动 (FCTB)”、“设置紧急通道保持中”为“设置紧急车道保持 (ELKA)”、“设置通道助手”为“设置车道辅助”、“设置门打开警告”为“设置开门预警 (DOW)”、“设置前向碰撞警告”为“设置前向碰撞预警 (FCW)”。
 
-            ### 🚗 2. 整车控制与页面零延迟中文首屏 (Zero-FOUC & Full Coverage)
-            - **车控系统 Tab 与 26 项悬浮控件**：修正缺失 `data-i18n` 的系统设置 Tab（原硬编码 `<span>System</span>`），汉化 26 处悬浮按钮 title，规范统一原厂“氛围灯”；
-            - **开发者视图与隧道网络**：`remote-dev-view.html` 与 `wireguard.html` 实现 100% 页面中文直出，汉化启动会话、全屏、截图、键盘、返回等全部操作；
-            - **充电中心与通知中心**：汉化充电曲线图表、日历弹窗、起止时间指示及前后轴状态。
+            ### 🔋 2. 深度精校 ABRP 遥测与通知系统 (ABRP & Notifications)
+            - **ABRP 核心术语重写**：修正“责任的状态”为“电池剩余电量 (SOC)”、“输入”为“上传次数”、“删除的标志”为“访问令牌已删除”、“现场电测”为“实时遥测”、“停车场”为“已驻车”、“开车”为“行驶中”、“快速充电DC”为“直流快充中”、“永远不会”为“从未”；
+            - **推送设置与设备管理**：修正“无名设备”为“未命名设备”、“最后见到的{time}”为“最近活跃于 {time}”、“永远不会”为“从未”，规范统一“仪表盘”。
 
-            ### 🛡️ 3. 门禁与兼容性 100% 达标 (Strict Verification)
-            - 严格通过 `scripts/i18n_check.py` 校验，无漏项 (missing=0, stale=0)，彻底杜绝港台/繁体用词报警；
-            - 保留所有底层定制逻辑（蓝牙钥匙靠近感应解闭锁、本地脱离云端车控、电池 SOH 贯通、媒体平滑闪避压音）。
-          files: release-assets/Overdrive-v49.9.21-cn-sec.apk
+            ### 📱 3. 蓝牙靠近感应解闭锁、防冲锁存与桌面微件动态汉化 (Proximity & Widgets)
+            - **靠近感应 (Remote Access)**：手机/实体钥匙 50+ 项状态原因、实时诊断、滤波时钟、雷达标题、落锁/解锁确认及标定提示全量实现地道中文本地化；
+            - **首屏直出与防抖**：修正 SafeKeep、Widgets、Telegram 页面中原本残留的英文兜底标签，实现 100% 零闪烁中文直出。
+
+            ### 🔋 4. Android 原生层与 SOH 弹窗严谨校准 (Native Strings & SOH)
+            - **电池容量范围校准**：修正 Android 原生弹窗中“容量必须为15-120kWh”错误为“容量必须在 5 - 120 kWh 之间”，兼容混动 PHEV 小电池包；
+            - **实测帧与路况导航**：修正“电池包容量框架不匹配”为“电池包容量与实测帧不一致”、“关闭路由 - 重新计算…”为“偏离路线，正在重新规划…”。
+
+            ### 🛡️ 5. 门禁与兼容性 100% 达标
+            - 严格通过 `scripts/i18n_check.py` 门禁测试 (missing=0, stale=0, variant clean, 0 errors)。
+          files: release-assets/Overdrive-v49.9.22-cn-sec.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
