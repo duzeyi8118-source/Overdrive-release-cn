@@ -38,7 +38,7 @@ public final class RemoteKeyControl {
     private RemoteKeyControl() {}
 
     public static boolean isEnabled() {
-        JSONObject config = UnifiedConfigManager.getConfig();
+        JSONObject config = UnifiedConfigManager.loadConfig();
         return !config.optBoolean("localRemoteKeyDisabled", false);
     }
 

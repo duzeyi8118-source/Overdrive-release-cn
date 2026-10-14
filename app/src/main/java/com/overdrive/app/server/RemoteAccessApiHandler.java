@@ -103,7 +103,7 @@ public final class RemoteAccessApiHandler {
     private RemoteAccessApiHandler() {}
 
     public static synchronized void loadConfig() {
-        JSONObject all = UnifiedConfigManager.getConfig();
+        JSONObject all = UnifiedConfigManager.loadConfig();
         JSONObject ra = all.optJSONObject("remoteAccess");
         if (ra == null) ra = new JSONObject();
 
@@ -242,7 +242,7 @@ public final class RemoteAccessApiHandler {
         try {
             JSONObject incoming = new JSONObject(body != null ? body : "{}");
             synchronized (STATE_LOCK) {
-                JSONObject current = UnifiedConfigManager.getConfig();
+                JSONObject current = UnifiedConfigManager.loadConfig();
                 JSONObject ra = current.optJSONObject("remoteAccess");
                 if (ra == null) ra = new JSONObject();
 
@@ -263,7 +263,7 @@ public final class RemoteAccessApiHandler {
                 }
 
                 current.put("remoteAccess", ra);
-                UnifiedConfigManager.saveConfig(current);
+                UnifiedConfigManager.saveConfig(current, true);
                 loadConfig();
                 bumpSequence();
 
@@ -461,7 +461,7 @@ public final class RemoteAccessApiHandler {
                 logger.info("Executing Proximity UNLOCK for " + ps.name + " (dryRun=" + dryRun + ")");
                 recordAction("unlock", ps.name, dryRun);
                 if (!dryRun) {
-                    VehicleCommandRouter.getInstance().dispatch(new VehicleCommandRouter.UnlockCommand());
+                    VehicleCommandRouter.getInstance().execute(new VehicleCommandRouter.UnlockCommand());
                 }
             }
         } else if ("AWAY".equals(toState) && lockEnabled && "NEAR".equals(fromState)) {
@@ -469,7 +469,7 @@ public final class RemoteAccessApiHandler {
             logger.info("Executing Proximity LOCK for " + ps.name + " (dryRun=" + dryRun + ")");
             recordAction("lock", ps.name, dryRun);
             if (!dryRun) {
-                VehicleCommandRouter.getInstance().dispatch(new VehicleCommandRouter.LockCommand());
+                VehicleCommandRouter.getInstance().execute(new VehicleCommandRouter.LockCommand());
             }
         }
     }

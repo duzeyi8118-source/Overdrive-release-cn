@@ -15169,7 +15169,7 @@ public class BydDataCollector {
         if (isDiLink5Vehicle() && doorLockDevice != null) {
             try {
                 DiLink5DoorLockControl.ReflectivePort port = new DiLink5DoorLockControl.ReflectivePort(doorLockDevice);
-                DiLink5DoorLockControl.Result res = DiLink5DoorLockControl.execute(port, lock, () -> isTracking(), () -> true);
+                DiLink5DoorLockControl.Result res = DiLink5DoorLockControl.execute(port, lock, () -> true, () -> true);
                 if (res != null && res.success) {
                     return true;
                 }
