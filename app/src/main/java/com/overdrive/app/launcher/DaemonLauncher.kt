@@ -419,7 +419,15 @@ class DaemonLauncher(
                 "",
                 "sleep 5",
                 "",
+                "# Ensure WireGuard watchdog is running",
+                "if [ -x /data/local/tmp/start_wg_watchdog.sh ]; then",
+                "  sh /data/local/tmp/start_wg_watchdog.sh >> \"\$LOG_FILE\" 2>&1",
+                "fi",
+                "",
                 "while true; do",
+                "  if [ -x /data/local/tmp/start_wg_watchdog.sh ]; then",
+                "    sh /data/local/tmp/start_wg_watchdog.sh >/dev/null 2>&1",
+                "  fi",
                 // Catch a log left oversized by a previous run before relaunch.
                 // Real-time bounding during the daemon's life is done by the
                 // poller co-process below (the app_process call blocks until
