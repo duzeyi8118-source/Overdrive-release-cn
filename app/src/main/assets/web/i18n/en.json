@@ -2373,7 +2373,10 @@
     "screen_deterrent_video_too_big": "Video resolution too high (max 1920x1080)",
     "theme_download_failed": "Failed to download theme",
     "deterrent_test_ok": "Deterrent triggered",
-    "deterrent_test_failed": "Failed to trigger deterrent"
+    "deterrent_test_failed": "Failed to trigger deterrent",
+    "screen_deterrent_placeholder": "YOU ARE ON CAMERA",
+    "roi_status_default": "Front: Full frame (ROI off)",
+    "usb_power_hardware_note": "This mode can keep Android awake, but parked USB and SD-card power remains best-effort because the vehicle firmware controls the physical rail."
   },
   "mqtt": {
     "tab_connections": "Connections",
@@ -3039,6 +3042,7 @@
     "tab_lights": "Lights",
     "tab_adas": "ADAS",
     "tab_sound": "Sound",
+    "tab_system": "System",
     "avas_ding_dong": "Ding-dong",
     "avas_triple_beep": "Triple beep",
     "avas_chime": "Chime",

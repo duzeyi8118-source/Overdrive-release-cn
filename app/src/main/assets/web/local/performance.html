@@ -944,8 +944,8 @@
                             <!-- Battery capacity row — tappable, opens modal -->
                             <div id="sohCapacityRow" onclick="BYD.performance.openSohCapacityModal()"
                                  style="background:var(--bg-elevated);padding:14px 16px;border-radius:12px;cursor:pointer;border:1px solid var(--border-subtle);">
-                                <div style="font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;" data-i18n="soh.battery_capacity_label">电池容量</div>
-                                <div id="sohCapacitySummary" style="font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:600;color:var(--text-primary);margin-top:4px;" data-i18n="soh.tap_to_set">按下设置</div>
+                                <div style="font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.5px;" data-i18n="soh.battery_capacity_label">动力电池标称容量</div>
+                                <div id="sohCapacitySummary" style="font-family:'JetBrains Mono',monospace;font-size:16px;font-weight:600;color:var(--text-primary);margin-top:4px;" data-i18n="soh.tap_to_set">点击设置</div>
                                 <div id="sohCapacitySource" style="font-size:11px;color:var(--text-muted);margin-top:2px;"></div>
                             </div>
                         </div>
@@ -970,9 +970,9 @@
                          notification's defaultClickUrl points here. JS wires
                          the button to /api/performance/soh/nominal directly. -->
                     <div id="sohFrameMismatchBanner" style="display:none;margin-top:10px;padding:12px 14px;background:rgba(255,176,0,0.08);border:1px solid rgba(255,176,0,0.4);border-radius:8px;">
-                        <div style="font-size:11px;font-weight:700;color:var(--chart-soh);text-transform:uppercase;letter-spacing:0.5px;" data-i18n="soh.frame_mismatch_title">电池包容量与帧数据不匹配</div>
+                        <div style="font-size:11px;font-weight:700;color:var(--chart-soh);text-transform:uppercase;letter-spacing:0.5px;" data-i18n="soh.frame_mismatch_title">电池包容量与实测帧不一致</div>
                         <div id="sohFrameMismatchBody" style="font-size:12px;color:var(--text-primary);margin-top:6px;line-height:1.5;"></div>
-                        <button id="sohFrameMismatchAction" class="btn" style="margin-top:10px;font-size:12px;padding:6px 14px;border-radius:6px;background:var(--chart-soh);color:#000;border:none;cursor:pointer;font-weight:600;" data-i18n="soh.use_observed_value">使用观测值</button>
+                        <button id="sohFrameMismatchAction" class="btn" style="margin-top:10px;font-size:12px;padding:6px 14px;border-radius:6px;background:var(--chart-soh);color:#000;border:none;cursor:pointer;font-weight:600;" data-i18n="soh.use_observed_value">采用实测值</button>
                     </div>
                 </div>
 
@@ -984,14 +984,14 @@
                     <div class="modal-card soh-modal-card" role="dialog" aria-modal="true" aria-labelledby="sohCapacityModalTitle">
                         <h3 id="sohCapacityModalTitle" class="soh-modal-title" data-i18n="soh.modal_title">设置电池容量</h3>
 
-                        <label class="soh-modal-label" for="sohCapacityModalInput" data-i18n="soh.modal_capacity_label">产能 (kWh)</label>
+                        <label class="soh-modal-label" for="sohCapacityModalInput" data-i18n="soh.modal_capacity_label">电池标称容量 (kWh)</label>
                         <input id="sohCapacityModalInput" class="soh-modal-input soh-modal-input-num" type="number" min="5" max="120" step="0.1" />
 
-                        <label class="soh-modal-label" for="sohCapacityModalModel" data-i18n="soh.modal_model_label">模型</label>
+                        <label class="soh-modal-label" for="sohCapacityModalModel" data-i18n="soh.modal_model_label">适配车型</label>
                         <select id="sohCapacityModalModel" class="soh-modal-input soh-modal-select"></select>
 
                         <div class="soh-modal-actions">
-                            <button class="btn btn-secondary" onclick="BYD.performance.resetSohCapacityToAuto()" data-i18n="soh.modal_reset">重新设置为自动检测</button>
+                            <button class="btn btn-secondary" onclick="BYD.performance.resetSohCapacityToAuto()" data-i18n="soh.modal_reset">重置为自动识别</button>
                             <button class="btn btn-secondary" onclick="BYD.performance.closeSohCapacityModal()" data-i18n="common.cancel">取消</button>
                             <button id="sohCapacityModalSave" class="btn btn-primary" onclick="BYD.performance.saveSohCapacity()" data-i18n="soh.modal_save">保存</button>
                         </div>

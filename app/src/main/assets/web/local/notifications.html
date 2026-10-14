@@ -706,10 +706,10 @@
                             <div class="nl-header">
                                 <span class="nl-count" id="nlCount" data-i18n="notiflog.empty">暂无通知</span>
                                 <div class="nl-actions">
-                                    <button class="nl-icon-btn" id="nlSelectToggle" onclick="NOTIFLOG.toggleSelectMode()" title="Select" aria-label="Select">
+                                    <button class="nl-icon-btn" id="nlSelectToggle" onclick="NOTIFLOG.toggleSelectMode()" title="多选" aria-label="多选">
                                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
                                     </button>
-                                    <button class="nl-icon-btn danger" id="nlClearAllBtn" onclick="NOTIFLOG.clearAll()" title="Clear all" aria-label="Clear all">
+                                    <button class="nl-icon-btn danger" id="nlClearAllBtn" onclick="NOTIFLOG.clearAll()" title="清空所有记录" aria-label="清空所有记录">
                                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>
                                     </button>
                                 </div>
@@ -745,7 +745,7 @@
                                     <span class="nl-fchip-label" id="nlSevChipLabel" data-i18n="notiflog.filter_severity">严重程度</span>
                                     <svg class="nl-fchip-caret" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
                                 </button>
-                                <button class="nl-fchip nl-fchip-reset" id="nlResetChip" onclick="NOTIFLOG.resetFilters()" style="display:none;" title="Reset filters" aria-label="Reset filters">
+                                <button class="nl-fchip nl-fchip-reset" id="nlResetChip" onclick="NOTIFLOG.resetFilters()" style="display:none;" title="重置筛选条件" aria-label="重置筛选条件">
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 12a9 9 0 1 0 9-9 9 9 0 0 0-6.36 2.64L3 8"/><path d="M3 3v5h5"/></svg>
                                 </button>
                             </div>
@@ -773,7 +773,7 @@
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg>
                                     <span data-i18n="notiflog.prev">上一页</span>
                                 </button>
-                                <span class="pagination-info" id="nlPageInfo">Page 1 of 1</span>
+                                <span class="pagination-info" id="nlPageInfo">第 1 / 1 页</span>
                                 <button class="pagination-btn next" id="nlNextBtn" onclick="NOTIFLOG.nextPage()" disabled>
                                     <span data-i18n="notiflog.next">下一页</span>
                                     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg>
@@ -851,7 +851,7 @@
                                     <div class="notif-row-label" data-i18n="notif.tyre_unit">胎压显示单位</div>
                                     <div class="notif-row-note" data-i18n="notif.tyre_unit_note">仪表板和预警通知中胎压的呈现单位。下方限额均以 kPa 为基准。</div>
                                 </div>
-                                <div class="notif-seg notif-seg-compact" id="tyreUnitSeg" role="radiogroup" aria-label="Pressure display unit">
+                                <div class="notif-seg notif-seg-compact" id="tyreUnitSeg" role="radiogroup" aria-label="胎压显示单位">
                                     <button type="button" class="notif-seg-btn" data-unit="kpa" role="radio" aria-checked="false">kPa</button>
                                     <button type="button" class="notif-seg-btn" data-unit="psi" role="radio" aria-checked="true">PSI</button>
                                     <button type="button" class="notif-seg-btn" data-unit="bar" role="radio" aria-checked="false">bar</button>
@@ -865,10 +865,10 @@
                                 </div>
                                 <div class="notif-range">
                                     <input class="notif-num" id="tyreFrontLow" type="number" inputmode="numeric"
-                                           min="80" max="600" step="1" aria-label="Front minimum pressure in kPa">
+                                           min="80" max="600" step="1" aria-label="前轴最低胎压 (kPa)">
                                     <span class="notif-range-sep">–</span>
                                     <input class="notif-num" id="tyreFrontHigh" type="number" inputmode="numeric"
-                                           min="80" max="600" step="1" aria-label="Front maximum pressure in kPa">
+                                           min="80" max="600" step="1" aria-label="前轴最高胎压 (kPa)">
                                     <span class="notif-num-unit">kPa</span>
                                 </div>
                             </div>
@@ -880,10 +880,10 @@
                                 </div>
                                 <div class="notif-range">
                                     <input class="notif-num" id="tyreRearLow" type="number" inputmode="numeric"
-                                           min="80" max="600" step="1" aria-label="Rear minimum pressure in kPa">
+                                           min="80" max="600" step="1" aria-label="后轴最低胎压 (kPa)">
                                     <span class="notif-range-sep">–</span>
                                     <input class="notif-num" id="tyreRearHigh" type="number" inputmode="numeric"
-                                           min="80" max="600" step="1" aria-label="Rear maximum pressure in kPa">
+                                           min="80" max="600" step="1" aria-label="后轴最高胎压 (kPa)">
                                     <span class="notif-num-unit">kPa</span>
                                 </div>
                             </div>
@@ -895,7 +895,7 @@
                                 </div>
                                 <div class="notif-range">
                                     <input class="notif-num" id="tyreCriticalLow" type="number" inputmode="numeric"
-                                           min="80" max="600" step="1" aria-label="Critical low pressure in kPa">
+                                           min="80" max="600" step="1" aria-label="极低严重胎压阈值 (kPa)">
                                     <span class="notif-num-unit">kPa</span>
                                 </div>
                             </div>
@@ -958,7 +958,7 @@
                                  subscription is confirmed. Without this the control would
                                  look active + clickable during the load window and a tap
                                  would show a false "enable first" warning. -->
-                            <div class="notif-seg disabled" id="minSeveritySeg" role="radiogroup" aria-label="Minimum importance">
+                            <div class="notif-seg disabled" id="minSeveritySeg" role="radiogroup" aria-label="最小重要性">
                                 <button type="button" class="notif-seg-btn" data-sev="info" role="radio" aria-checked="true" data-i18n="notif.min_info">全部内容</button>
                                 <button type="button" class="notif-seg-btn" data-sev="warn" role="radio" aria-checked="false" data-i18n="notif.min_warn">警告及以上</button>
                                 <button type="button" class="notif-seg-btn" data-sev="critical" role="radio" aria-checked="false" data-i18n="notif.min_critical">仅严重故障</button>
@@ -1313,10 +1313,10 @@
             <div class="nl-date-divider"><span data-i18n="notiflog.filter_custom">自定义范围</span></div>
             <div class="nl-date-summary" id="nlDateSummary" data-i18n="notiflog.range_pick">请选择开始或结束日期</div>
             <div class="calendar-header">
-                <span class="calendar-title" id="nlCalendarTitle">Calendar</span>
+                <span class="calendar-title" id="nlCalendarTitle">日历</span>
                 <div class="calendar-nav">
-                    <button onclick="NOTIFLOG.calPrevMonth()" aria-label="Previous month"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg></button>
-                    <button onclick="NOTIFLOG.calNextMonth()" aria-label="Next month"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></button>
+                    <button onclick="NOTIFLOG.calPrevMonth()" aria-label="上个月"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M15 18l-6-6 6-6"/></svg></button>
+                    <button onclick="NOTIFLOG.calNextMonth()" aria-label="下个月"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18l6-6-6-6"/></svg></button>
                 </div>
             </div>
             <div class="calendar-grid" id="nlCalendarGrid"></div>

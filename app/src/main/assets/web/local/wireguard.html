@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
@@ -55,7 +55,7 @@
             </div>
 
             <header class="page-header">
-                <h1 class="page-title" data-i18n="wireguard.page_title">WireGuard Tunnel</h1>
+                <h1 class="page-title" data-i18n="wireguard.page_title">WireGuard 隧道</h1>
             </header>
 
             <div class="page-body">
@@ -65,7 +65,7 @@
                         <div class="wg-status">
                             <span id="wgDot" class="conn-dot stopped"></span>
                             <div class="wg-status-text">
-                                <div id="wgState" class="wg-state" data-i18n="wireguard.status_loading">Checking status...</div>
+                                <div id="wgState" class="wg-state" data-i18n="wireguard.status_loading">正在检查状态...</div>
                                 <div id="wgDetail" class="wg-detail"></div>
                             </div>
                         </div>
@@ -77,29 +77,29 @@
                     <div class="card-header">
                         <div class="card-title">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                            <span data-i18n="wireguard.card_title">Tunnel configuration</span>
+                            <span data-i18n="wireguard.card_title">隧道网络配置</span>
                         </div>
                     </div>
                     <div class="card-body">
-                        <div class="hint" style="margin-top:0;margin-bottom:12px;" data-i18n="wireguard.intro">Connects the car to your home network through WireGuard. Addresses in AllowedIPs (for example your Home Assistant broker) are reached through the tunnel; everything else keeps its normal route. Upload or paste the peer (client) config your router exported, for example from OPNsense, Fritz!Box or wg-easy.</div>
+                        <div class="hint" style="margin-top:0;margin-bottom:12px;" data-i18n="wireguard.intro">通过 WireGuard 隧道将车机直连至家庭或自建局域网（如 EasyTier、OPNsense、wg-easy 等）。AllowedIPs 范围内的服务（例如 Home Assistant MQTT Broker）将通过隧道传输，其余公网请求保持原生路由。请上传或粘贴路由器/节点导出的客户端配置文件（.conf）。</div>
 
                         <div class="file-row">
-                            <label class="btn btn-secondary" for="wgFile" data-i18n="wireguard.choose_file">Choose .conf file</label>
+                            <label class="btn btn-secondary" for="wgFile" data-i18n="wireguard.choose_file">选择 .conf 配置文件</label>
                             <input type="file" id="wgFile" accept=".conf,text/plain" style="display:none;" onchange="WG.onFile(this)">
                         </div>
 
                         <div class="form-group">
-                            <label for="wgConfig" data-i18n="wireguard.field_config">WireGuard config</label>
+                            <label for="wgConfig" data-i18n="wireguard.field_config">WireGuard 配置内容</label>
                             <textarea id="wgConfig" spellcheck="false" autocomplete="off" autocapitalize="off" autocorrect="off"
                                       placeholder="[Interface]&#10;PrivateKey = ...&#10;Address = 10.10.10.2/32&#10;&#10;[Peer]&#10;PublicKey = ...&#10;Endpoint = vpn.example.org:51820&#10;AllowedIPs = 192.168.1.0/24"></textarea>
                         </div>
                         <div id="wgError" class="wg-error"></div>
-                        <div class="hint" data-i18n="wireguard.key_note">The private key is stored on the car only and is never shown again. Saving a new config replaces the old one.</div>
-                        <div class="hint" data-i18n="wireguard.apply_note">A saved config applies immediately while the tunnel is running. Otherwise, switch on "WireGuard Tunnel" in the car's Daemons screen.</div>
+                        <div class="hint" data-i18n="wireguard.key_note">私钥仅加密存储于车机本地，且不会二次显示。保存新配置将覆盖已有配置。</div>
+                        <div class="hint" data-i18n="wireguard.apply_note">若隧道已在运行，保存新配置后将在数秒内平滑生效。否则请在车机「守护进程」列表中开启 WireGuard 隧道。</div>
 
                         <div class="form-actions">
-                            <button id="wgDeleteBtn" class="btn btn-secondary" style="display:none;" onclick="WG.remove()" data-i18n="wireguard.delete">Delete config</button>
-                            <button class="btn btn-primary" onclick="WG.save()" data-i18n="wireguard.save">Save config</button>
+                            <button id="wgDeleteBtn" class="btn btn-secondary" style="display:none;" onclick="WG.remove()" data-i18n="wireguard.delete">删除配置</button>
+                            <button class="btn btn-primary" onclick="WG.save()" data-i18n="wireguard.save">保存配置</button>
                         </div>
                     </div>
                 </div>

@@ -55,7 +55,7 @@ jobs:
           KEY_ALIAS: ${{ secrets.RELEASE_KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.RELEASE_KEY_PASSWORD }}
         # assembleDebug: keeps debug flags (no R8 shrink) but now uses our fixed keystore
-        run: ./gradlew assembleDebug -PoverdriveVersionName=49.9.20 -PoverdriveVersionCode=49920 -PoverdriveUpdateChannel=alpha --stacktrace --no-daemon
+        run: ./gradlew assembleDebug -PoverdriveVersionName=49.9.21 -PoverdriveVersionCode=49921 -PoverdriveUpdateChannel=alpha --stacktrace --no-daemon
 
       - name: Verify APK signature fingerprint
         run: |
@@ -78,7 +78,7 @@ jobs:
           mkdir -p release-assets
           APK_FILE=$(find app/build/outputs/apk -name "*.apk" | head -1)
           echo "Found built APK: $APK_FILE"
-          cp "$APK_FILE" release-assets/Overdrive-v49.9.20-cn-sec.apk
+          cp "$APK_FILE" release-assets/Overdrive-v49.9.21-cn-sec.apk
           ls -lh release-assets/
 
       - name: Upload APK Artifact
@@ -92,26 +92,24 @@ jobs:
         uses: softprops/action-gh-release@v2
         if: github.ref == 'refs/heads/main'
         with:
-          tag_name: v49.9.20-cn-sec
-          name: OverDrive v49.9.20 - 新增功能模块全量车规级简中精校与原生零延迟首屏
+          tag_name: v49.9.21-cn-sec
+          name: OverDrive v49.9.21 - 全量模块车规级深度汉化与灾难级机翻地毯式清零
           body: |
-            ## OverDrive v49.9.20 定制版 (新增模块全量汉化精校)
+            ## OverDrive v49.9.21 定制版 (全量深度汉化与机翻全面清零)
 
-            ### 🇨🇳 1. 靠近感知页面全量汉化与架构改造 (Proximity Remote-Access)
-            - **原生中文零延迟首屏**：页面属性升级为 `lang="zh-CN"`，所有 DOM 节点默认文本彻底告别硬编码英文，全部改为地道简体中文直出，杜绝弱网及首次加载时的闪烁 (FOUC-free)；
-            - **全量 `data-i18n` 属性绑定**：补齐雷达卡片、信号时序图、标定采集、信号门限区间、车控联动规则、活动动态等 80+ 个关键节点的国际化 key 绑定与 `remote-access.js` 中文 fallback。
+            ### 🇨🇳 1. 彻底清除全库灾难级机翻 (160+ 词条地毯式精校)
+            - **车规级术语纠偏**：修正“阳光屋顶”为“天窗”、“阳光遮阳”为“遮阳帘”、“闪电失败”为“闪灯失败”、“锁已故障”为“闭锁失败”、“仅粉丝模式”为“纯通风模式”、“弹出感受器”为“制动踏板脚感”、“通道帮助”为“车道辅助”、“离境预防”为“车道偏离抑制”、“集群亮度”为“仪表盘亮度”、“重新计算”为“内循环”、“流量标志识别”为“交通标志识别”、“高1.5米”为“高 (1.5M)”、“双人”为“设备配对”；
+            - **SOH 动力电池健康度**：修正“产能”为“标称容量”、“模型”为“适配车型”、“电池包容量与帧数据不匹配”优化为“电池包容量与实测帧不一致”、“采用实测值”校准流程全贯通；
+            - **哨兵与录像系统**：彻底清除原 DOM 中预录被直出为“经济发展”、延录被直出为“邮件”的离谱历史机翻，修正“虚拟机”为“原厂记录仪”。
 
-            ### 🛡️ 2. 防冲锁存 SafeKeep 330+ 词条全量精校 (SafeKeep Localization)
-            - **云存储与备份规则深度汉化**：全量精校 Google Drive、OneDrive、Nextcloud、WebDAV / NAS、SFTP、S3 对象存储说明，对 5 大主标签页 (总览/存储目标/备份规则/配额与限制/同步动态) 实现原生中文直出；
-            - **车规级语料规范**：严格遵循大陆用语规范，彻底清除港台用词残留（“预设”改为“默认/模式”，“设定”改为“设置”等），并补充私钥应急恢复包、加密导出与 Webhooks 回调说明。
+            ### 🚗 2. 整车控制与页面零延迟中文首屏 (Zero-FOUC & Full Coverage)
+            - **车控系统 Tab 与 26 项悬浮控件**：修正缺失 `data-i18n` 的系统设置 Tab（原硬编码 `<span>System</span>`），汉化 26 处悬浮按钮 title，规范统一原厂“氛围灯”；
+            - **开发者视图与隧道网络**：`remote-dev-view.html` 与 `wireguard.html` 实现 100% 页面中文直出，汉化启动会话、全屏、截图、键盘、返回等全部操作；
+            - **充电中心与通知中心**：汉化充电曲线图表、日历弹窗、起止时间指示及前后轴状态。
 
-            ### 🪟 3. 毛玻璃桌面微件原生零延迟改造 (Glass Widgets)
-            - **默认中文直出**：升级 `widgets.html` 为 `lang="zh-CN"`，所有单选框、滑动条、微件类别与外观设置默认直接中文直出；
-            - **微件元数据 Fallback 汉化**：同步更新 `widgets-settings.js` 中 `CATALOG` 所有微件的中文名称与长文本详细描述。
-
-            ### 🚗 4. 整车控制与车机重启弹窗多语言对齐 (Vehicle Control)
-            - **补齐整车上下电确认**：增加 `vehicle.power_on`、`vehicle.power_off` 及其安全二次确认弹窗、Toast 结果字典；
-            - **车机系统重启确认**：将 `btnIviReboot` 弹窗与提示全面接入国际化，避免车端出现英文提示。
-          files: release-assets/Overdrive-v49.9.20-cn-sec.apk
+            ### 🛡️ 3. 门禁与兼容性 100% 达标 (Strict Verification)
+            - 严格通过 `scripts/i18n_check.py` 校验，无漏项 (missing=0, stale=0)，彻底杜绝港台/繁体用词报警；
+            - 保留所有底层定制逻辑（蓝牙钥匙靠近感应解闭锁、本地脱离云端车控、电池 SOH 贯通、媒体平滑闪避压音）。
+          files: release-assets/Overdrive-v49.9.21-cn-sec.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

@@ -185,7 +185,7 @@
                                 </label>
                             </div>
                         </div>
-                        <div class="setting-hint" id="survKeepUsbPowerCapabilityNote" style="display:none;">This mode can keep Android awake, but parked USB and SD-card power remains best-effort because the vehicle firmware controls the physical rail.</div>
+                        <div class="setting-hint" id="survKeepUsbPowerCapabilityNote" style="display:none;" data-i18n="surveillance.usb_power_hardware_note">该模式可保持 Android 系统持续唤醒，但驻车状态下的 USB 及 SD 卡物理供电由车辆底层固件控制，供电保持视车型固件支持情况而定。</div>
 
                         <!-- Parked cellular keep-alive. Default OFF (opt-in): on some
                              models the data module sleeps a while after the car is
@@ -726,7 +726,7 @@
                         </div>
 
                         <!-- ROI status (always visible) -->
-                        <div style="margin-top:8px; font-size:12px; color:var(--text-muted);" id="roiStatus">Front: Full frame (ROI off)</div>
+                        <div style="margin-top:8px; font-size:12px; color:var(--text-muted);" id="roiStatus" data-i18n="surveillance.roi_status_default">前向：全画幅监测 (已关闭自定义检测区域)</div>
                     </div>
                 </div>
 
@@ -938,7 +938,7 @@
                                     <div class="setting-desc" data-i18n="surveillance.screen_deterrent_message_desc">替换默认红屏上的“你已进入监控区域”。</div>
                                 </div>
                                 <div class="setting-control">
-                                    <input type="text" id="screenDeterrentMessage" maxlength="120" class="md-input" oninput="SurvSettings.queueScreenDeterrentMessage(this.value)" placeholder="YOU ARE ON CAMERA" style="padding-top:14px; padding-bottom:14px; line-height:1.2;">
+                                    <input type="text" id="screenDeterrentMessage" maxlength="120" class="md-input" oninput="SurvSettings.queueScreenDeterrentMessage(this.value)" placeholder="注意：您已进入车辆监控范围" data-i18n-attr="placeholder:surveillance.screen_deterrent_placeholder" style="padding-top:14px; padding-bottom:14px; line-height:1.2;">
                                 </div>
                             </div>
 
@@ -1219,12 +1219,12 @@
                             </div>
                         </div>
                         <div class="timeline-visual">
-                            <div class="timeline-segment timeline-pre" id="timelinePre" data-i18n="surveillance.timeline_pre">经济发展</div>
+                            <div class="timeline-segment timeline-pre" id="timelinePre" data-i18n="surveillance.timeline_pre">事件前 (预录)</div>
                             <div class="timeline-segment timeline-event" data-i18n="surveillance.timeline_event">事件</div>
-                            <div class="timeline-segment timeline-post" id="timelinePost" data-i18n="surveillance.timeline_post">邮件</div>
+                            <div class="timeline-segment timeline-post" id="timelinePost" data-i18n="surveillance.timeline_post">事件后 (延时)</div>
                         </div>
                         <div class="timeline-labels">
-                            <span id="preLabel">5s before</span><span data-i18n="surveillance.timeline_motion_detected">发现运动</span><span id="postLabel">10s after</span>
+                            <span id="preLabel">前 5 秒</span><span data-i18n="surveillance.timeline_motion_detected">检测到画面异动</span><span id="postLabel">后 10 秒</span>
                         </div>
                     </div>
                 </div>

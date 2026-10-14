@@ -84,7 +84,7 @@
                     <small data-i18n="remote_dev.live_session_hint">操控真实运行的 OverDrive 车机端界面。仅限驻车时使用。</small>
                 </div>
                 <div class="session-actions">
-                    <button id="startButton" class="dev-button primary">Start session</button>
+                    <button id="startButton" class="dev-button primary" data-i18n="remote_dev.start_session">启动会话</button>
                 </div>
                 <div id="message" role="status" aria-live="polite"></div>
             </section>
@@ -95,33 +95,33 @@
                         <div class="frame-shell">
                             <div class="fullscreen-toolbar">
                                 <button id="fullscreenBackButton" class="dev-button compact" disabled data-i18n="remote_dev.back">返回</button>
-                                <button id="fullscreenKeyboardButton" class="dev-button compact" disabled>Keyboard</button>
-                                <button id="fullscreenScreenshotButton" class="dev-button compact" disabled>Screenshot</button>
+                                <button id="fullscreenKeyboardButton" class="dev-button compact" disabled data-i18n="remote_dev.keyboard">键盘</button>
+                                <button id="fullscreenScreenshotButton" class="dev-button compact" disabled data-i18n="remote_dev.screenshot">屏幕截图</button>
                                 <button id="fullscreenRefreshButton" class="dev-button compact" disabled data-i18n="remote_dev.refresh">刷新</button>
                                 <button id="fullscreenStopButton" class="dev-button compact danger" disabled data-i18n="remote_dev.end">结束会话</button>
                                 <button id="fullscreenExitButton" class="dev-button compact" data-i18n="remote_dev.exit_fullscreen">退出全屏</button>
                             </div>
-                            <div id="framePlaceholder" class="frame-placeholder">Start a session to view Overdrive.</div>
+                            <div id="framePlaceholder" class="frame-placeholder" data-i18n="remote_dev.placeholder">启动会话以查看车机端 OverDrive 界面。</div>
                             <canvas id="remoteFrame" width="960" height="540" role="img" aria-label="OverDrive 实时应用窗口" data-i18n-attr="aria-label:remote_dev.aria_live"></canvas>
                         </div>
                     </div>
                     <div class="viewer-footer">
                         <div class="frame-status">
-                            <span><span id="liveDot" class="status-dot"></span><span id="connectionState">Stopped</span></span>
+                            <span><span id="liveDot" class="status-dot"></span><span id="connectionState" data-i18n="remote_dev.stopped">已停止</span></span>
                             <span id="frameDimensions">--</span>
-                            <span id="pixelCopyState">Capture --</span>
-                            <span id="activityState">Activity --</span>
+                            <span id="pixelCopyState">画面 --</span>
+                            <span id="activityState">界面 --</span>
                         </div>
                         <div class="button-row">
-                            <button id="backButton" class="dev-button compact" disabled>Back</button>
-                            <button id="fullscreenButton" class="dev-button compact" disabled>Fullscreen</button>
-                            <button id="keyboardButton" class="dev-button compact" disabled>Keyboard</button>
-                            <button id="screenshotButton" class="dev-button compact" disabled>Screenshot</button>
+                            <button id="backButton" class="dev-button compact" disabled data-i18n="remote_dev.back">返回</button>
+                            <button id="fullscreenButton" class="dev-button compact" disabled data-i18n="remote_dev.fullscreen">全屏</button>
+                            <button id="keyboardButton" class="dev-button compact" disabled data-i18n="remote_dev.keyboard">键盘</button>
+                            <button id="screenshotButton" class="dev-button compact" disabled data-i18n="remote_dev.screenshot">屏幕截图</button>
                             <button id="refreshButton" class="dev-button compact" disabled data-i18n="remote_dev.refresh">刷新</button>
                             <button id="stopButton" class="dev-button compact danger" disabled data-i18n="remote_dev.end">结束会话</button>
                         </div>
                     </div>
-                    <textarea id="keyboardCapture" class="keyboard-capture" aria-label="Remote keyboard input" autocomplete="off" autocapitalize="sentences" spellcheck="false" disabled></textarea>
+                    <textarea id="keyboardCapture" class="keyboard-capture" aria-label="远程键盘输入" autocomplete="off" autocapitalize="sentences" spellcheck="false" disabled></textarea>
                 </section>
             </div>
         </div>
