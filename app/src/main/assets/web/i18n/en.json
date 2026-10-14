@@ -507,7 +507,7 @@
     "bs_speed_max_aria": "Maximum speed in km/h, 0 for any",
     "bs_speed_min_aria": "Minimum speed in km/h, 0 for any",
     "bs_speed_not_loaded": "Could not read the saved speed range — reload the page before changing it.",
-    "bs_overlay_size": "浮窗默认尺寸"
+    "bs_overlay_size": "Floating window size"
   },
   "status": {
     "device": "Device",
@@ -961,13 +961,13 @@
     "current_a": "{n} A",
     "energy_kwh": "{n} kWh",
     "speed_kmh": "+{n} km/h",
-    "empty_desc": "车辆连接充电桩并启动充电后，系统将自动记录充电曲线与用电数据。",
-    "session_title": "充电详情",
-    "chart_power": "功率曲线",
-    "chart_soc": "SOC 电量曲线",
-    "chart_temp": "电池温度",
-    "action_failed": "控制指令下发失败",
-    "delete_session": "删除该条记录"
+    "empty_desc": "Charging curves and telemetry are automatically recorded once plugged in.",
+    "session_title": "Session details",
+    "chart_power": "Power curve",
+    "chart_soc": "SOC curve",
+    "chart_temp": "Battery temperature",
+    "action_failed": "Failed to dispatch command",
+    "delete_session": "Delete this session"
   },
   "trip": {
     "tab_trips": "Trips",
@@ -1542,10 +1542,10 @@
     "position_missing": "missing",
     "positions_mine": "My positions",
     "positions_from_car": "From the car",
-    "add_action": "添加动作",
-    "running": "正在执行…",
-    "action_vehicle": "控制车辆",
-    "confirm_delete": "确定要删除自动化规则“{0}”吗？"
+    "add_action": "Add action",
+    "running": "Running…",
+    "action_vehicle": "Control vehicle",
+    "confirm_delete": "Are you sure you want to delete the automation rule \"{0}\"?"
   },
   "community": {
     "tab_community": "Community",
@@ -1825,7 +1825,7 @@
     "telemetry_field_highBeam": "High beam",
     "telemetry_field_location": "GPS location",
     "telemetry_field_vin": "VIN",
-    "recording_settings_title": "行车录像"
+    "recording_settings_title": "Dashcam"
   },
   "events": {
     "select_date": "Select Date",
@@ -3157,9 +3157,9 @@
     "ivi_reboot_btn": "Reboot IVI",
     "ivi_reboot_sent": "IVI reboot requested",
     "ivi_reboot_failed": "IVI reboot failed",
-    "climate_duration": "持续运行时长",
-    "windows_vent": "车窗缝隙通风",
-    "windows_close": "一键关闭全部车窗",
+    "climate_duration": "Runtime duration",
+    "windows_vent": "Vent windows",
+    "windows_close": "Close all windows",
     "ventilated_not_available": "Ventilated seat not available on this trim",
     "driver_seat_cool": "Driver Seat Ventilation",
     "passenger_seat_cool": "Passenger Seat Ventilation",
@@ -3227,7 +3227,7 @@
     "badge_off": "OFF",
     "you_are_here": "You are here",
     "popup_radius": "<b>{name}</b><br>{meters}m radius",
-    "delete_zone": "删除安全区域"
+    "delete_zone": "Delete safe zone"
   },
   "liveview": {
     "cameras": "Cameras",
@@ -3413,13 +3413,13 @@
     "tier_platinum": "Platinum",
     "tier_silver": "Silver",
     "tiers_explainer": "Diamond, platinum, gold, silver and bronze mark how much someone has chipped in overall; ×N shows how many separate times they have.",
-    "ack_chimes": "RoadSense 警告提示音 — 来自 Google 音效库，授权许可为",
-    "vin_label": "车辆识别代号 (VIN)",
-    "vin_hidden": "敏感隐私信息已隐藏",
-    "vin_show": "显示 VIN",
-    "vin_hide": "隐藏 VIN",
-    "contributors": "开源贡献者与致谢",
-    "check_update": "检查最新版本"
+    "ack_chimes": "RoadSense alert chimes — from Google Sound Library, licensed under",
+    "vin_label": "Vehicle Identification Number (VIN)",
+    "vin_hidden": "Sensitive privacy info hidden",
+    "vin_show": "Show VIN",
+    "vin_hide": "Hide VIN",
+    "contributors": "Open-source contributors and acknowledgements",
+    "check_update": "Check for updates"
   },
   "byd_cloud": {
     "page_title": "BYD Cloud",
@@ -3608,15 +3608,15 @@
     "glance_windows_closed": "All closed",
     "glance_windows_open": "{n} open",
     "range_breakdown": "{ev} EV · {fuel} fuel",
-    "metric_soc": "当前电量",
-    "metric_speed": "车速",
-    "metric_gear": "挡位",
-    "quick_ac": "远程空调",
-    "action_trips": "行程历史",
-    "action_vehicle_control": "车辆控制",
-    "tunnel_tile_failed": "穿透异常",
-    "tunnel_tile_stopping": "正在停止…",
-    "view_all": "查看全部",
+    "metric_soc": "State of Charge",
+    "metric_speed": "Speed",
+    "metric_gear": "Gear",
+    "quick_ac": "Remote A/C",
+    "action_trips": "Trip history",
+    "action_vehicle_control": "Vehicle control",
+    "tunnel_tile_failed": "Tunnel error",
+    "tunnel_tile_stopping": "Stopping…",
+    "view_all": "View all",
     "drag_reorder": "Drag to reorder"
   },
   "oem_dashcam": {
@@ -4179,10 +4179,10 @@
     "qc_need_label": "Give the button a label.",
     "qc_save_failed": "Could not save dashboard buttons",
     "qc_saved": "Dashboard buttons saved",
-    "step_warmer": "调高 1 度",
-    "step_cooler": "调低 1 度",
-    "mapping_title": "按键映射",
-    "confirm_reset": "确定将所有物理按键恢复为默认未映射状态吗？"
+    "step_warmer": "Raise 1°C",
+    "step_cooler": "Lower 1°C",
+    "mapping_title": "Button mapping",
+    "confirm_reset": "Reset all physical button mappings to default?"
   },
   "network": {
     "nav": "Network",
@@ -5384,8 +5384,7 @@
     "tab_storage": "Storage",
     "tab_backup": "What & when",
     "tab_limits": "Limits",
-    "tab_activity": "Activity",
-    "r_offline: No internet connection": "无互联网连接"
+    "tab_activity": "Activity"
   },
   "assistant": {
     "open_details": "Open details",
