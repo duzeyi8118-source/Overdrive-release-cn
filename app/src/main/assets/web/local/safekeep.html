@@ -1,19 +1,19 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title data-i18n="app.safekeep_title">SafeKeep - OverDrive</title>
+    <title data-i18n="app.safekeep_title">防冲锁存 - OverDrive</title>
     <link rel="icon" type="image/webp" href="../shared/app-icon-dark.webp">
     <script src="../shared/theme.js?v=9"></script>
     <script src="../shared/app-shell.js?v=13"></script>
     <script>
         window.OT_TABS = [
-            { id: 'overview', label: 'Overview', i18n: 'safekeep.tab_overview', svg: '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>', readOnly: true },
-            { id: 'storage', label: 'Storage', i18n: 'safekeep.tab_storage', svg: '<path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/>', readOnly: true },
-            { id: 'backup', label: 'What & when', i18n: 'safekeep.tab_backup', svg: '<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>', readOnly: true },
-            { id: 'limits', label: 'Limits', i18n: 'safekeep.tab_limits', svg: '<line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/>', readOnly: true },
-            { id: 'activity', label: 'Activity', i18n: 'safekeep.tab_activity', svg: '<line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/>', readOnly: true }
+            { id: 'overview', label: '总览', i18n: 'safekeep.tab_overview', svg: '<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/>', readOnly: true },
+            { id: 'storage', label: '存储目标', i18n: 'safekeep.tab_storage', svg: '<path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/>', readOnly: true },
+            { id: 'backup', label: '备份规则', i18n: 'safekeep.tab_backup', svg: '<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>', readOnly: true },
+            { id: 'limits', label: '配额与限制', i18n: 'safekeep.tab_limits', svg: '<line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/>', readOnly: true },
+            { id: 'activity', label: '同步动态', i18n: 'safekeep.tab_activity', svg: '<line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/>', readOnly: true }
         ];
         window.OT_setActiveTab = function (id) {
             var btn = document.querySelector('.bottom-tabs .bottom-tab[data-tab-target="' + id + '"]');
@@ -117,7 +117,7 @@
             <header class="page-header">
                 <h1 class="page-title" data-i18n="safekeep.page_title">SafeKeep</h1>
                 <div class="header-actions">
-                    <span class="status-badge inactive" id="skBadge" data-i18n="safekeep.badge_off">OFF</span>
+                    <span class="status-badge inactive" id="skBadge" data-i18n="safekeep.badge_off">已停用</span>
                 </div>
             </header>
 
@@ -127,21 +127,21 @@
                     <div class="card-header">
                         <div class="card-title">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                            <span data-i18n="safekeep.master_title">Keep a safe copy</span>
+                            <span data-i18n="safekeep.master_title">离车安全归档</span>
                         </div>
                     </div>
                     <div class="card-body">
                         <div class="sk-hero">
                             <div class="sk-hero-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" width="26" height="26"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/><polyline points="9 14 11.5 16.5 16 12"/></svg></div>
                             <div>
-                                <div class="sk-hero-title" data-i18n="safekeep.hero_title">Your clips and trips, off the car</div>
-                                <div class="sk-hero-text" data-i18n="safekeep.hero_text">SafeKeep copies sentry events, saved clips, dashcam recordings and trip history to storage you own — Google Drive, OneDrive, Dropbox, Nextcloud, a NAS or an S3 bucket — so evidence survives even if the car or its SD card doesn't.</div>
+                                <div class="sk-hero-title" data-i18n="safekeep.hero_title">重要视频与行程数据离车归档</div>
+                                <div class="sk-hero-text" data-i18n="safekeep.hero_text">SafeKeep 可将哨兵事件、手动锁存片段、行车记录视频和行程历史自动同步至个人私有存储（如 Google Drive、OneDrive、Dropbox、Nextcloud、私有 NAS 或 S3 存储桶），确保即使车载 SD 卡损坏或车机数据受损，关键取证视频依然万无一失。</div>
                             </div>
                         </div>
                         <div class="setting-row" style="margin-top:16px;">
                             <div class="setting-info">
                                 <div class="setting-name" data-i18n="safekeep.master_toggle">SafeKeep</div>
-                                <div class="setting-desc" data-i18n="safekeep.master_toggle_desc">When off, SafeKeep uses no CPU, storage or network at all.</div>
+                                <div class="setting-desc" data-i18n="safekeep.master_toggle_desc">关闭后，SafeKeep 不占用任何 CPU、存储空间或网络带宽。</div>
                             </div>
                             <div class="setting-control">
                                 <label class="toggle-switch"><input type="checkbox" id="skEnabled" onchange="SK.toggleMaster(this.checked)"><span class="toggle-slider"></span></label>
@@ -153,8 +153,8 @@
                 <div class="card sk-hidden" data-tab="overview" id="skSetupCard" data-collapse="off">
                     <div class="empty-state">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/><line x1="12" y1="11" x2="12" y2="17"/><line x1="9" y1="14" x2="15" y2="14"/></svg>
-                        <p data-i18n="safekeep.setup_empty">Connect your first storage to start backing up.</p>
-                        <button class="btn btn-primary" onclick="SK.openAddStorage()" data-i18n="safekeep.add_storage">Add storage</button>
+                        <p data-i18n="safekeep.setup_empty">请先连接首个存储目标以开启自动备份。</p>
+                        <button class="btn btn-primary" onclick="SK.openAddStorage()" data-i18n="safekeep.add_storage">添加存储目标</button>
                     </div>
                 </div>
 
@@ -162,7 +162,7 @@
                     <div class="card-header">
                         <div class="card-title">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-                            <span data-i18n="safekeep.status_title">Status</span>
+                            <span data-i18n="safekeep.status_title">运行状态</span>
                         </div>
                     </div>
                     <div class="card-body">
@@ -176,15 +176,15 @@
                         <div id="skMobile"></div>
                         <div class="sk-net" id="skNet"></div>
                         <div class="sk-actions">
-                            <button class="btn btn-primary" onclick="SK.syncNow()" data-i18n="safekeep.sync_now">Sync now</button>
+                            <button class="btn btn-primary" onclick="SK.syncNow()" data-i18n="safekeep.sync_now">立即同步</button>
                             <select class="select-control" id="skPauseFor">
-                                <option value="60" data-i18n="safekeep.pause_1h">Pause for 1 hour</option>
-                                <option value="480" data-i18n="safekeep.pause_8h">Pause for 8 hours</option>
-                                <option value="1440" data-i18n="safekeep.pause_24h">Pause for 24 hours</option>
-                                <option value="0" data-i18n="safekeep.pause_forever">Pause until resumed</option>
+                                <option value="60" data-i18n="safekeep.pause_1h">暂停 1 小时</option>
+                                <option value="480" data-i18n="safekeep.pause_8h">暂停 8 小时</option>
+                                <option value="1440" data-i18n="safekeep.pause_24h">暂停 24 小时</option>
+                                <option value="0" data-i18n="safekeep.pause_forever">保持暂停直到手动恢复</option>
                             </select>
-                            <button class="btn btn-secondary" id="skPauseBtn" onclick="SK.pause()" data-i18n="safekeep.pause">Pause</button>
-                            <button class="btn btn-secondary sk-hidden" id="skResumeBtn" onclick="SK.resume()" data-i18n="safekeep.resume">Resume</button>
+                            <button class="btn btn-secondary" id="skPauseBtn" onclick="SK.pause()" data-i18n="safekeep.pause">暂停</button>
+                            <button class="btn btn-secondary sk-hidden" id="skResumeBtn" onclick="SK.resume()" data-i18n="safekeep.resume">恢复</button>
                         </div>
                     </div>
                 </div>
@@ -194,17 +194,17 @@
                     <div class="card-header">
                         <div class="card-title">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 10h-1.26A8 8 0 1 0 9 20h9a5 5 0 0 0 0-10z"/></svg>
-                            <span data-i18n="safekeep.storage_title">Your storage</span>
+                            <span data-i18n="safekeep.storage_title">存储目标</span>
                         </div>
                     </div>
                     <div class="card-body">
                         <div class="safe-zone-list" id="skDestList"></div>
                         <div class="byd-action-row" style="margin-top:14px;">
-                            <button class="btn btn-primary" onclick="SK.openAddStorage()" data-i18n="safekeep.add_storage">Add storage</button>
+                            <button class="btn btn-primary" onclick="SK.openAddStorage()" data-i18n="safekeep.add_storage">添加存储目标</button>
                         </div>
                         <div class="info-box-note" style="margin-top:14px;">
                             <svg class="info-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-                            <div class="info-note" data-i18n="safekeep.storage_note">SafeKeep only sees what it uploads: Google Drive and OneDrive give it access to its own files or folder, never the rest of your account. OverDrive never stores your footage.</div>
+                            <div class="info-note" data-i18n="safekeep.storage_note">SafeKeep 仅能访问其自身上传的文件：Google Drive 和 OneDrive 仅授予独立应用文件夹权限，绝不会触碰您账户下的其他数据。OverDrive 服务器自身绝不留存您的任何视频。</div>
                         </div>
                     </div>
                 </div>
@@ -214,7 +214,7 @@
                 <div class="card" data-tab="backup" id="skLanesSave" data-collapse="off">
                     <div class="card-body">
                         <div class="byd-action-row">
-                            <button class="btn btn-primary" onclick="SK.saveLanes()" data-i18n="safekeep.save">Save</button>
+                            <button class="btn btn-primary" onclick="SK.saveLanes()" data-i18n="safekeep.save">保存配置</button>
                         </div>
                     </div>
                 </div>
@@ -223,115 +223,115 @@
                 <div class="card" data-tab="limits" id="skLimitsNet">
                     <div class="card-header"><div class="card-title">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.55a11 11 0 0 1 14.08 0"/><path d="M1.42 9a16 16 0 0 1 21.16 0"/><path d="M8.53 16.11a6 6 0 0 1 6.95 0"/><line x1="12" y1="20" x2="12.01" y2="20"/></svg>
-                        <span data-i18n="safekeep.home_wifi_title">Home Wi-Fi</span>
+                        <span data-i18n="safekeep.home_wifi_title">常用家庭 Wi-Fi</span>
                     </div></div>
                     <div class="card-body">
-                        <div class="setting-desc" style="margin-bottom:10px;" data-i18n="safekeep.home_wifi_desc">"Home" rules only upload on these networks (or when a NAS on your network answers). Leave empty to treat any Wi-Fi that isn't a phone hotspot as home.</div>
+                        <div class="setting-desc" style="margin-bottom:10px;" data-i18n="safekeep.home_wifi_desc">“家庭网络”规则仅在这些 Wi-Fi 下触发上传（或局域网 NAS 响应时）。若留空，则连接任意非手机热点的 Wi-Fi 均视为家庭网络。</div>
                         <div class="sk-chip-row" id="skHomeSsids"></div>
                         <div class="sk-row-inline" style="margin-top:10px;">
-                            <input class="text-input" id="skSsidInput" style="flex:1;min-width:160px;" data-i18n-attr="placeholder:safekeep.ssid_placeholder" placeholder="Network name">
-                            <button class="btn btn-secondary" onclick="SK.addSsid()" data-i18n="safekeep.add">Add</button>
-                            <button class="btn btn-secondary" id="skAddCurrentSsid" onclick="SK.addCurrentSsid()" data-i18n="safekeep.add_current_wifi">Add current Wi-Fi</button>
+                            <input class="text-input" id="skSsidInput" style="flex:1;min-width:160px;" data-i18n-attr="placeholder:safekeep.ssid_placeholder" placeholder="网络名称 (SSID)">
+                            <button class="btn btn-secondary" onclick="SK.addSsid()" data-i18n="safekeep.add">添加</button>
+                            <button class="btn btn-secondary" id="skAddCurrentSsid" onclick="SK.addCurrentSsid()" data-i18n="safekeep.add_current_wifi">添加当前 Wi-Fi</button>
                         </div>
                     </div>
                 </div>
                 <div class="card" data-tab="limits" id="skLimitsData">
                     <div class="card-header"><div class="card-title">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>
-                        <span data-i18n="safekeep.data_title">Data and bandwidth</span>
+                        <span data-i18n="safekeep.data_title">移动流量与网络带宽</span>
                     </div></div>
                     <div class="card-body">
-                        <div class="setting-row"><div class="setting-info"><div class="setting-name" data-i18n="safekeep.mobile_cap">Mobile data per month (MB)</div><div class="setting-desc" data-i18n="safekeep.mobile_cap_desc">Only rules that allow mobile data can use it. 0 means no mobile data.</div></div>
+                        <div class="setting-row"><div class="setting-info"><div class="setting-name" data-i18n="safekeep.mobile_cap">每月移动蜂窝流量限额 (MB)</div><div class="setting-desc" data-i18n="safekeep.mobile_cap_desc">仅配置了允许蜂窝移动数据的规则可使用。设为 0 表示禁用蜂窝网络上传。</div></div>
                             <div class="setting-control"><input type="number" class="text-input" id="skMobileCap" min="0" max="100000" style="width:96px;min-width:96px;"></div></div>
-                        <div class="setting-row"><div class="setting-info"><div class="setting-name" data-i18n="safekeep.reset_day">Allowance resets on day</div></div>
+                        <div class="setting-row"><div class="setting-info"><div class="setting-name" data-i18n="safekeep.reset_day">每月流量限额重置日期 (号)</div></div>
                             <div class="setting-control"><select class="select-control" id="skResetDay"></select></div></div>
-                        <div class="setting-row"><div class="setting-info"><div class="setting-name" data-i18n="safekeep.driving_mbps">Speed while driving (Mbps)</div><div class="setting-desc" data-i18n="safekeep.driving_mbps_desc">Leaves room for navigation and streaming. 0 = no limit.</div></div>
+                        <div class="setting-row"><div class="setting-info"><div class="setting-name" data-i18n="safekeep.driving_mbps">行驶中上传速率上限 (Mbps)</div><div class="setting-desc" data-i18n="safekeep.driving_mbps_desc">为导航与车载音乐预留网络带宽。0 表示不限速。</div></div>
                             <div class="setting-control"><input type="number" class="text-input" id="skDrivingMbps" min="0" max="1000" step="0.5" style="width:96px;min-width:96px;"></div></div>
-                        <div class="setting-row"><div class="setting-info"><div class="setting-name" data-i18n="safekeep.mobile_mbps">Speed on mobile data (Mbps)</div></div>
+                        <div class="setting-row"><div class="setting-info"><div class="setting-name" data-i18n="safekeep.mobile_mbps">蜂窝网络上传速率上限 (Mbps)</div></div>
                             <div class="setting-control"><input type="number" class="text-input" id="skMobileMbps" min="0" max="1000" step="0.5" style="width:96px;min-width:96px;"></div></div>
-                        <div class="setting-row"><div class="setting-info"><div class="setting-name" data-i18n="safekeep.wifi_mbps">Speed on Wi-Fi while parked (Mbps)</div><div class="setting-desc" data-i18n="safekeep.unlimited_hint">0 = no limit.</div></div>
+                        <div class="setting-row"><div class="setting-info"><div class="setting-name" data-i18n="safekeep.wifi_mbps">驻车 Wi-Fi 上传速率上限 (Mbps)</div><div class="setting-desc" data-i18n="safekeep.unlimited_hint">0 表示不限速。</div></div>
                             <div class="setting-control"><input type="number" class="text-input" id="skWifiMbps" min="0" max="10000" step="1" style="width:96px;min-width:96px;"></div></div>
-                        <div class="setting-row"><div class="setting-info"><div class="setting-name" data-i18n="safekeep.pause_live">Pause videos during live view</div><div class="setting-desc" data-i18n="safekeep.pause_live_desc">Live view shares the car's uplink. Snapshots and trips still go.</div></div>
+                        <div class="setting-row"><div class="setting-info"><div class="setting-name" data-i18n="safekeep.pause_live">远程实时预览时暂停视频上传</div><div class="setting-desc" data-i18n="safekeep.pause_live_desc">实时画面需要占用车机上行带宽。事件快照与行程轨迹不受影响仍会发送。</div></div>
                             <div class="setting-control"><label class="toggle-switch"><input type="checkbox" id="skPauseLive"><span class="toggle-slider"></span></label></div></div>
-                        <div class="setting-row"><div class="setting-info"><div class="setting-name" data-i18n="safekeep.concurrency">Parallel uploads on home Wi-Fi</div></div>
+                        <div class="setting-row"><div class="setting-info"><div class="setting-name" data-i18n="safekeep.concurrency">家庭 Wi-Fi 并发上传线程数</div></div>
                             <div class="setting-control"><div class="btn-group" id="skConcurrency"><button class="btn-toggle" data-value="1" onclick="SK.setToggle('skConcurrency','1')">1</button><button class="btn-toggle" data-value="2" onclick="SK.setToggle('skConcurrency','2')">2</button></div></div></div>
                     </div>
                 </div>
                 <div class="card" data-tab="limits" id="skLimitsPower">
                     <div class="card-header"><div class="card-title">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="6" width="18" height="12" rx="2"/><line x1="23" y1="13" x2="23" y2="11"/></svg>
-                        <span data-i18n="safekeep.power_title">Parked uploads</span>
+                        <span data-i18n="safekeep.power_title">驻车离车上传</span>
                     </div></div>
                     <div class="card-body">
-                        <div class="setting-row"><div class="setting-info"><div class="setting-name" data-i18n="safekeep.parked_minutes">Upload time per parking</div><div class="setting-desc" data-i18n="safekeep.parked_minutes_desc">Caps how long uploads keep going after you park (unlimited while charging).</div></div>
+                        <div class="setting-row"><div class="setting-info"><div class="setting-name" data-i18n="safekeep.parked_minutes">单次驻车最大允许上传时长</div><div class="setting-desc" data-i18n="safekeep.parked_minutes_desc">限制锁车离车后继续上传的最长时间（充电时无此限制）。</div></div>
                             <div class="setting-control"><select class="select-control" id="skParkedMinutes">
-                                <option value="15">15 min</option><option value="30">30 min</option><option value="60">1 h</option><option value="120">2 h</option><option value="240">4 h</option><option value="0" data-i18n="safekeep.no_limit">No limit</option>
+                                <option value="15">15 分钟</option><option value="30">30 分钟</option><option value="60">1 小时</option><option value="120">2 小时</option><option value="240">4 小时</option><option value="0" data-i18n="safekeep.no_limit">不限时长</option>
                             </select></div></div>
-                        <div class="setting-row"><div class="setting-info"><div class="setting-name" data-i18n="safekeep.min_12v">Stop below 12 V battery</div><div class="setting-desc" data-i18n="safekeep.min_12v_desc">Protects the starter battery while parked.</div></div>
+                        <div class="setting-row"><div class="setting-info"><div class="setting-name" data-i18n="safekeep.min_12v">小电瓶电压低于此值时停止上传</div><div class="setting-desc" data-i18n="safekeep.min_12v_desc">驻车时保护 12 V 启动小电瓶，防止亏电。</div></div>
                             <div class="setting-control"><select class="select-control" id="skMin12v">
                                 <option value="118">11.8 V</option><option value="120">12.0 V</option><option value="122">12.2 V</option><option value="124">12.4 V</option><option value="126">12.6 V</option>
                             </select></div></div>
                         <div class="info-box-note" id="skOnOnlyNote" style="display:none;margin-top:10px;">
                             <svg class="info-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
-                            <div class="info-note" data-i18n="safekeep.on_only_note">Your surveillance mode is "Vehicle on only", so SafeKeep can upload only while the car is on.</div>
+                            <div class="info-note" data-i18n="safekeep.on_only_note">当前哨兵模式为“仅在上电时运行”，因此 SafeKeep 仅在车辆上电时执行上传。</div>
                         </div>
                     </div>
                 </div>
                 <div class="card" data-tab="limits" id="skLimitsCar">
                     <div class="card-header"><div class="card-title">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                        <span data-i18n="safekeep.car_storage_title">On the car</span>
+                        <span data-i18n="safekeep.car_storage_title">车载存储配额</span>
                     </div></div>
                     <div class="card-body">
-                        <div class="setting-row"><div class="setting-info"><div class="setting-name" data-i18n="safekeep.vehicle_name">Folder name for this car</div></div>
+                        <div class="setting-row"><div class="setting-info"><div class="setting-name" data-i18n="safekeep.vehicle_name">本车在云端的专属文件夹名称</div></div>
                             <div class="setting-control"><input class="text-input" id="skVehicleName" maxlength="64" style="width:180px;"></div></div>
-                        <div class="setting-row"><div class="setting-info"><div class="setting-name" data-i18n="safekeep.pin_cap">Keep clips waiting to upload (GB)</div><div class="setting-desc" data-i18n="safekeep.pin_cap_desc">Rotation skips clips still waiting to upload, up to this much space and 3 days.</div></div>
+                        <div class="setting-row"><div class="setting-info"><div class="setting-name" data-i18n="safekeep.pin_cap">等待上传的锁存视频保护容量 (GB)</div><div class="setting-desc" data-i18n="safekeep.pin_cap_desc">循环覆盖机制将跳过尚未上传的锁存视频（最高保护该容量且不超过 3 天）。</div></div>
                             <div class="setting-control"><input type="number" class="text-input" id="skPinGb" min="0.5" max="64" step="0.5" style="width:96px;min-width:96px;"></div></div>
-                        <div class="setting-row"><div class="setting-info"><div class="setting-name" data-i18n="safekeep.lock_cap">Space for locked clips (GB)</div><div class="setting-desc" data-i18n="safekeep.lock_cap_desc">Locked clips are never deleted by rotation while SafeKeep is on.</div></div>
+                        <div class="setting-row"><div class="setting-info"><div class="setting-name" data-i18n="safekeep.lock_cap">已锁存视频保留容量 (GB)</div><div class="setting-desc" data-i18n="safekeep.lock_cap_desc">开启 SafeKeep 时，已锁存视频绝不会被循环录像自动删除。</div></div>
                             <div class="setting-control"><input type="number" class="text-input" id="skLockGb" min="0.5" max="128" step="0.5" style="width:96px;min-width:96px;"></div></div>
                     </div>
                 </div>
                 <div class="card" data-tab="limits" id="skLimitsNotify">
                     <div class="card-header"><div class="card-title">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></svg>
-                        <span data-i18n="safekeep.notify_title">Telegram notifications</span>
+                        <span data-i18n="safekeep.notify_title">消息机器人推送通知</span>
                     </div></div>
                     <div class="card-body">
-                        <div class="setting-row"><div class="setting-info"><div class="setting-name" data-i18n="safekeep.notify_auth">Sign-in expired</div></div><div class="setting-control"><label class="toggle-switch"><input type="checkbox" id="skNotifyAuth"><span class="toggle-slider"></span></label></div></div>
-                        <div class="setting-row"><div class="setting-info"><div class="setting-name" data-i18n="safekeep.notify_quota">Storage almost full</div></div><div class="setting-control"><label class="toggle-switch"><input type="checkbox" id="skNotifyQuota"><span class="toggle-slider"></span></label></div></div>
-                        <div class="setting-row"><div class="setting-info"><div class="setting-name" data-i18n="safekeep.notify_mobile">Mobile data allowance used</div></div><div class="setting-control"><label class="toggle-switch"><input type="checkbox" id="skNotifyMobile"><span class="toggle-slider"></span></label></div></div>
-                        <div class="setting-row"><div class="setting-info"><div class="setting-name" data-i18n="safekeep.notify_saved">Each clip saved</div><div class="setting-desc" data-i18n="safekeep.notify_saved_desc">Includes a private link where the storage supports it.</div></div><div class="setting-control"><label class="toggle-switch"><input type="checkbox" id="skNotifySaved"><span class="toggle-slider"></span></label></div></div>
+                        <div class="setting-row"><div class="setting-info"><div class="setting-name" data-i18n="safekeep.notify_auth">云存储登录凭证过期</div></div><div class="setting-control"><label class="toggle-switch"><input type="checkbox" id="skNotifyAuth"><span class="toggle-slider"></span></label></div></div>
+                        <div class="setting-row"><div class="setting-info"><div class="setting-name" data-i18n="safekeep.notify_quota">云存储空间即将耗尽</div></div><div class="setting-control"><label class="toggle-switch"><input type="checkbox" id="skNotifyQuota"><span class="toggle-slider"></span></label></div></div>
+                        <div class="setting-row"><div class="setting-info"><div class="setting-name" data-i18n="safekeep.notify_mobile">本月移动蜂窝流量已用尽</div></div><div class="setting-control"><label class="toggle-switch"><input type="checkbox" id="skNotifyMobile"><span class="toggle-slider"></span></label></div></div>
+                        <div class="setting-row"><div class="setting-info"><div class="setting-name" data-i18n="safekeep.notify_saved">每个视频归档完成时通知</div><div class="setting-desc" data-i18n="safekeep.notify_saved_desc">在支持的云存储上附带私密查看直链。</div></div><div class="setting-control"><label class="toggle-switch"><input type="checkbox" id="skNotifySaved"><span class="toggle-slider"></span></label></div></div>
                     </div>
                 </div>
                 <div class="card" data-tab="limits" id="skLimitsHooks" data-collapse-default="closed">
                     <div class="card-header"><div class="card-title">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg>
-                        <span data-i18n="safekeep.webhooks_title">Webhooks</span>
+                        <span data-i18n="safekeep.webhooks_title">Webhooks 事件回调</span>
                     </div></div>
                     <div class="card-body">
-                        <div class="setting-desc" style="margin-bottom:10px;" data-i18n="safekeep.webhooks_desc">POST a JSON message when a trip finishes or a clip is saved — for Home Assistant, n8n, Zapier and friends. Signed with HMAC-SHA256 when you set a secret.</div>
+                        <div class="setting-desc" style="margin-bottom:10px;" data-i18n="safekeep.webhooks_desc">行程结束或视频片段锁存时向指定地址发送 POST JSON 消息 —— 适配 Home Assistant、n8n 等自动化平台。设置密钥后将附带 HMAC-SHA256 签名。</div>
                         <div id="skWebhooks"></div>
-                        <div class="byd-action-row" style="margin-top:10px;"><button class="btn btn-secondary" onclick="SK.addWebhook()" data-i18n="safekeep.add_webhook">Add webhook</button></div>
+                        <div class="byd-action-row" style="margin-top:10px;"><button class="btn btn-secondary" onclick="SK.addWebhook()" data-i18n="safekeep.add_webhook">添加 Webhook 接收端</button></div>
                     </div>
                 </div>
                 <div class="card" data-tab="limits" id="skLimitsSave" data-collapse="off">
-                    <div class="card-body"><div class="byd-action-row"><button class="btn btn-primary" onclick="SK.saveLimits()" data-i18n="safekeep.save">Save</button></div></div>
+                    <div class="card-body"><div class="byd-action-row"><button class="btn btn-primary" onclick="SK.saveLimits()" data-i18n="safekeep.save">保存配置</button></div></div>
                 </div>
 
                 <!-- ===== Activity ===== -->
                 <div class="card" data-tab="activity" id="skQueueCard" data-collapse="off">
                     <div class="card-header"><div class="card-title">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
-                        <span data-i18n="safekeep.queue_title">Queue</span>
+                        <span data-i18n="safekeep.queue_title">传输队列</span>
                     </div></div>
                     <div class="card-body">
                         <div class="sk-row-inline" style="justify-content:space-between;">
                             <div class="btn-group" id="skQueueFilter">
-                                <button class="btn-toggle active" data-value="" onclick="SK.queueFilter('')" data-i18n="safekeep.filter_open">Open</button>
-                                <button class="btn-toggle" data-value="FAILED" onclick="SK.queueFilter('FAILED')" data-i18n="safekeep.filter_failed">Failed</button>
-                                <button class="btn-toggle" data-value="DONE" onclick="SK.queueFilter('DONE')" data-i18n="safekeep.filter_done">Saved</button>
+                                <button class="btn-toggle active" data-value="" onclick="SK.queueFilter('')" data-i18n="safekeep.filter_open">待处理 / 进行中</button>
+                                <button class="btn-toggle" data-value="FAILED" onclick="SK.queueFilter('FAILED')" data-i18n="safekeep.filter_failed">传输失败</button>
+                                <button class="btn-toggle" data-value="DONE" onclick="SK.queueFilter('DONE')" data-i18n="safekeep.filter_done">已归档</button>
                             </div>
-                            <button class="btn btn-secondary" onclick="SK.retryAll()" data-i18n="safekeep.retry_failed">Retry failed</button>
+                            <button class="btn btn-secondary" onclick="SK.retryAll()" data-i18n="safekeep.retry_failed">重试所有失败项</button>
                         </div>
                         <div id="skQueue" style="margin-top:10px;"></div>
                     </div>
@@ -339,41 +339,41 @@
                 <div class="card" data-tab="activity" id="skCheckCard">
                     <div class="card-header"><div class="card-title">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-                        <span data-i18n="safekeep.check_title">What would upload now?</span>
+                        <span data-i18n="safekeep.check_title">规则预演测试</span>
                     </div></div>
                     <div class="card-body">
-                        <div class="setting-desc" data-i18n="safekeep.check_desc">Checks every rule against the car's current network, power and activity without uploading anything.</div>
-                        <div class="byd-action-row" style="margin-top:10px;"><button class="btn btn-secondary" onclick="SK.dryRun()" data-i18n="safekeep.check_now">Check now</button></div>
+                        <div class="setting-desc" data-i18n="safekeep.check_desc">根据车辆当前的网络、电源与行驶状态预演评估每条规则，不实际上传任何文件。</div>
+                        <div class="byd-action-row" style="margin-top:10px;"><button class="btn btn-secondary" onclick="SK.dryRun()" data-i18n="safekeep.check_now">立即检测预演</button></div>
                         <div id="skDryRun" class="sk-result"></div>
                     </div>
                 </div>
                 <div class="card" data-tab="activity" id="skRestoreCard" data-collapse-default="closed">
                     <div class="card-header"><div class="card-title">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/></svg>
-                        <span data-i18n="safekeep.restore_title">Restore and history</span>
+                        <span data-i18n="safekeep.restore_title">云端数据恢复与历史行程</span>
                     </div></div>
                     <div class="card-body">
-                        <div class="setting-row"><div class="setting-info"><div class="setting-name" data-i18n="safekeep.restore_from">Restore from</div></div>
+                        <div class="setting-row"><div class="setting-info"><div class="setting-name" data-i18n="safekeep.restore_from">从目标存储恢复</div></div>
                             <div class="setting-control"><select class="select-control" id="skRestoreDest"></select></div></div>
                         <div class="md-field" style="margin-top:8px;">
                             <div class="md-field-box">
                                 <input class="md-input" id="skRestoreIdentity" type="password" placeholder=" " autocomplete="off">
-                                <label class="md-label" for="skRestoreIdentity" data-i18n="safekeep.identity_label">Secret key (only for encrypted backups)</label>
+                                <label class="md-label" for="skRestoreIdentity" data-i18n="safekeep.identity_label">解密私钥 (仅加密备份需要)</label>
                             </div>
-                            <span class="md-supporting" data-i18n="safekeep.identity_hint">Starts with AGE-SECRET-KEY-1. Used once in this request, never stored.</span>
+                            <span class="md-supporting" data-i18n="safekeep.identity_hint">以 AGE-SECRET-KEY-1 开头。仅在本次请求中用于解密，绝不会留存在车机。</span>
                         </div>
                         <div class="byd-action-row" style="margin-top:10px;">
-                            <button class="btn btn-secondary" onclick="SK.restoreTrips()" data-i18n="safekeep.restore_trips">Restore trips</button>
-                            <button class="btn btn-secondary" onclick="SK.restoreSettings()" data-i18n="safekeep.restore_settings">Restore settings</button>
+                            <button class="btn btn-secondary" onclick="SK.restoreTrips()" data-i18n="safekeep.restore_trips">恢复行程数据</button>
+                            <button class="btn btn-secondary" onclick="SK.restoreSettings()" data-i18n="safekeep.restore_settings">恢复系统配置</button>
                         </div>
-                        <div class="sk-sub" data-i18n="safekeep.backfill_title">Back up past trips</div>
+                        <div class="sk-sub" data-i18n="safekeep.backfill_title">回溯备份历史行程</div>
                         <div class="sk-row-inline">
                             <select class="select-control" id="skBackfillDays">
-                                <option value="30" data-i18n="safekeep.last_30">Last 30 days</option>
-                                <option value="365" data-i18n="safekeep.last_year">Last year</option>
-                                <option value="0" data-i18n="safekeep.all_history">All history</option>
+                                <option value="30" data-i18n="safekeep.last_30">最近 30 天</option>
+                                <option value="365" data-i18n="safekeep.last_year">最近 1 年</option>
+                                <option value="0" data-i18n="safekeep.all_history">全部历史记录</option>
                             </select>
-                            <button class="btn btn-secondary" onclick="SK.backfillTrips()" data-i18n="safekeep.queue_trips">Queue trips</button>
+                            <button class="btn btn-secondary" onclick="SK.backfillTrips()" data-i18n="safekeep.queue_trips">加入备份队列</button>
                         </div>
                         <div id="skRestoreResult" class="sk-result"></div>
                     </div>

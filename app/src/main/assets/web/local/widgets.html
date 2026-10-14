@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title data-i18n="app.widgets_title">Widgets - OverDrive</title>
+    <title data-i18n="app.widgets_title">桌面微件 - OverDrive</title>
     <link rel="icon" type="image/webp" href="../shared/app-icon-dark.webp">
     <script src="../shared/theme.js?v=9"></script>
     <script src="../shared/app-shell.js?v=13"></script>
@@ -74,8 +74,8 @@
                     <div class="card-body">
                         <div class="setting-row" style="border-bottom:none;">
                             <div class="setting-info">
-                                <div class="setting-name" data-i18n="widgets.master_enable">Show widgets on screen</div>
-                                <div class="setting-desc" data-i18n="widgets.master_enable_desc">Floats the widgets you pick below over the head unit screen. Off by default; nothing is shown until you turn this on.</div>
+                                <div class="setting-name" data-i18n="widgets.master_enable">在屏幕上显示微件</div>
+                                <div class="setting-desc" data-i18n="widgets.master_enable_desc">将所选微件以悬浮形式显示在车机屏幕上。默认关闭；开启后才会显示。</div>
                             </div>
                             <div class="setting-control">
                                 <label class="toggle-switch">
@@ -92,15 +92,15 @@
                     <div class="card-header">
                         <div class="card-title">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="4" width="20" height="14" rx="2"/><path d="M8 21h8"/><path d="M12 18v3"/></svg>
-                            <span data-i18n="widgets.where_title">Where to show</span>
+                            <span data-i18n="widgets.where_title">显示场景</span>
                         </div>
                     </div>
                     <div class="card-body">
                         <div class="gw-seg" role="radiogroup">
-                            <label><input type="radio" name="gwMode" value="home" onchange="WidgetsSettings.set('mode', 'home')"><span data-i18n="widgets.mode_home">Home screen only</span></label>
-                            <label><input type="radio" name="gwMode" value="global" onchange="WidgetsSettings.set('mode', 'global')"><span data-i18n="widgets.mode_global">Over every app</span></label>
+                            <label><input type="radio" name="gwMode" value="home" onchange="WidgetsSettings.set('mode', 'home')"><span data-i18n="widgets.mode_home">仅在桌面显示</span></label>
+                            <label><input type="radio" name="gwMode" value="global" onchange="WidgetsSettings.set('mode', 'global')"><span data-i18n="widgets.mode_global">在所有应用上方悬浮</span></label>
                         </div>
-                        <div class="gw-note" data-i18n="widgets.mode_note">Widgets always hide while reversing. "Home screen only" hides them as soon as another app opens.</div>
+                        <div class="gw-note" data-i18n="widgets.mode_note">挂倒挡时微件会自动隐藏以免遮挡倒车影像。“仅在桌面显示”模式下，一旦打开其它应用微件立即自动隐退。</div>
                     </div>
                 </div>
 
@@ -109,12 +109,12 @@
                     <div class="card-header">
                         <div class="card-title">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
-                            <span data-i18n="widgets.list_title">Widgets to show</span>
+                            <span data-i18n="widgets.list_title">微件列表</span>
                         </div>
                     </div>
                     <div class="card-body">
                         <div class="gw-list" id="gwList"></div>
-                        <div class="gw-note" data-i18n="widgets.list_note">Use the arrows to change the order they appear in.</div>
+                        <div class="gw-note" data-i18n="widgets.list_note">使用上下箭头可调整微件在屏幕上的排列顺序。</div>
                     </div>
                 </div>
 
@@ -123,14 +123,14 @@
                     <div class="card-header">
                         <div class="card-title">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7.5c.5 2.6 1.4 3.5 4 4-2.6.5-3.5 1.4-4 4-.5-2.6-1.4-3.5-4-4 2.6-.5 3.5-1.4 4-4z"/></svg>
-                            <span data-i18n="widgets.floating_title">Floating shortcuts</span>
+                            <span data-i18n="widgets.floating_title">全局悬浮快捷键</span>
                         </div>
                     </div>
                     <div class="card-body">
                         <div class="setting-row">
                             <div class="setting-info">
-                                <div class="setting-name" data-i18n="widgets.floating">Floating shortcuts button</div>
-                                <div class="setting-desc" data-i18n="widgets.floating_desc">A small button that floats over every app, like the trip and recording pill. Tap it for your three automation shortcuts, hold a shortcut to change it, and drag the button anywhere. It uses the same automations as the Automation shortcuts widget.</div>
+                                <div class="setting-name" data-i18n="widgets.floating">全局悬浮快捷球</div>
+                                <div class="setting-desc" data-i18n="widgets.floating_desc">悬浮在所有应用之上的微型快捷球。点击展开 3 个自动化快捷按键，长按可更改绑定，按住可任意拖动。与桌面自动化微件共享配置。</div>
                             </div>
                             <div class="setting-control">
                                 <label class="toggle-switch">
@@ -147,41 +147,41 @@
                     <div class="card-header">
                         <div class="card-title">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 2v20M2 12h20"/><circle cx="12" cy="12" r="4"/></svg>
-                            <span data-i18n="widgets.placement_title">Placement and look</span>
+                            <span data-i18n="widgets.placement_title">排布与外观</span>
                         </div>
                     </div>
                     <div class="card-body">
                         <div class="setting-row">
                             <div class="setting-info">
-                                <div class="setting-name" data-i18n="widgets.arrange">Arrange on screen</div>
-                                <div class="setting-desc" data-i18n="widgets.arrange_desc">Drag each widget anywhere on the screen. You can also long-press any widget to start.</div>
-                                <div class="setting-desc" id="gwArrangedNote" style="display:none" data-i18n="widgets.arranged_note">Arranged on screen: the position and distances below apply after a reset.</div>
+                                <div class="setting-name" data-i18n="widgets.arrange">屏幕自由排布</div>
+                                <div class="setting-desc" data-i18n="widgets.arrange_desc">在车机屏幕上随意拖拽放置各个微件。也可以在车机桌面长按任意微件进入排布模式。</div>
+                                <div class="setting-desc" id="gwArrangedNote" style="display:none" data-i18n="widgets.arranged_note">当前已自定义屏幕位置：下方的位置与边距设置将在重置后生效。</div>
                             </div>
                             <div class="setting-control">
-                                <button class="btn btn-secondary" type="button" id="gwResetArrange" style="display:none" onclick="WidgetsSettings.resetArrangement()" data-i18n="widgets.arrange_reset">Reset</button>
-                                <button class="btn btn-secondary" type="button" onclick="WidgetsSettings.arrange()" data-i18n="widgets.arrange_open">Arrange</button>
+                                <button class="btn btn-secondary" type="button" id="gwResetArrange" style="display:none" onclick="WidgetsSettings.resetArrangement()" data-i18n="widgets.arrange_reset">恢复默认</button>
+                                <button class="btn btn-secondary" type="button" onclick="WidgetsSettings.arrange()" data-i18n="widgets.arrange_open">开始排布</button>
                             </div>
                         </div>
                         <div class="setting-row">
                             <div class="setting-info">
-                                <div class="setting-name" data-i18n="widgets.position">Position</div>
-                                <div class="setting-desc" data-i18n="widgets.position_desc">Corners and bottom show the widgets in a row; left and right stack them in a column.</div>
+                                <div class="setting-name" data-i18n="widgets.position">基准位置</div>
+                                <div class="setting-desc" data-i18n="widgets.position_desc">四角和底部以单行横向排列；左侧和右侧以单列纵向排列。</div>
                             </div>
                             <div class="setting-control">
                                 <select id="gwPosition" class="text-input" onchange="WidgetsSettings.set('position', this.value)">
-                                    <option value="bottom-left" data-i18n="widgets.pos_bottom_left">Bottom left</option>
-                                    <option value="bottom-center" data-i18n="widgets.pos_bottom_center">Bottom centre</option>
-                                    <option value="bottom-right" data-i18n="widgets.pos_bottom_right">Bottom right</option>
-                                    <option value="top-left" data-i18n="widgets.pos_top_left">Top left</option>
-                                    <option value="top-right" data-i18n="widgets.pos_top_right">Top right</option>
-                                    <option value="left" data-i18n="widgets.pos_left">Left edge</option>
-                                    <option value="right" data-i18n="widgets.pos_right">Right edge</option>
+                                    <option value="bottom-left" data-i18n="widgets.pos_bottom_left">左下方</option>
+                                    <option value="bottom-center" data-i18n="widgets.pos_bottom_center">底部居中</option>
+                                    <option value="bottom-right" data-i18n="widgets.pos_bottom_right">右下方</option>
+                                    <option value="top-left" data-i18n="widgets.pos_top_left">左上方</option>
+                                    <option value="top-right" data-i18n="widgets.pos_top_right">右上方</option>
+                                    <option value="left" data-i18n="widgets.pos_left">靠左边缘</option>
+                                    <option value="right" data-i18n="widgets.pos_right">靠右边缘</option>
                                 </select>
                             </div>
                         </div>
                         <div class="setting-row">
                             <div class="setting-info">
-                                <div class="setting-name" data-i18n="widgets.offset_x">Distance from the side</div>
+                                <div class="setting-name" data-i18n="widgets.offset_x">边缘横向边距</div>
                             </div>
                             <div class="setting-control">
                                 <div class="slider-control">
@@ -192,7 +192,7 @@
                         </div>
                         <div class="setting-row">
                             <div class="setting-info">
-                                <div class="setting-name" data-i18n="widgets.offset_y">Distance from the top or bottom</div>
+                                <div class="setting-name" data-i18n="widgets.offset_y">顶部/底部纵向边距</div>
                             </div>
                             <div class="setting-control">
                                 <div class="slider-control">
@@ -203,7 +203,7 @@
                         </div>
                         <div class="setting-row">
                             <div class="setting-info">
-                                <div class="setting-name" data-i18n="widgets.size">Size</div>
+                                <div class="setting-name" data-i18n="widgets.size">尺寸大小</div>
                             </div>
                             <div class="setting-control">
                                 <div class="slider-control">
@@ -214,21 +214,21 @@
                         </div>
                         <div class="setting-row">
                             <div class="setting-info">
-                                <div class="setting-name" data-i18n="widgets.theme">Day / night look</div>
-                                <div class="setting-desc" data-i18n="widgets.theme_desc">Auto follows the head unit's day and night mode.</div>
+                                <div class="setting-name" data-i18n="widgets.theme">日间 / 夜间主题</div>
+                                <div class="setting-desc" data-i18n="widgets.theme_desc">自动跟随车机系统的浅色/深色模式切换。</div>
                             </div>
                             <div class="setting-control">
                                 <select id="gwTheme" class="text-input" onchange="WidgetsSettings.set('theme', this.value)">
-                                    <option value="auto" data-i18n="widgets.theme_auto">Auto</option>
-                                    <option value="night" data-i18n="widgets.theme_night">Always night</option>
-                                    <option value="day" data-i18n="widgets.theme_day">Always day</option>
+                                    <option value="auto" data-i18n="widgets.theme_auto">跟随系统</option>
+                                    <option value="night" data-i18n="widgets.theme_night">常驻深色</option>
+                                    <option value="day" data-i18n="widgets.theme_day">常驻浅色</option>
                                 </select>
                             </div>
                         </div>
                         <div class="setting-row">
                             <div class="setting-info">
-                                <div class="setting-name" data-i18n="widgets.tint">Glass tint</div>
-                                <div class="setting-desc" data-i18n="widgets.tint_desc">How much of the screen behind shows through. Text stays readable down to 70%.</div>
+                                <div class="setting-name" data-i18n="widgets.tint">毛玻璃通透度</div>
+                                <div class="setting-desc" data-i18n="widgets.tint_desc">背景画面的透射程度。低至 70% 依然保持文字清晰可读。</div>
                             </div>
                             <div class="setting-control">
                                 <div class="slider-control">
@@ -239,8 +239,8 @@
                         </div>
                         <div class="setting-row" style="border-bottom:none;">
                             <div class="setting-info">
-                                <div class="setting-name" data-i18n="widgets.reduce_motion">Reduce motion</div>
-                                <div class="setting-desc" data-i18n="widgets.reduce_motion_desc">Turns off animation except hazard warnings.</div>
+                                <div class="setting-name" data-i18n="widgets.reduce_motion">减弱动效</div>
+                                <div class="setting-desc" data-i18n="widgets.reduce_motion_desc">关闭常规动画效果（危险告警动画除外）。</div>
                             </div>
                             <div class="setting-control">
                                 <label class="toggle-switch">
@@ -257,37 +257,37 @@
                     <div class="card-header">
                         <div class="card-title">
                             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="17" r="2.5"/><circle cx="18" cy="17" r="2.5"/><path d="M3.5 17V12l2.5-5h12l2.5 5v5"/><path d="M8.5 17h7"/></svg>
-                            <span data-i18n="widgets.vehicle_title">Vehicle</span>
+                            <span data-i18n="widgets.vehicle_title">车辆动力学</span>
                         </div>
                     </div>
                     <div class="card-body">
                         <div class="setting-row">
                             <div class="setting-info">
-                                <div class="setting-name" data-i18n="widgets.motors">Motors</div>
-                                <div class="setting-desc" data-i18n="widgets.motors_desc">For the power widget. Auto learns it from the car while you drive.</div>
+                                <div class="setting-name" data-i18n="widgets.motors">电机配置</div>
+                                <div class="setting-desc" data-i18n="widgets.motors_desc">供功率微件使用。行驶中系统会自动从车机学习识别。</div>
                             </div>
                             <div class="setting-control">
                                 <select id="gwMotors" class="text-input" onchange="WidgetsSettings.set('motors', this.value)">
-                                    <option value="auto" data-i18n="widgets.motors_auto">Auto</option>
-                                    <option value="fwd" data-i18n="widgets.motors_front">Front motor</option>
-                                    <option value="rwd" data-i18n="widgets.motors_rear">Rear motor</option>
-                                    <option value="awd" data-i18n="widgets.motors_dual">Dual motor</option>
+                                    <option value="auto" data-i18n="widgets.motors_auto">跟随系统</option>
+                                    <option value="fwd" data-i18n="widgets.motors_front">前单电机</option>
+                                    <option value="rwd" data-i18n="widgets.motors_rear">后单电机</option>
+                                    <option value="awd" data-i18n="widgets.motors_dual">双电机 (四驱)</option>
                                 </select>
                             </div>
                         </div>
                         <div class="setting-row">
                             <div class="setting-info">
-                                <div class="setting-name" data-i18n="widgets.units">Tyre pressure units</div>
-                                <div class="setting-desc" data-i18n="widgets.units_desc">Uses the display unit set with the tyre pressure limits in Notifications, like the rest of the app.</div>
+                                <div class="setting-name" data-i18n="widgets.units">胎压单位</div>
+                                <div class="setting-desc" data-i18n="widgets.units_desc">与通知设置中的胎压报警限值保持一致，全局同步车机显示单位。</div>
                             </div>
                             <div class="setting-control">
                                 <span class="slider-value" id="gwUnitNow"></span>
-                                <button class="btn btn-secondary" type="button" onclick="window.location.href='/notifications#tyreLimitsSection'" data-i18n="widgets.units_change">Change</button>
+                                <button class="btn btn-secondary" type="button" onclick="window.location.href='/notifications#tyreLimitsSection'" data-i18n="widgets.units_change">修改单位</button>
                             </div>
                         </div>
                         <div class="setting-row">
                             <div class="setting-info">
-                                <div class="setting-name" data-i18n="widgets.charging_auto">Show charging only while charging</div>
+                                <div class="setting-name" data-i18n="widgets.charging_auto">仅在充电时显示充电微件</div>
                             </div>
                             <div class="setting-control">
                                 <label class="toggle-switch">
@@ -298,8 +298,8 @@
                         </div>
                         <div class="setting-row">
                             <div class="setting-info">
-                                <div class="setting-name" data-i18n="widgets.blind_spot">Show blind-spot detections</div>
-                                <div class="setting-desc" data-i18n="widgets.blind_spot_desc">The power widget lights the side where the car's radar sees a vehicle. Needs a car that reports blind-spot alerts.</div>
+                                <div class="setting-name" data-i18n="widgets.blind_spot">盲区监测预警指示</div>
+                                <div class="setting-desc" data-i18n="widgets.blind_spot_desc">当原车盲区雷达探测到侧后方有来车时，功率微件两侧对应亮起流光预警。需要车型支持上报盲区雷达信号。</div>
                             </div>
                             <div class="setting-control">
                                 <label class="toggle-switch">
@@ -310,8 +310,8 @@
                         </div>
                         <div class="setting-row" style="border-bottom:none;">
                             <div class="setting-info">
-                                <div class="setting-name" data-i18n="widgets.terrain">Altitude and slope on RoadSense</div>
-                                <div class="setting-desc" data-i18n="widgets.terrain_desc">While you drive on a clear road, RoadSense shows your altitude, the slope you're on and the last 2 km of climb behind you, from GPS.</div>
+                                <div class="setting-name" data-i18n="widgets.terrain">RoadSense 海拔与坡度</div>
+                                <div class="setting-desc" data-i18n="widgets.terrain_desc">巡航行驶在开阔道路时，RoadSense 将通过 GPS 实时计算显示当前海拔高度、道路坡度以及过去 2 公里的爬升曲线。</div>
                             </div>
                             <div class="setting-control">
                                 <label class="toggle-switch">

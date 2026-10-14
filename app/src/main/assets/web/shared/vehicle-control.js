@@ -2380,19 +2380,20 @@ var VC = {
         bindPower('btnPowerOff', false);
 
         this.bindBtn('btnIviReboot', function() {
-            var body =
-                'The display and OverDrive will be unavailable while the IVI restarts.';
+            var body = self.translatedText(
+                'vehicle.ivi_reboot_body',
+                'The display and OverDrive will be unavailable while the IVI restarts.');
             var confirmation = window.BYD && BYD.utils
                     && BYD.utils.confirmDialog
                 ? BYD.utils.confirmDialog({
-                    title: 'Reboot IVI?',
+                    title: self.translatedText('vehicle.ivi_reboot_confirm', 'Reboot IVI?'),
                     body: body,
-                    confirmLabel: 'Reboot IVI',
-                    cancelLabel: 'Cancel',
+                    confirmLabel: self.translatedText('vehicle.ivi_reboot_btn', 'Reboot IVI'),
+                    cancelLabel: self.translatedText('common.cancel', 'Cancel'),
                     danger: true
                 })
                 : Promise.resolve(window.confirm(
-                    'Reboot the IVI now? ' + body));
+                    self.translatedText('vehicle.ivi_reboot_confirm', 'Reboot IVI?') + ' ' + body));
             Promise.resolve(confirmation).then(function(confirmed) {
                 if (!confirmed) return;
                 self.setPending('btnIviReboot', true);
@@ -2402,8 +2403,8 @@ var VC = {
                     self.setPending('btnIviReboot', false);
                     self.toastFromResult(
                         result,
-                        'IVI reboot requested',
-                        'IVI reboot failed');
+                        self.translatedText('vehicle.ivi_reboot_sent', 'IVI reboot requested'),
+                        self.translatedText('vehicle.ivi_reboot_failed', 'IVI reboot failed'));
                 });
             });
         });

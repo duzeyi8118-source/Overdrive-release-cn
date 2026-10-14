@@ -143,7 +143,7 @@ var RemoteAccess = (function () {
         while (select.firstChild) select.removeChild(select.firstChild);
         var placeholder = document.createElement('option');
         placeholder.value = '';
-        placeholder.textContent = state.phones.length ? 'Select an approved phone' : 'Add an approved phone';
+        placeholder.textContent = state.phones.length ? tr('select_approved', '选择已授权手机') : tr('add_approved', '添加授权手机');
         select.appendChild(placeholder);
         var matched = false;
         state.phones.forEach(function (device) {
@@ -160,7 +160,7 @@ var RemoteAccess = (function () {
         select.disabled = !state.ready || state.saving;
         var add = el('raAddPhoneSelect'), addWanted = add.value;
         while (add.firstChild) add.removeChild(add.firstChild);
-        var option = document.createElement('option'); option.value = ''; option.textContent = 'Choose a paired phone'; add.appendChild(option);
+        var option = document.createElement('option'); option.value = ''; option.textContent = tr('select_phone', '选择一部已配对手机'); add.appendChild(option);
         state.devices.forEach(function (device) {
             if (!device.address || profileFor(device.address)) return;
             var item = document.createElement('option'); item.value = device.address;
@@ -284,7 +284,7 @@ var RemoteAccess = (function () {
         while (roster.firstChild) roster.removeChild(roster.firstChild);
         if (!state.phones.length) {
             var empty = document.createElement('div'); empty.className = 'ra-roster-empty';
-            empty.textContent = 'Add paired phones below. Nothing is monitored until the master switch is enabled.';
+            empty.textContent = tr('roster_empty', '请在下方添加已配对手机。在总开关开启前，不会执行任何监听。');
             roster.appendChild(empty); return;
         }
         state.phones.forEach(function (profile) {
@@ -390,7 +390,7 @@ var RemoteAccess = (function () {
     function markDirty() {
         storeProfileThresholds();
         state.dirty = true;
-        text('raSaveState', tr('unsaved', 'Unsaved changes · Save rules to apply'));
+        text('raSaveState', tr('unsaved', '有未保存的修改 · 请点击保存规则以应用'));
         updateRulesSummary();
         drawChart();
         renderPhoneMarkers();
@@ -407,32 +407,32 @@ var RemoteAccess = (function () {
         el('raKeyFobLockEnabled').disabled = !state.ready || state.saving || !fobDraft ||
             (!supports('keyFob') || !supports('keyFobLock')) && !el('raKeyFobLockEnabled').checked;
         text('raKeyFobLockDetail', !supports('keyFob') || !supports('keyFobLock') ?
-            tr('keyfob_lock_unsupported', 'Keyfob departure locking is unsupported on this car. A saved rule can be switched off.') :
-            !fobDraft ? tr('keyfob_lock_requires_detection', 'Enable Keyfob detection above to use departure locking. Automatic lock must also be on.') :
-            tr('keyfob_lock_desc', 'With Automatic lock on, require confirmed fob departure. Every enabled phone must also be Away. Unknown signals block locking.'));
+            tr('keyfob_lock_unsupported', '当前车型不支持钥匙远离落锁检测。可关闭已保存的规则。') :
+            !fobDraft ? tr('keyfob_lock_requires_detection', '请先在上方启用“车钥匙靠近感知”以使用离车落锁功能。且必须同时开启“离车自动落锁”。') :
+            tr('keyfob_lock_desc', '开启离车自动落锁时，需确认钥匙已远离车辆。同时所有已启用的手机也必须处于远离状态。未知信号将阻止落锁。'));
         var phones = state.phones.some(function (phone) { return phone.enabled; });
         var fobHint = near ?
-            tr('keyfob_near_hint', 'Keyfob: unlock on a fresh detection event; no prior Away event is required.') :
-            tr('keyfob_return_hint', 'Keyfob: confirm an Away event first, then unlock on a fresh detection event.');
+            tr('keyfob_near_hint', '车钥匙：检测到钥匙即解锁；不需要前置远离事件。') :
+            tr('keyfob_return_hint', '车钥匙：需先确认远离，再次检测到钥匙靠近时才触发解锁。');
         var detail = near ?
-            tr('unlock_near_detail', 'Unlock when any enabled approved phone has a stable Near signal.') :
-            tr('unlock_return_detail', 'Unlock when any enabled approved phone returns from Away to Near.');
+            tr('unlock_near_detail', '当任意一部已启用的授权手机处于稳定的靠近状态时自动解锁。') :
+            tr('unlock_return_detail', '当任意一部已启用的授权手机从“远离”重新回到“靠近”范围时自动解锁。');
         text('raUnlockRuleDetail', fob && !phones ? fobHint :
-            detail + (fob ? ' ' + tr('keyfob_unlock_detail', 'Enabled keyfob detection can also trigger unlock.') : ''));
+            detail + (fob ? ' ' + tr('keyfob_unlock_detail', '启用车钥匙感应亦可触发自动解锁。') : ''));
         var hint = near ?
-            tr('unlock_trigger_near_hint', 'Unlock after a stable Near signal, including first connection or reconnection. No prior Away signal is required.') :
-            tr('unlock_trigger_away_to_near_hint', 'Confirm Away first, then unlock after a stable return to Near. First connection and reconnection alone do not unlock.');
+            tr('unlock_trigger_near_hint', '检测到稳定的靠近信号即解锁，包含首次连接或断开重连。无需前置离开过程。') :
+            tr('unlock_trigger_away_to_near_hint', '先确认人已走远，重新靠近时方触发解锁。首次连接或信号重连不会误解锁（推荐，防误开锁）。');
         text('raUnlockTriggerHint', fob && !phones ? fobHint :
-            (fob ? tr('phone_trigger_prefix', 'Phones:') + ' ' : '') + hint + (fob ? ' ' + fobHint : ''));
+            (fob ? tr('phone_trigger_prefix', '手机：') + ' ' : '') + hint + (fob ? ' ' + fobHint : ''));
         text('raLockRuleDetail', lockRuleDetail(phones, fobLock));
     }
     function lockRuleDetail(phones, fobLock) {
         if (fobLock) return phones ?
-            tr('lock_phone_fob_detail', 'All enabled phones must be freshly Away and keyfob departure must be confirmed. Nearby or unknown signals block locking. Power and closures are checked.') :
-            tr('lock_fob_detail', 'Lock after confirmed keyfob departure. Unknown signals block locking. Power and closures are checked.');
+            tr('lock_phone_fob_detail', '所有启用的手机必须全部处于远离状态且确认钥匙已远离。周围有信号或状态未知将阻止落锁。执行前会自动校验电源与车门闭合状态。') :
+            tr('lock_fob_detail', '确认车钥匙远离后落锁。未知信号将阻止落锁。执行前会自动校验电源与车门闭合状态。');
         return phones ?
-            tr('lock_phone_detail', 'All enabled phones must be freshly Away. Near, unknown or disconnected blocks locking. Bluetooth cannot detect occupants or keys inside.') :
-            tr('lock_no_sources', 'Departure locking is inactive. Enable an approved phone or keyfob departure locking.');
+            tr('lock_phone_detail', '所有启用的手机必须全部处于远离状态。靠近、未知或断开连接将阻止落锁。注意：蓝牙无法检测车内是否遗留乘客或钥匙。') :
+            tr('lock_no_sources', '离车落锁未激活。请启用已授权手机或开启钥匙远离落锁。');
     }
     function toggleKeyFob() {
         if (!el('raKeyFobEnabled').checked) el('raKeyFobLockEnabled').checked = false;
@@ -446,18 +446,18 @@ var RemoteAccess = (function () {
         var fobEnabled = el('raKeyFobEnabled').checked && supports('keyFob');
         var fobOnly = fobEnabled && !state.phones.some(function (phone) { return phone.enabled; });
         var label;
-        if (learning) label = tr('preview_note', 'Monitor preview is on. Vehicle commands are disabled.');
-        else if (!unlock && !lock) label = tr('no_actions', 'Monitoring only. Both automatic vehicle actions are disabled.');
+        if (learning) label = tr('preview_note', '监控预览模式已开启，车控指令已暂停执行。');
+        else if (!unlock && !lock) label = tr('no_actions', '仅监测模式。已禁用所有自动车控动作。');
         else {
             label = unlock ? el('raUnlockTrigger').value === 'near' ?
-                tr('unlock_near_note', 'Unlock accepts a confirmed Near signal, including first connection or reconnection. Power and closures are checked.') :
-                tr('unlock_return_note', 'Unlock requires a confirmed departure followed by a stable return. Startup and reconnection alone do not trigger an action.') : '';
+                tr('unlock_near_note', '只要检测到稳定的靠近信号即可解锁（包括首次连接或重新连接）。执行前会自动校验车辆电源状态。') :
+                tr('unlock_return_note', '必须先经历一次明确的离开，随后重新靠近方可触发解锁。单纯系统启动或重连不会误触发。') : '';
             if (unlock && fobEnabled) label += ' ' + (el('raUnlockTrigger').value === 'near' ?
-                tr('keyfob_near_hint', 'Keyfob: unlock on a fresh detection event; no prior Away event is required.') :
-                tr('keyfob_return_hint', 'Keyfob: confirm an Away event first, then unlock on a fresh detection event.'));
+                tr('keyfob_near_hint', '车钥匙：检测到钥匙即解锁；不需要前置远离事件。') :
+                tr('keyfob_return_hint', '车钥匙：需先确认远离，再次检测到钥匙靠近时才触发解锁。'));
             if (unlock && fobOnly) label = (el('raUnlockTrigger').value === 'near' ?
-                tr('keyfob_near_hint', 'Keyfob: unlock on a fresh detection event; no prior Away event is required.') :
-                tr('keyfob_return_hint', 'Keyfob: confirm an Away event first, then unlock on a fresh detection event.')) + ' Power and closures are checked.';
+                tr('keyfob_near_hint', '车钥匙：检测到钥匙即解锁；不需要前置远离事件。') :
+                tr('keyfob_return_hint', '车钥匙：需先确认远离，再次检测到钥匙靠近时才触发解锁。')) + ' Power and closures are checked.';
             if (lock) label += (label ? ' ' : '') + lockRuleDetail(
                 state.phones.some(function (phone) { return phone.enabled; }),
                 fobEnabled && supports('keyFobLock') && el('raKeyFobLockEnabled').checked);
@@ -552,38 +552,38 @@ var RemoteAccess = (function () {
         var value = String(fob.state || 'UNKNOWN').toUpperCase();
         var label, detail, style;
         if (!supports('keyFob')) {
-            label = tr('keyfob_unavailable', 'Unavailable'); detail = 'Keyfob proximity is unsupported on this car.'; style = 'unavailable';
+            label = tr('keyfob_unavailable', '不可用'); detail = 'Keyfob proximity is unsupported on this car.'; style = 'unavailable';
         } else if (!el('raKeyFobEnabled').checked) {
-            label = tr('keyfob_disabled', 'Disabled'); detail = tr('keyfob_disabled_detail', 'Keyfob detection is disabled.'); style = 'disabled';
+            label = tr('keyfob_disabled', '已禁用'); detail = tr('keyfob_disabled_detail', '车钥匙靠近检测已禁用。'); style = 'disabled';
         } else if (!configured) {
-            label = tr('keyfob_save_first', 'Save to start detection'); detail = tr('keyfob_save_first_detail', 'Save rules to apply keyfob detection.'); style = 'waiting';
+            label = tr('keyfob_save_first', '请保存以开始检测'); detail = tr('keyfob_save_first_detail', '保存规则后方可应用车钥匙感应功能。'); style = 'waiting';
         } else if (!state.enabled) {
-            label = tr('keyfob_monitoring_off', 'Monitoring off'); detail = tr('keyfob_master_off', 'The master switch stops keyfob monitoring and actions.'); style = 'disabled';
+            label = tr('keyfob_monitoring_off', '监听已关闭'); detail = tr('keyfob_master_off', '总开关已关闭，暂停车钥匙监听与联动动作。'); style = 'disabled';
         } else if (!active) {
             var reason = fob.reason || fob.sourceStatus;
-            label = reason === 'vehicle_not_off' ? tr('keyfob_waiting_power', 'Waiting for power off') :
+            label = reason === 'vehicle_not_off' ? tr('keyfob_waiting_power', '等待车辆熄火断电') :
                 reason === 'vehicle_not_locked' && !(state.config && state.config.keyFobLockEnabled === true) ?
-                    tr('keyfob_waiting_lock', 'Waiting for vehicle lock') :
-                reason === 'collector_stale' ? tr('keyfob_stale', 'Updates stopped') :
-                reason === 'stopped' || reason === 'revoked' || reason === 'disabled' ? tr('keyfob_stopped', 'Stopped') :
+                    tr('keyfob_waiting_lock', '等待车辆落锁') :
+                reason === 'collector_stale' ? tr('keyfob_stale', '信号已停止更新') :
+                reason === 'stopped' || reason === 'revoked' || reason === 'disabled' ? tr('keyfob_stopped', '已停止') :
                 reason === 'receiver_unavailable' || reason === 'table_unavailable' ||
                 reason === 'registration_failed' || reason === 'cleanup_failed' ||
-                reason === 'unsupported_platform' || reason === 'unavailable' ? tr('keyfob_unavailable', 'Unavailable') :
-                tr('keyfob_waiting', 'Waiting for vehicle signal');
-            detail = keyFobReasonText(reason); style = label === tr('keyfob_unavailable', 'Unavailable') ||
+                reason === 'unsupported_platform' || reason === 'unavailable' ? tr('keyfob_unavailable', '不可用') :
+                tr('keyfob_waiting', '等待车辆信号');
+            detail = keyFobReasonText(reason); style = label === tr('keyfob_unavailable', '不可用') ||
                 reason === 'collector_stale' ? 'unavailable' : 'waiting';
         } else if (fresh && value === 'NEAR') {
-            label = tr('keyfob_detected', 'Detected');
-            detail = tr('keyfob_fresh_detection', 'Fresh keyfob detection event') + ' · ' + eventAgeText(age); style = 'detected';
+            label = tr('keyfob_detected', '已检测到钥匙');
+            detail = tr('keyfob_fresh_detection', '最新钥匙靠近事件') + ' · ' + eventAgeText(age); style = 'detected';
         } else if (fresh && value === 'AWAY') {
-            label = tr('keyfob_away_event', 'Away event');
-            detail = tr('keyfob_fresh_away', 'Fresh keyfob Away event') + ' · ' + eventAgeText(age); style = 'listening';
+            label = tr('keyfob_away_event', '钥匙远离事件');
+            detail = tr('keyfob_fresh_away', '最新钥匙远离事件') + ' · ' + eventAgeText(age); style = 'listening';
         } else if (age !== null && (fob.lastKnownState === 'NEAR' || fob.lastKnownState === 'AWAY')) {
-            label = fob.lastKnownState === 'NEAR' ? tr('keyfob_last_detected', 'Last detected') : tr('keyfob_last_away', 'Last Away event');
-            detail = eventAgeText(age) + ' · ' + tr('keyfob_listening_next', 'Listening for the next event. Current proximity is unknown.'); style = 'listening';
+            label = fob.lastKnownState === 'NEAR' ? tr('keyfob_last_detected', '上次检测到钥匙') : tr('keyfob_last_away', '上次远离事件');
+            detail = eventAgeText(age) + ' · ' + tr('keyfob_listening_next', '正在监听下次事件。当前距离未知。'); style = 'listening';
         } else {
-            label = tr('keyfob_listening', 'Listening');
-            detail = tr('keyfob_waiting_event', 'Waiting for a fresh keyfob approach event.'); style = 'listening';
+            label = tr('keyfob_listening', '正在监听');
+            detail = tr('keyfob_waiting_event', '等待新的钥匙靠近事件。'); style = 'listening';
         }
         if (supports('keyFob') && !supports('keyFobLock') && el('raKeyFobEnabled').checked)
             detail += ' Keyfob departure locking is unsupported on this car.';
@@ -591,7 +591,7 @@ var RemoteAccess = (function () {
     }
     function keyFobReasonText(reason) {
         if (reason === 'vehicle_not_locked' && state.config && state.config.keyFobLockEnabled === true)
-            return tr('keyfob_lock_state_waiting', 'Waiting for a valid vehicle lock state.');
+            return tr('keyfob_lock_state_waiting', '等待有效的车锁状态。');
         var labels = {
             disabled: 'Keyfob detection is disabled.', master_off: 'Proximity is disabled.',
             no_device: 'Waiting for the vehicle keyfob receiver.',
@@ -619,7 +619,7 @@ var RemoteAccess = (function () {
             event_stale: 'The last keyfob event expired. Waiting for a fresh event.',
             unknown_event: 'The vehicle event does not report keyfob presence.'
         };
-        return labels[reason] || tr('keyfob_waiting_source', 'Waiting for the vehicle keyfob receiver.');
+        return labels[reason] || tr('keyfob_waiting_source', '等待车身钥匙接收器响应。');
     }
     function renderKeyFobStatus() {
         var panel = el('raKeyFobPanel'), view = keyFobView();
@@ -635,10 +635,10 @@ var RemoteAccess = (function () {
         el('raKeyFobDepartureRow').hidden = !lockDraft;
         text('raKeyFobDeparture', !supports('keyFob') || !supports('keyFobLock') ? 'Unsupported on this car' :
             !state.config || state.config.keyFobLockEnabled !== true ?
-            tr('keyfob_lock_save_first', 'Save to apply') : !state.enabled ?
-                tr('keyfob_monitoring_off', 'Monitoring off') : view.active && view.fob.departureKnown === true ?
-                    tr('keyfob_departure_confirmed', 'Departure confirmed') :
-                    tr('keyfob_departure_waiting', 'Waiting for departure'));
+            tr('keyfob_lock_save_first', '请保存规则以应用') : !state.enabled ?
+                tr('keyfob_monitoring_off', '监听已关闭') : view.active && view.fob.departureKnown === true ?
+                    tr('keyfob_departure_confirmed', '已确认钥匙远离') :
+                    tr('keyfob_departure_waiting', '等待钥匙远离'));
         renderKeyFobMarker(view);
         return view;
     }
@@ -698,7 +698,7 @@ var RemoteAccess = (function () {
         view = view || keyFobView();
         var shown = visible() && el('raKeyFobEnabled').checked && view.fresh && view.state === 'NEAR';
         if (shown) {
-            var label = tr('keyfob_marker', 'Keyfob · Detected');
+            var label = tr('keyfob_marker', '车钥匙 · 已感应');
             var marker = svgNode('g', { 'class': 'ra-keyfob-marker', role: 'img',
                 'aria-label': label, transform: 'translate(150 44)' });
             marker.appendChild(svgNode('title', {}, label));
@@ -710,7 +710,7 @@ var RemoteAccess = (function () {
                 stroke: 'currentColor', 'stroke-width': '1.6', 'stroke-linecap': 'round',
                 'stroke-linejoin': 'round' }));
             marker.appendChild(svgNode('text', { 'class': 'ra-phone-label', x: '0', y: '30',
-                'text-anchor': 'middle' }, tr('keyfob_marker_label', 'Keyfob')));
+                'text-anchor': 'middle' }, tr('keyfob_marker_label', '车钥匙')));
             links.appendChild(svgNode('path', { 'class': 'ra-phone-link', fill: 'none',
                 d: 'M182 98L150 44' }));
             markers.appendChild(marker);
@@ -757,7 +757,7 @@ var RemoteAccess = (function () {
             proximity = fob.fresh && fob.state === 'NEAR' ? 'NEAR' : 'UNKNOWN';
         }
         text('raSignalTitle', !state.enabled ? 'Monitoring is disabled' : fobOnly ?
-            supports('keyFob') ? tr('keyfob_monitoring_title', 'Monitoring your keyfob') : 'Keyfob proximity unavailable' :
+            supports('keyFob') ? tr('keyfob_monitoring_title', '正在监听车钥匙信号') : 'Keyfob proximity unavailable' :
             !supports('bluetooth') ? 'Phone proximity unavailable' : !connected ? 'Waiting for your phone' : 'Your phone is ' + label.toLowerCase());
         text('raProximityState', label);
         text('raProximityDetail', detail);
@@ -780,7 +780,7 @@ var RemoteAccess = (function () {
         el('raConnectionDot').className = 'ra-status-dot' + (connected ? ' connected' : '');
         text('raDeviceAddress', state.viewAddress || '—');
         text('raArmedState', state.config && state.config.unlockTrigger === 'near' ?
-            tr('departure_not_required', 'Prior departure not required') :
+            tr('departure_not_required', '无需前置远离事件') :
             state.enabled && signal.armed && !stale && connected ? 'Armed for return' : 'Disarmed');
         text('raModeLabel', state.config && state.config.dryRun === false ? 'Automatic actions' : 'Monitor preview');
         renderPhoneMarkers();
@@ -872,7 +872,7 @@ var RemoteAccess = (function () {
         text('raEventCount', events.length + (events.length === 1 ? ' event' : ' events'));
         if (!events.length) {
             var empty = document.createElement('div'); empty.className = 'ra-history-empty';
-            empty.textContent = tr('history_empty', 'Detected transitions and action results will appear here.');
+            empty.textContent = tr('history_empty', '感应状态变化与车控动作记录将在此处显示。');
             list.appendChild(empty); return;
         }
         events.forEach(function (event) {
@@ -1198,12 +1198,12 @@ var RemoteAccess = (function () {
             // A newer session/status may have superseded this POST response.
             el('raKeepBluetoothOn').checked = state.config.keepBluetoothOn === true;
             toast(state.config.keepBluetoothOn === true ?
-                tr('bluetooth_saved_on', 'Shared parked Bluetooth enabled') :
-                tr('bluetooth_saved_off', 'Shared parked Bluetooth disabled'));
+                tr('bluetooth_saved_on', '已开启驻车共享蓝牙') :
+                tr('bluetooth_saved_off', '已关闭驻车共享蓝牙'));
         }).catch(function (err) {
             state.bluetoothSaving = false;
             el('raKeepBluetoothOn').checked = state.config ? state.config.keepBluetoothOn === true : !!previous;
-            error(tr('bluetooth_save_failed', 'Could not save the shared Bluetooth setting') + ': ' + err.message);
+            error(tr('bluetooth_save_failed', '无法保存共享蓝牙设置') + ': ' + err.message);
         }).then(function () { setBusy(false); });
     }
     function toggleMaster() {

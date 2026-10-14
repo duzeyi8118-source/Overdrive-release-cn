@@ -55,8 +55,7 @@ jobs:
           KEY_ALIAS: ${{ secrets.RELEASE_KEY_ALIAS }}
           KEY_PASSWORD: ${{ secrets.RELEASE_KEY_PASSWORD }}
         # assembleDebug: keeps debug flags (no R8 shrink) but now uses our fixed keystore
-        # instead of the random per-runner debug keystore → consistent fingerprint every run.
-        run: ./gradlew assembleDebug -PoverdriveVersionName=49.9.19 -PoverdriveVersionCode=49919 -PoverdriveUpdateChannel=alpha --stacktrace --no-daemon
+        run: ./gradlew assembleDebug -PoverdriveVersionName=49.9.20 -PoverdriveVersionCode=49920 -PoverdriveUpdateChannel=alpha --stacktrace --no-daemon
 
       - name: Verify APK signature fingerprint
         run: |
@@ -79,7 +78,7 @@ jobs:
           mkdir -p release-assets
           APK_FILE=$(find app/build/outputs/apk -name "*.apk" | head -1)
           echo "Found built APK: $APK_FILE"
-          cp "$APK_FILE" release-assets/Overdrive-v49.9.19-cn-sec.apk
+          cp "$APK_FILE" release-assets/Overdrive-v49.9.20-cn-sec.apk
           ls -lh release-assets/
 
       - name: Upload APK Artifact
@@ -93,32 +92,26 @@ jobs:
         uses: softprops/action-gh-release@v2
         if: github.ref == 'refs/heads/main'
         with:
-          tag_name: v49.9.19-cn-sec
-          name: OverDrive v49.9.19 - 驻车碰撞感应唤醒、防冲锁存SafeKeep、媒体闪避压音与毛玻璃桌面微件
+          tag_name: v49.9.20-cn-sec
+          name: OverDrive v49.9.20 - 新增功能模块全量车规级简中精校与原生零延迟首屏
           body: |
-            ## OverDrive v49.9.19 定制版 (第一、二梯队全量特性合入)
+            ## OverDrive v49.9.20 定制版 (新增模块全量汉化精校)
 
-            ### 💥 1. 驻车碰撞感应唤醒与 SafeKeep 视频防冲锁存 (Parked Impact & SafeKeep)
-            - **驻车碰撞 IMU 加速度感应**：基于系统内置三轴加速度传感器实时采集向量模差，搭配重力基准滑动低通滤波与连续双脉冲防抖算法，支持高中低三挡灵敏度调节；
-            - **智能哨兵联动控制器**：在驻车、熄火且哨兵处于设防状态下自动拉起前台传感器守护服务，检测到异常震动或刮擦撞击时秒级响应并向守护进程上报事件；
-            - **SafeKeep 视频防冲锁存机制**：受保护视频自动登记至 `.safekeep/locks.json`，在磁盘空间不足执行自动循环覆写清理时，绝对跳过受保护视频，保障关键碰撞录像与取证数据永不被冲掉；
-            - **全功能防冲锁存 Web 控制台**：支持视频加锁/解锁状态管理、待同步队列监控及多网盘/私有存储归档联动。
+            ### 🇨🇳 1. 靠近感知页面全量汉化与架构改造 (Proximity Remote-Access)
+            - **原生中文零延迟首屏**：页面属性升级为 `lang="zh-CN"`，所有 DOM 节点默认文本彻底告别硬编码英文，全部改为地道简体中文直出，杜绝弱网及首次加载时的闪烁 (FOUC-free)；
+            - **全量 `data-i18n` 属性绑定**：补齐雷达卡片、信号时序图、标定采集、信号门限区间、车控联动规则、活动动态等 80+ 个关键节点的国际化 key 绑定与 `remote-access.js` 中文 fallback。
 
-            ### 🎵 2. 语音播报原车音乐平滑闪避 (Media Ducking Control)
-            - **系统级媒体平滑压低音量**：通过反射注入底层 `IAudioService.setTrackVolumeDuck` 并借力原厂语音助手通道，在 OverDrive 进行语音播报或告警提示时，原生级平滑压低当前播放的音乐/多媒体音量；
-            - **租约自动释放与断电自愈**：播报完毕后音量自动丝滑恢复原值，内置 15 秒强制安全租约超时，彻底杜绝意外卡在低音量状态。
+            ### 🛡️ 2. 防冲锁存 SafeKeep 330+ 词条全量精校 (SafeKeep Localization)
+            - **云存储与备份规则深度汉化**：全量精校 Google Drive、OneDrive、Nextcloud、WebDAV / NAS、SFTP、S3 对象存储说明，对 5 大主标签页 (总览/存储目标/备份规则/配额与限制/同步动态) 实现原生中文直出；
+            - **车规级语料规范**：严格遵循大陆用语规范，彻底清除港台用词残留（“预设”改为“默认/模式”，“设定”改为“设置”等），并补充私钥应急恢复包、加密导出与 Webhooks 回调说明。
 
-            ### 🪟 3. 桌面半透明毛玻璃快捷小组件 (Glass Widgets)
-            - **精致半透明毛玻璃悬浮微件**：支持电池续航电芯、动态充电流光、实时行程统计、RoadSense 路况感知、输出功率与实时胎压、快捷车控等 10+ 种车规级微件；
-            - **智能前台桌面感应**：仅在车机原生桌面显示，打开第三方 App 或挂倒挡时自动避让隐藏；
-            - **屏幕自由拖拽排布**：支持直观的长按拖拽屏幕自由排布模式与全局快捷悬浮球。
+            ### 🪟 3. 毛玻璃桌面微件原生零延迟改造 (Glass Widgets)
+            - **默认中文直出**：升级 `widgets.html` 为 `lang="zh-CN"`，所有单选框、滑动条、微件类别与外观设置默认直接中文直出；
+            - **微件元数据 Fallback 汉化**：同步更新 `widgets-settings.js` 中 `CATALOG` 所有微件的中文名称与长文本详细描述。
 
-            ### 🎨 4. 氛围灯随动调色盘 (AmbientPalette & LightConstants)
-            - **31 色标准原厂色阶映射**：完整内置原厂 31 色标准色标表；
-            - **CIE-Lab 色彩空间智能换算**：支持直接输入十六进制颜色 Hex 值，自动在感知均匀的 CIE-Lab 色彩空间中寻找最接近的原车档位，并集成开/关语音提示资源。
-
-            ### 🇨🇳 5. 全量高标准简中本地化
-            - **精细化地道中文审校**：全量补齐 `widgets` 80 项配置描述与 `safekeep` 核心词条，针对车机使用习惯逐一精校，彻底杜绝生硬机翻。
-          files: release-assets/Overdrive-v49.9.19-cn-sec.apk
+            ### 🚗 4. 整车控制与车机重启弹窗多语言对齐 (Vehicle Control)
+            - **补齐整车上下电确认**：增加 `vehicle.power_on`、`vehicle.power_off` 及其安全二次确认弹窗、Toast 结果字典；
+            - **车机系统重启确认**：将 `btnIviReboot` 弹窗与提示全面接入国际化，避免车端出现英文提示。
+          files: release-assets/Overdrive-v49.9.20-cn-sec.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
