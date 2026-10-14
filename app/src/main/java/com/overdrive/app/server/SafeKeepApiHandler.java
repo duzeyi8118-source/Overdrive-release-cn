@@ -44,7 +44,7 @@ public class SafeKeepApiHandler {
         } catch (Exception e) {
             logger.warn("SafeKeepApiHandler error: " + e.getMessage());
             try {
-                HttpResponse.send500(out, e.getMessage());
+                HttpResponse.sendError(out, 500, e.getMessage());
             } catch (Exception ignored) {}
             return true;
         }

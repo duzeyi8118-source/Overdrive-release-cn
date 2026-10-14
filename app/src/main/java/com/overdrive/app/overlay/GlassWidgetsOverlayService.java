@@ -97,7 +97,7 @@ public class GlassWidgetsOverlayService extends Service {
         }
         builder.setContentTitle("OverDrive Glass")
                 .setContentText(text)
-                .setSmallIcon(R.drawable.ic_notification)
+                .setSmallIcon(R.drawable.ic_play_circle)
                 .setOngoing(true);
         return builder.build();
     }

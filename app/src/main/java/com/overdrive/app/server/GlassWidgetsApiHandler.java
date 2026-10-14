@@ -120,7 +120,7 @@ public abstract class GlassWidgetsApiHandler {
             resp.put("enabled", enabled);
             HttpResponse.sendJson(out, resp.toString());
         } catch (Throwable t) {
-            try { HttpResponse.send500(out, t.getMessage()); } catch (Throwable ignored) {}
+            try { HttpResponse.sendError(out, 500, t.getMessage()); } catch (Throwable ignored) {}
         }
     }
 
@@ -205,7 +205,7 @@ public abstract class GlassWidgetsApiHandler {
             resp.put("home", isHomeResolved);
             HttpResponse.sendJson(out, resp.toString());
         } catch (Throwable t) {
-            try { HttpResponse.send500(out, t.getMessage()); } catch (Throwable ignored) {}
+            try { HttpResponse.sendError(out, 500, t.getMessage()); } catch (Throwable ignored) {}
         }
     }
 
@@ -261,7 +261,7 @@ public abstract class GlassWidgetsApiHandler {
 
             HttpResponse.sendJson(out, resp.toString());
         } catch (Throwable t) {
-            try { HttpResponse.send500(out, t.getMessage()); } catch (Throwable ignored) {}
+            try { HttpResponse.sendError(out, 500, t.getMessage()); } catch (Throwable ignored) {}
         }
     }
 
@@ -291,7 +291,7 @@ public abstract class GlassWidgetsApiHandler {
             resp.put("automations", automationsArr);
             HttpResponse.sendJson(out, resp.toString());
         } catch (Throwable t) {
-            try { HttpResponse.send500(out, t.getMessage()); } catch (Throwable ignored) {}
+            try { HttpResponse.sendError(out, 500, t.getMessage()); } catch (Throwable ignored) {}
         }
     }
 
@@ -327,7 +327,7 @@ public abstract class GlassWidgetsApiHandler {
             resp.put("enabled", enabled);
             HttpResponse.sendJson(out, resp.toString());
         } catch (Throwable t) {
-            try { HttpResponse.send500(out, t.getMessage()); } catch (Throwable ignored) {}
+            try { HttpResponse.sendError(out, 500, t.getMessage()); } catch (Throwable ignored) {}
         }
     }
 

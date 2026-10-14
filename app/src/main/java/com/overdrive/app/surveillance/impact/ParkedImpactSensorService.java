@@ -60,7 +60,7 @@ public final class ParkedImpactSensorService extends Service implements SensorEv
         }
         builder.setContentTitle("Sentry")
                 .setContentText("Watching for impacts while parked")
-                .setSmallIcon(R.drawable.ic_notification)
+                .setSmallIcon(R.drawable.ic_sentry)
                 .setOngoing(true)
                 .setGroup("com.overdrive.app.STATUS");
         Notification notification = builder.build();
@@ -142,8 +142,9 @@ public final class ParkedImpactSensorService extends Service implements SensorEv
     private void reportImpactToDaemon(float peak) {
         new Thread(() -> {
             try {
-                HttpURLConnection conn = DaemonHttpClient.postJson(
+                HttpURLConnection conn = DaemonHttpClient.open(
                         "/api/surveillance/impact",
+                        "POST",
                         1500,
                         2000
                 );
