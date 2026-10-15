@@ -99,14 +99,14 @@ jobs:
         if: github.ref == 'refs/heads/main'
         with:
           tag_name: "v${{ env.APP_VERSION }}-cn-sec"
-          name: "OverDrive v${{ env.APP_VERSION }} - 全库车规级汉化深度精校与零闪烁优化"
+          name: "OverDrive v${{ env.APP_VERSION }} - 哨兵通知摄像头方位精显与多重优化"
           body: |
-            ## OverDrive v${{ env.APP_VERSION }} 定制版 (车规级汉化深度精校)
+            ## OverDrive v${{ env.APP_VERSION }} 定制版
 
-            ### 🇨🇳 1. 重大车规级术语纠偏
-            - **交流慢充电流纠偏**：修正充电设置中将 Alternating Current (AC) 误翻为“空调电流”与“强力制冷 (MAX A/C)”的严重错误，正确命名为“交流慢充电流”与“最大 (MAX)”；
-            - **仪表屏尺寸与投屏**：修正 RoadSense 盲区影像与导航中将 Instrument Cluster 误翻为“集群布局”、“集群预测”、“8.8个群组”等机翻，规范为“仪表屏布局”、“仪表屏地图投屏”、“8.8 英寸仪表屏”、“10.25 英寸仪表屏”、“12.3 英寸仪表屏”；
-            - **核心车控功能**：修正“电池热量”为标准车规“电池加热”。
+            ### 🎯 1. 企业微信 Webhook 摄像头方位显式提示
+            - **触发象限锁存 (Trigger Quadrant Latch)**：针对目标在 30 秒录像期间离开视野导致汇总丢失摄像头方位的问题，在事件触发源头（运动流水线、延迟确认、基线人脸识别）锁存触发象限，作为通知生成的保底回退；
+            - **文字与列表双重清晰提示**：在企微 Webhook 预警与录像汇总中，显式列出“• 触发方位：后置摄像头（车尾方向）”，标题与正文双重呈现；
+            - **多渠道覆盖**：Telegram、WebPush、内部通知总线同步受益，杜绝无方位或纯“Motion detected”提示。
 
             ### 🛡️ 2. 全库弹窗与交互文案 100% 汉化
             - **AI 事故取证包 (`events.js`)**：创建取证包提示、脱敏免责声明与操作按钮全量接入车规双语字典；

@@ -85,11 +85,15 @@ public class WeComNotifier {
                     "ALERT".equals(severity) ? "⚠️【哨兵安全预警】" : "🔍【哨兵动检预警】";
             String confText = formatConfidence(confidence);
 
-            String msg = sevStr + " 发现" + label + camStr + "\n"
-                    + "• 识别可信度：" + confText + "\n"
-                    + "• 触发时间：" + nowStr() + "\n"
-                    + "• 提示：事件录像与现场抓拍正在生成中…";
-            WeComSink.sendText(msg);
+            StringBuilder sb = new StringBuilder();
+            sb.append(sevStr).append(" 发现").append(label).append(camStr).append("\n");
+            if (camera != null && !camera.isEmpty()) {
+                sb.append("• 触发方位：").append(formatCameraDirection(camera)).append("\n");
+            }
+            sb.append("• 识别可信度：").append(confText).append("\n")
+              .append("• 触发时间：").append(nowStr()).append("\n")
+              .append("• 提示：事件录像与现场抓拍正在生成中…");
+            WeComSink.sendText(sb.toString());
         });
     }
 
@@ -140,6 +144,9 @@ public class WeComNotifier {
 
             StringBuilder sb = new StringBuilder();
             sb.append(sevStr).append(" 发现").append(label).append(camStr).append("\n");
+            if (camera != null && !camera.isEmpty()) {
+                sb.append("• 触发方位：").append(formatCameraDirection(camera)).append("\n");
+            }
             sb.append("• 识别可信度：").append(confText).append("\n");
             if (videoFilename != null && !videoFilename.isEmpty()) {
                 sb.append("• 录像文件：").append(videoFilename).append("\n");
@@ -281,6 +288,17 @@ public class WeComNotifier {
             case "left":   return "左侧";
             case "right":  return "右侧";
             default:       return cam;
+        }
+    }
+
+    private static String formatCameraDirection(String cam) {
+        if (cam == null || cam.isEmpty()) return "";
+        switch (cam.toLowerCase(Locale.ROOT)) {
+            case "front":  return "前置摄像头（车头方向）";
+            case "rear":   return "后置摄像头（车尾方向）";
+            case "left":   return "左侧摄像头（左侧后视镜）";
+            case "right":  return "右侧摄像头（右侧后视镜）";
+            default:       return cam + " 摄像头";
         }
     }
 

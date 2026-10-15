@@ -1267,6 +1267,7 @@ public class SurveillanceEngineGpu {
     // read once in stopRecording's shouldDiscardEvent(). Volatile — written on the
     // engine + aiExecutor threads, read on the engine thread at stop.
     private volatile boolean eventTriggerWasMotionOnly = false;  // motion-source trigger, not tracker/deferred-person
+    private volatile String eventInitialTriggerCamera = null;    // camera quadrant name ("front"/"right"/"rear"/"left") that triggered this event
     private volatile boolean eventEverApproaching = false;       // any non-static actor read APPROACHING this event
     private volatile boolean eventEverSawPerson = false;         // any YOLO-classified PERSON this event (any conf/sev/static) → hard KEEP
     private volatile boolean eventEverSawMovingObject = false;   // any YOLO-classified MOVING (!isStaticForTimeline) vehicle/bike/animal → hard KEEP (parked cars excluded — they are the FP target)
@@ -4457,6 +4458,11 @@ public class SurveillanceEngineGpu {
                                 startedThisEvent = true;
                                 startedVideoFilename = currentEventFile != null
                                         ? currentEventFile.getName() : null;
+                                if (qName != null && !qName.isEmpty() && !"?".equals(qName)) {
+                                    eventInitialTriggerCamera = qName;
+                                } else if (bestQ >= 0 && bestQ < MotionPipelineV2.QUADRANT_NAMES.length) {
+                                    eventInitialTriggerCamera = MotionPipelineV2.QUADRANT_NAMES[bestQ];
+                                }
                             eventTriggerWasMotionOnly =
                                     EmptyMotionDiscardPolicy.isMotionSourceTrigger(triggerSource);
                             // A raw YOLO result can open the trigger path immediately
@@ -4795,6 +4801,9 @@ public class SurveillanceEngineGpu {
                                 startedThisEvent = true;
                                 startedVideoFilename = currentEventFile != null
                                         ? currentEventFile.getName() : null;
+                                if (bestQ >= 0 && bestQ < MotionPipelineV2.QUADRANT_NAMES.length) {
+                                    eventInitialTriggerCamera = MotionPipelineV2.QUADRANT_NAMES[bestQ];
+                                }
                                 // startRecording resets event latches. Preserve the
                                 // pre-trigger person confirmation that authorized this
                                 // deferred trigger, matching the inline trigger path.
@@ -8040,6 +8049,9 @@ public class SurveillanceEngineGpu {
         // camHint follows the threat actor so the title's "X at <camera>" phrase
         // names the camera that saw X, not whichever actor happened to be closest.
         String camHint = cameraNameFor(camAnchor);
+        if ((camHint == null || camHint.isEmpty()) && eventInitialTriggerCamera != null) {
+            camHint = eventInitialTriggerCamera;
+        }
         float bestConf = threat != null ? threat.peakConfidence : 0f;
         if (threat != null) detectionLabel = Actor.groupLabel(threat.classGroup);
 
@@ -8272,6 +8284,9 @@ public class SurveillanceEngineGpu {
         }
         // camHint follows the threat actor — see sendRichMotionNotifications.
         String camHint = cameraNameFor(camAnchor);
+        if ((camHint == null || camHint.isEmpty()) && eventInitialTriggerCamera != null) {
+            camHint = eventInitialTriggerCamera;
+        }
         // Telegram tier mute. By stop time, an actor that was CRITICAL mid-event
         // may have been TTL-pruned from lastActors, collapsing the instantaneous
         // snapshot to NOTICE and silently dropping the closing photo+video of a
@@ -8893,6 +8908,9 @@ public class SurveillanceEngineGpu {
                 String name = cameraNameFor(a);
                 if (name != null) { camHint = name; break; }
             }
+            if ((camHint == null || camHint.isEmpty()) && eventInitialTriggerCamera != null) {
+                camHint = eventInitialTriggerCamera;
+            }
             String title = (camHint != null) ? "Motion at " + camHint : "Motion detected";
             String body = "Recording in progress";
 
@@ -9162,6 +9180,9 @@ public class SurveillanceEngineGpu {
             // Uses the pre-demotion anchor: WHERE the motion was is still true even
             // when the class claim is withheld.
             String camHint = cameraNameFor(camAnchor);
+            if ((camHint == null || camHint.isEmpty()) && eventInitialTriggerCamera != null) {
+                camHint = eventInitialTriggerCamera;
+            }
 
             // ---- Title (severity tier + threat class + camera) ----
             // Format: "CRITICAL · Person at front" or "Alert · Vehicle at rear"
@@ -9844,6 +9865,9 @@ public class SurveillanceEngineGpu {
                         lastPersonConfirmationTimeMs = confirmationWallMs;
                         lastPersonConfirmationElapsedMs = confirmationElapsedMs;
                         eventEverSawPerson = true;
+                        if (quadrant >= 0 && quadrant < MotionPipelineV2.QUADRANT_NAMES.length) {
+                            eventInitialTriggerCamera = MotionPipelineV2.QUADRANT_NAMES[quadrant];
+                        }
                         startedThisEvent = true;
                     }
                 }
@@ -10134,6 +10158,7 @@ public class SurveillanceEngineGpu {
         eventPeakActors.clear();
         // Fresh event → reset the empty-bright-motion discard latches.
         eventTriggerWasMotionOnly = false;
+        eventInitialTriggerCamera = null;
         eventEverApproaching = false;
         eventEverSawPerson = false;
         eventEverSawMovingObject = false;
