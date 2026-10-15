@@ -58,6 +58,11 @@ public final class SocCutoffMonitor {
 
     private SocCutoffMonitor() {}
 
+    /** Returns the most recently observed high-voltage battery SoC (0-100), or null if not yet observed. */
+    public static Double getLastSoc() {
+        return lastSocPercent;
+    }
+
     /**
      * Caller-supplied context — usually the daemon's own
      * {@code appContext} (e.g. {@code AccSentryDaemon.getAppContext()}).

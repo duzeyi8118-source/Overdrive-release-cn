@@ -123,6 +123,11 @@ public final class BatteryVoltageMonitorV2 {
 
     private BatteryVoltageMonitorV2() {}
 
+    /** Returns the most recently observed 12V battery voltage in volts, or -1.0 if not yet sampled. */
+    public static double getLastPowerVoltage() {
+        return lastPowerVoltage;
+    }
+
     /**
      * "Keep USB powered while parked" toggle (surveillance.keepUsbPowerOnAccOff,
      * default true). Mirrors {@code AccSentryDaemon.isKeepUsbPowerOnAccOff()}

@@ -77,7 +77,8 @@ public class WeComNotifier {
      * @param severity    严重级别："NOTICE"/"ALERT"/"CRITICAL"，可为 null
      */
     public static void notifyMotion(String aiDetection, float confidence,
-                                    String camera, String severity) {
+                                    String camera, String severity,
+                                    String vehicleStatus, String parkingStats) {
         motionExecutor.execute(() -> {
             String label = localizeDetection(aiDetection);
             String camStr = camera != null && !camera.isEmpty() ? "（" + localizeCamera(camera) + "摄像头）" : "";
@@ -90,11 +91,23 @@ public class WeComNotifier {
             if (camera != null && !camera.isEmpty()) {
                 sb.append("• 触发方位：").append(formatCameraDirection(camera)).append("\n");
             }
-            sb.append("• 识别可信度：").append(confText).append("\n")
-              .append("• 触发时间：").append(nowStr()).append("\n")
-              .append("• 提示：事件录像与现场抓拍正在生成中…");
+            sb.append("• 识别可信度：").append(confText).append("\n");
+            if (vehicleStatus != null && !vehicleStatus.isEmpty()) {
+                sb.append("• 车辆状态：").append(vehicleStatus).append("\n");
+            }
+            if (parkingStats != null && !parkingStats.isEmpty()) {
+                sb.append("• 触发时间：").append(nowStr()).append(" (").append(parkingStats).append(")\n");
+            } else {
+                sb.append("• 触发时间：").append(nowStr()).append("\n");
+            }
+            sb.append("• 提示：事件录像与现场抓拍正在生成中…");
             WeComSink.sendText(sb.toString());
         });
+    }
+
+    public static void notifyMotion(String aiDetection, float confidence,
+                                    String camera, String severity) {
+        notifyMotion(aiDetection, confidence, camera, severity, null, null);
     }
 
     /**
@@ -121,16 +134,22 @@ public class WeComNotifier {
      * 事件录像已完成，整合推送包含目标、可信度、录像文件和时间的完整汇总通知，随后附带 Hero 截图。
      * 将原先分散的“动检开播”、“录像归档”、“抓拍照片”合并为单次精简推送，杜绝多条刷屏。
      *
-     * @param heroPhotoPath Hero 截图绝对路径，null 则只发文字
-     * @param videoFilename 录像文件名
-     * @param aiDetection   检测类型
-     * @param camera        摄像头方向
-     * @param confidence    置信度 0-1
-     * @param severity      严重级别："NOTICE"/"ALERT"/"CRITICAL"
+     * @param heroPhotoPath  Hero 截图绝对路径，null 则只发文字
+     * @param videoFilename  录像文件名
+     * @param aiDetection    检测类型
+     * @param camera         摄像头方向
+     * @param confidence     置信度 0-1
+     * @param severity       严重级别："NOTICE"/"ALERT"/"CRITICAL"
+     * @param targetBehavior 目标行为态势（逗留/距离/接近趋势），可为 null
+     * @param vehicleStatus  车辆门窗闭锁与小电瓶/动力电池状态，可为 null
+     * @param parkingStats   驻车时长与本次触发频次统计，可为 null
      */
     public static void notifyMotionFinalized(String heroPhotoPath, String videoFilename,
                                              String aiDetection, String camera,
-                                             float confidence, String severity) {
+                                             float confidence, String severity,
+                                             String targetBehavior,
+                                             String vehicleStatus,
+                                             String parkingStats) {
         motionExecutor.execute(() -> {
             String label = localizeDetection(aiDetection);
             String camStr = camera != null && !camera.isEmpty() ? "（" + localizeCamera(camera) + "摄像头）" : "";
@@ -148,10 +167,20 @@ public class WeComNotifier {
                 sb.append("• 触发方位：").append(formatCameraDirection(camera)).append("\n");
             }
             sb.append("• 识别可信度：").append(confText).append("\n");
+            if (targetBehavior != null && !targetBehavior.isEmpty()) {
+                sb.append("• 目标行为：").append(targetBehavior).append("\n");
+            }
+            if (vehicleStatus != null && !vehicleStatus.isEmpty()) {
+                sb.append("• 车辆状态：").append(vehicleStatus).append("\n");
+            }
             if (videoFilename != null && !videoFilename.isEmpty()) {
                 sb.append("• 录像文件：").append(videoFilename).append("\n");
             }
-            sb.append("• 触发时间：").append(nowStr());
+            if (parkingStats != null && !parkingStats.isEmpty()) {
+                sb.append("• 触发时间：").append(nowStr()).append(" (").append(parkingStats).append(")");
+            } else {
+                sb.append("• 触发时间：").append(nowStr());
+            }
             if (hasPhoto) {
                 sb.append("\n• 现场抓拍：见下方照片 👇");
             } else {
@@ -168,12 +197,18 @@ public class WeComNotifier {
         });
     }
 
+    public static void notifyMotionFinalized(String heroPhotoPath, String videoFilename,
+                                             String aiDetection, String camera,
+                                             float confidence, String severity) {
+        notifyMotionFinalized(heroPhotoPath, videoFilename, aiDetection, camera, confidence, severity, null, null, null);
+    }
+
     /**
      * 向后兼容老接口（默认置信度 1.0）
      */
     public static void notifyMotionFinalized(String heroPhotoPath, String videoFilename,
                                              String aiDetection, String camera) {
-        notifyMotionFinalized(heroPhotoPath, videoFilename, aiDetection, camera, 1.0f, null);
+        notifyMotionFinalized(heroPhotoPath, videoFilename, aiDetection, camera, 1.0f, null, null, null, null);
     }
 
     // ==================== 隧道 URL ====================

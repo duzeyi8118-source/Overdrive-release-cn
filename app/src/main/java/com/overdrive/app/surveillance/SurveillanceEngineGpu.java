@@ -1268,6 +1268,10 @@ public class SurveillanceEngineGpu {
     // engine + aiExecutor threads, read on the engine thread at stop.
     private volatile boolean eventTriggerWasMotionOnly = false;  // motion-source trigger, not tracker/deferred-person
     private volatile String eventInitialTriggerCamera = null;    // camera quadrant name ("front"/"right"/"rear"/"left") that triggered this event
+    // 驻车统计：驻车开始时间戳与本次驻车累计事件计数
+    private static volatile long currentParkingSessionStartMs = 0L;
+    private static final java.util.concurrent.atomic.AtomicInteger parkingSessionEventCount =
+            new java.util.concurrent.atomic.AtomicInteger(0);
     private volatile boolean eventEverApproaching = false;       // any non-static actor read APPROACHING this event
     private volatile boolean eventEverSawPerson = false;         // any YOLO-classified PERSON this event (any conf/sev/static) → hard KEEP
     private volatile boolean eventEverSawMovingObject = false;   // any YOLO-classified MOVING (!isStaticForTimeline) vehicle/bike/animal → hard KEEP (parked cars excluded — they are the FP target)
@@ -8059,11 +8063,15 @@ public class SurveillanceEngineGpu {
         // 若配置显式开启 sendStartPing，则保留开播即时文字预警。
         if (com.overdrive.app.wecom.WeComNotifier.isSendStartPingEnabled()) {
             try {
+                String vehicleStatus = com.overdrive.app.wecom.VehicleSecuritySnapshot.getSecurityAndBatterySummary();
+                String parkingStats = formatParkingSessionStats();
                 com.overdrive.app.wecom.WeComNotifier.notifyMotion(
                         detectionLabel,
                         bestConf > 0f ? bestConf : 1.0f,
                         camHint,
-                        peakSev != null ? peakSev.name() : null);
+                        peakSev != null ? peakSev.name() : null,
+                        vehicleStatus,
+                        parkingStats);
             } catch (Throwable t) {
                 logger.debug("WeComNotifier motion notify failed: " + t.getMessage());
             }
@@ -8321,13 +8329,19 @@ public class SurveillanceEngineGpu {
             String label = threat != null ? com.overdrive.app.surveillance.Actor.groupLabel(threat.classGroup) : null;
             float finalConf = threat != null ? threat.peakConfidence : (camAnchor != null ? camAnchor.peakConfidence : 0f);
             Actor.Severity finalSev = maxOf(eventPeakSeverity, peakSev);
+            String behavior = formatThreatBehavior(threat != null ? threat : camAnchor, camHint);
+            String vehicleStatus = com.overdrive.app.wecom.VehicleSecuritySnapshot.getSecurityAndBatterySummary();
+            String parkingStats = formatParkingSessionStats();
             com.overdrive.app.wecom.WeComNotifier.notifyMotionFinalized(
                     heroPhotoPath,
                     videoFilename,
                     label,
                     camHint,
                     finalConf > 0f ? finalConf : 1.0f,
-                    finalSev != null ? finalSev.name() : null);
+                    finalSev != null ? finalSev.name() : null,
+                    behavior,
+                    vehicleStatus,
+                    parkingStats);
         } catch (Throwable t) {
             logger.debug("WeComNotifier finalized notify failed: " + t.getMessage());
         }
@@ -8411,6 +8425,79 @@ public class SurveillanceEngineGpu {
         } catch (Throwable t) {
             logger.debug("Telegram OEM surveillance video send failed: " + t.getMessage());
         }
+    }
+
+    private String formatThreatBehavior(Actor threat, String camera) {
+        if (threat == null) {
+            return "画面出现移动物体";
+        }
+        StringBuilder sb = new StringBuilder();
+
+        String camLabel = "";
+        if (camera != null && !camera.isEmpty()) {
+            switch (camera.toLowerCase(java.util.Locale.ROOT)) {
+                case "front": camLabel = "车头"; break;
+                case "rear":  camLabel = "车尾"; break;
+                case "left":  camLabel = "左侧"; break;
+                case "right": camLabel = "右侧"; break;
+            }
+        }
+
+        long dwellMs = threat.lastSeenWallMs - threat.firstSeenWallMs;
+        int dwellSec = (int) Math.max(1, dwellMs / 1000);
+
+        if (dwellSec >= 5) {
+            if (!camLabel.isEmpty()) sb.append(camLabel).append("逗留 ");
+            else sb.append("持续逗留 ");
+            sb.append(dwellSec).append("秒");
+        } else {
+            sb.append("快速移动/路过");
+        }
+
+        java.util.List<String> details = new java.util.ArrayList<>();
+        if (threat.peakProximity != null && threat.peakProximity != Actor.Proximity.UNKNOWN) {
+            switch (threat.peakProximity) {
+                case VERY_CLOSE: details.add("贴近车身 (<1米)"); break;
+                case CLOSE:      details.add("靠近车身 (1~2米)"); break;
+                case MID:        details.add("中距 (2~4米)"); break;
+                case FAR:        details.add("较远 (>4米)"); break;
+            }
+        }
+
+        if (threat.trend != null && threat.trend != Actor.Trend.UNKNOWN) {
+            switch (threat.trend) {
+                case APPROACHING: details.add("持续靠近"); break;
+                case RECEDING:    details.add("逐渐远离"); break;
+                case STABLE:      if (dwellSec >= 5) details.add("原地徘徊"); break;
+            }
+        }
+
+        if (!details.isEmpty()) {
+            sb.append(" (").append(String.join("，", details)).append(")");
+        }
+
+        return sb.toString();
+    }
+
+    private String formatParkingSessionStats() {
+        long startMs = currentParkingSessionStartMs;
+        int count = parkingSessionEventCount.get();
+        if (startMs <= 0L) {
+            return count > 0 ? "第 " + count + " 次触发" : null;
+        }
+        long durationMs = Math.max(0, System.currentTimeMillis() - startMs);
+        long mins = durationMs / 60_000L;
+        long hours = mins / 60;
+        long remMins = mins % 60;
+
+        String timeStr;
+        if (hours > 0) {
+            timeStr = hours + "小时" + remMins + "分";
+        } else {
+            timeStr = Math.max(1, remMins) + "分钟";
+        }
+
+        return "驻车 " + timeStr + (count > 0 ? "，第 " + count + " 次" : "");
     }
 
     /**
@@ -10159,6 +10246,10 @@ public class SurveillanceEngineGpu {
         // Fresh event → reset the empty-bright-motion discard latches.
         eventTriggerWasMotionOnly = false;
         eventInitialTriggerCamera = null;
+        if (currentParkingSessionStartMs <= 0L) {
+            currentParkingSessionStartMs = System.currentTimeMillis();
+        }
+        parkingSessionEventCount.incrementAndGet();
         eventEverApproaching = false;
         eventEverSawPerson = false;
         eventEverSawMovingObject = false;
