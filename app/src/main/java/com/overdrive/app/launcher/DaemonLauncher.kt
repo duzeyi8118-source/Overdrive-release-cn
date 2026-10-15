@@ -508,7 +508,9 @@ class DaemonLauncher(
             // Backgrounded (trailing &) so the log poller can supervise it
             // while it runs; $! is captured into DAEMON_PID below.
             val appProcessLine =
-                "  CLASSPATH=$apkPath app_process " +
+                "  RESOLVED_APK=\$(pm path com.overdrive.app 2>/dev/null | grep '/base.apk\$' | head -n 1 | sed 's/^package://')\n" +
+                "  if [ -n \"\$RESOLVED_APK\" ] && [ -f \"\$RESOLVED_APK\" ]; then APK_PATH=\"\$RESOLVED_APK\"; else APK_PATH=\"$apkPath\"; fi\n" +
+                "  CLASSPATH=\"\$APK_PATH\" app_process " +
                 "${proxyArgs}/system/bin " +
                 "--nice-name=$TELEGRAM_DAEMON_PROCESS " +
                 "com.overdrive.app.daemon.TelegramBotDaemon >> \"\$LOG_FILE\" 2>&1 &"
@@ -587,12 +589,20 @@ class DaemonLauncher(
             // daemon is the highest-volume stdout logger, so real-time
             // bounding of cam_daemon.log (the UI-shown file) matters most here.
             val appProcessLine =
-                "  CLASSPATH=\$([ -f /system/framework/bmmcamera.jar ] && echo /system/framework/bmmcamera.jar:)$apkPath app_process " +
-                "-Djava.library.path=$nativeLibDir:/system/lib64:/vendor/lib64:/product/lib64:/odm/lib64 " +
+                "  RESOLVED_APK=\$(pm path com.overdrive.app 2>/dev/null | grep '/base.apk\$' | head -n 1 | sed 's/^package://')\n" +
+                "  if [ -n \"\$RESOLVED_APK\" ] && [ -f \"\$RESOLVED_APK\" ]; then\n" +
+                "    APK_PATH=\"\$RESOLVED_APK\"\n" +
+                "    NATIVE_LIB_DIR=\"\$(dirname \"\$RESOLVED_APK\")/lib/arm64\"\n" +
+                "  else\n" +
+                "    APK_PATH=\"$apkPath\"\n" +
+                "    NATIVE_LIB_DIR=\"$nativeLibDir\"\n" +
+                "  fi\n" +
+                "  CLASSPATH=\$([ -f /system/framework/bmmcamera.jar ] && echo /system/framework/bmmcamera.jar:)\"\$APK_PATH\" app_process " +
+                "-Djava.library.path=\"\$NATIVE_LIB_DIR\":/system/lib64:/vendor/lib64:/product/lib64:/odm/lib64 " +
                 "${proxyArgs}/system/bin " +
                 "--nice-name=$CAMERA_DAEMON_PROCESS " +
                 "com.overdrive.app.daemon.CameraDaemon " +
-                "$outputDir $nativeLibDir >> \"\$LOG_FILE\" 2>&1 &"
+                "$outputDir \"\$NATIVE_LIB_DIR\" >> \"\$LOG_FILE\" 2>&1 &"
 
             return listOf(
                 "#!/system/bin/sh",
