@@ -20,6 +20,7 @@ public class SafeKeepLocksManager {
     private final Object fileLock = new Object();
     private final ConcurrentHashMap<String, JSONObject> lockedFiles = new ConcurrentHashMap<>();
     private final File storageFile;
+    private volatile boolean enabled = false;
 
     public static SafeKeepLocksManager getInstance() {
         return INSTANCE;
@@ -34,13 +35,25 @@ public class SafeKeepLocksManager {
         load();
     }
 
+    public boolean isEnabled() {
+        return enabled;
+    }
+
+    public void setEnabled(boolean enabled) {
+        this.enabled = enabled;
+        save();
+        logger.info("SafeKeep master state set to: " + enabled);
+    }
+
     public static boolean isLocked(File file) {
         if (file == null) return false;
+        if (!getInstance().isEnabled()) return false;
         return getInstance().isLockedInternal(file.getName()) || getInstance().isLockedInternal(file.getAbsolutePath());
     }
 
     public static boolean isLocked(String pathOrName) {
         if (pathOrName == null) return false;
+        if (!getInstance().isEnabled()) return false;
         return getInstance().isLockedInternal(pathOrName);
     }
 
@@ -109,6 +122,8 @@ public class SafeKeepLocksManager {
         JSONObject status = new JSONObject();
         try {
             status.put("success", true);
+            status.put("enabled", enabled);
+            status.put("state", enabled ? "idle" : "off");
             status.put("count", getLockedFilenames().size());
             status.put("locks", getLocksJson());
         } catch (Exception ignored) {}
@@ -124,6 +139,7 @@ public class SafeKeepLocksManager {
                 if (read > 0) {
                     String jsonStr = new String(data, 0, read, StandardCharsets.UTF_8);
                     JSONObject root = new JSONObject(jsonStr);
+                    this.enabled = root.optBoolean("enabled", false);
                     JSONArray arr = root.optJSONArray("locks");
                     if (arr != null) {
                         for (int i = 0; i < arr.length(); i++) {
@@ -149,6 +165,7 @@ public class SafeKeepLocksManager {
         synchronized (fileLock) {
             try {
                 JSONObject root = new JSONObject();
+                root.put("enabled", enabled);
                 root.put("locks", getLocksJson());
                 byte[] bytes = root.toString(2).getBytes(StandardCharsets.UTF_8);
                 try (FileOutputStream fos = new FileOutputStream(storageFile)) {
