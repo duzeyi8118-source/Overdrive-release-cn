@@ -10,11 +10,14 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="theme-color" content="#00876C">
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
     <script src="../shared/theme.js?v=8"></script>
-    <script src="../shared/app-shell.js?v=7" defer></script>
+    <script src="../shared/app-shell.js?v=8" defer></script>
     <link rel="stylesheet" href="../shared/leaflet.css">
     <script src="../shared/leaflet.js" defer></script>
-    <link rel="stylesheet" href="../shared/styles.css?v=34">
+    <link rel="stylesheet" href="../shared/styles.css?v=35">
 </head>
 <body class="dashboard-page">
     <div class="app-layout">
@@ -68,31 +71,9 @@
                                 </div>
                             </div>
                         </div>
-                        <!-- Network & Cellular Data Monitor Card (Scheme 1: fills empty space elegantly) -->
-                        <div class="dash-net-card" id="dashNetCard">
-                            <div class="dash-net-card-header">
-                                <div class="dash-net-type" id="dashNetType">
-                                    <span class="dash-net-icon" id="dashNetIcon">📶</span>
-                                    <strong id="dashNetTitle">移动蜂窝网络</strong>
-                                </div>
-                                <div class="dash-net-usage" id="dashNetUsage">
-                                    <span class="dash-net-used-label">本月已用</span>
-                                    <strong class="dash-net-used-val" id="dashNetUsedVal">--</strong>
-                                    <small class="dash-net-limit-val" id="dashNetLimitVal">/ 10G</small>
-                                </div>
-                            </div>
-                            <div class="dash-net-progress-track" id="dashNetProgressTrack">
-                                <div class="dash-net-progress-bar" id="dashNetProgressBar" style="width: 0%;"></div>
-                            </div>
-                            <div class="dash-net-card-footer" id="dashNetCardFooter">
-                                <span class="dash-net-hint" id="dashNetHint">连热点自动显示 SSID</span>
-                                <span class="dash-net-remain" id="dashNetRemain">--</span>
-                            </div>
-                        </div>
-
                         <div class="dash-hero-status">
                             <span class="dash-chip" id="dashConnChip" data-i18n="dashboard.chip_device_pending">车机 --</span>
-                            <span class="dash-chip" id="dashNetChip" style="display: none;">📶 --</span>
+                            <span class="dash-chip" id="dashNetChip">📶 --</span>
                             <span class="dash-chip" id="dashSurvChip" data-i18n="dashboard.chip_surveillance_pending">哨兵 --</span>
                             <span class="dash-chip" id="dashGpsChip" data-i18n="dashboard.chip_gps_pending">GPS 定位中…</span>
                         </div>
@@ -447,8 +428,8 @@
             min-width: 0;
             display: flex;
             flex-direction: column;
-            justify-content: space-between;
-            gap: 18px;
+            justify-content: flex-start;
+            gap: 16px;
             padding: 4px 0 4px 4px;
         }
 
@@ -919,7 +900,6 @@
         .dash-chip.good { color: var(--brand-primary); border-color: rgba(0, 212, 170, 0.35); }
         .dash-chip.warn { color: #f59e0b; border-color: rgba(245, 158, 11, 0.35); }
         .dash-chip.alert { color: #ef4444; border-color: rgba(239, 68, 68, 0.35); }
-        #dashNetChip { display: none; }
 
         /* ── Vehicle glance panel ────────────────────────────────────
            Hero right column: top-down schematic + SoC ring + glance
@@ -1568,8 +1548,6 @@
             .dash-hero {
                 padding: 18px;
             }
-            .dash-net-card { display: none !important; }
-            #dashNetChip { display: inline-flex !important; }
             .dash-hero-main { gap: 10px; }
             .dash-hero-status { flex-wrap: wrap; gap: 6px; }
             .dash-chip { padding: 5px 9px; font-size: 11px; }
