@@ -306,7 +306,8 @@ class DashboardFragment : Fragment() {
                 net.type.equals("ethernet", ignoreCase = true) -> getString(R.string.dashboard_network_ethernet)
                 else -> getString(R.string.dashboard_network_offline)
             }
-            AppToast.show(ctx, msg)
+            val toastMsg = msg
+            appToast?.show(toastMsg) ?: android.widget.Toast.makeText(ctx, toastMsg, android.widget.Toast.LENGTH_SHORT).show()
         }
         heroChipTunnel = view.findViewById(R.id.heroChipTunnel)
         heroChipServices = view.findViewById(R.id.heroChipServices)
