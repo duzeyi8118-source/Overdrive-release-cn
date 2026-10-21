@@ -27,6 +27,19 @@ data class DashboardVehicleSnapshot(
     val isAccOn: Boolean? = null,
     val isRecording: Boolean? = null,
     val isGpuSurveillance: Boolean? = null,
+    val network: DashboardNetworkSnapshot? = null,
+)
+
+data class DashboardNetworkSnapshot(
+    val type: String = "none",
+    val ssid: String = "",
+    val ip: String = "",
+    val signal: Int = -1,
+    val monthlyMobileBytes: Long = 0L,
+    val monthlyMobileFormatted: String = "",
+    val limitBytes: Long = 10L * 1024 * 1024 * 1024,
+    val isWarning: Boolean = false,
+    val isExceeded: Boolean = false,
 )
 
 /**
@@ -141,6 +154,21 @@ object DashboardStatusParser {
         val gps = root.optJSONObject("gps")
         val speedKmh = gps?.finiteDouble("speed")?.let { it * 3.6 }?.takeIf { it >= 0.0 }
 
+        val netObj = root.optJSONObject("network")
+        val networkSnapshot = netObj?.let {
+            DashboardNetworkSnapshot(
+                type = it.optString("type", "none"),
+                ssid = it.optString("ssid", ""),
+                ip = it.optString("ip", ""),
+                signal = it.optInt("signal", -1),
+                monthlyMobileBytes = it.optLong("monthlyMobileBytes", 0L),
+                monthlyMobileFormatted = it.optString("monthlyMobileFormatted", ""),
+                limitBytes = it.optLong("limitBytes", 10L * 1024 * 1024 * 1024),
+                isWarning = it.optBoolean("isWarning", false),
+                isExceeded = it.optBoolean("isExceeded", false),
+            )
+        }
+
         val hasVehicleData = soc != null || distance != null || charging != null
         if (!hasVehicleData) {
             return DashboardStatusResult.Unavailable(
@@ -160,6 +188,7 @@ object DashboardStatusParser {
                 isAccOn = isAccOn,
                 isRecording = isRecording,
                 isGpuSurveillance = isGpuSurveillance,
+                network = networkSnapshot,
             )
         )
     }

@@ -931,6 +931,12 @@
     <string name="dashboard_metric_vehicle">车辆</string>
     <string name="dashboard_chip_recording_active">收音</string>
     <string name="dashboard_chip_recording_idle">空闲</string>
+    <string name="dashboard_network_checking">网络检测中…</string>
+    <string name="dashboard_network_wifi">Wi-Fi: %1$s</string>
+    <string name="dashboard_network_wifi_connected">Wi-Fi 已连接</string>
+    <string name="dashboard_network_cellular_used">移动网络 · %1$s</string>
+    <string name="dashboard_network_offline">无网络</string>
+    <string name="dashboard_network_ethernet">以太网</string>
     <string name="dashboard_vehicle_tap_to_set">点击设置</string>
     <string name="dashboard_vehicle_summary">%1$.1f kWh · %2$s</string>
     <string name="vehicle_dialog_title">设置电池容量</string>

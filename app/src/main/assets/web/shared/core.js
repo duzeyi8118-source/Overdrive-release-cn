@@ -1520,9 +1520,11 @@ BYD.core = {
             if (netIcon) netIcon.innerHTML = this._wifiSvg();
         } else if (net.type === 'cellular') {
             const ip = net.ip || '';
-            netEl.innerHTML = '<span class="net-ssid">' + this._esc(BYD.i18n.t('status.mobile_data')) + '</span>' +
+            const used = net.monthlyMobileFormatted ? (' (' + net.monthlyMobileFormatted + ')') : '';
+            const warnClass = net.isExceeded ? ' alert' : (net.isWarning ? ' warn' : '');
+            netEl.innerHTML = '<span class="net-ssid' + warnClass + '">' + this._esc(BYD.i18n.t('status.mobile_data')) + used + '</span>' +
                 (ip ? '<span class="net-ip">' + this._esc(ip) + '</span>' : '');
-            netEl.className = 'status-value on net-info';
+            netEl.className = 'status-value on net-info' + warnClass;
             if (netIcon) netIcon.innerHTML = this._cellSvg();
         } else {
             netEl.textContent = BYD.i18n.t('status.no_network');

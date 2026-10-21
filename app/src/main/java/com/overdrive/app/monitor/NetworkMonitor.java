@@ -1,5 +1,7 @@
 package com.overdrive.app.monitor;
 
+import android.app.usage.NetworkStats;
+import android.app.usage.NetworkStatsManager;
 import android.content.Context;
 import android.net.ConnectivityManager;
 import android.net.Network;
@@ -8,15 +10,20 @@ import android.net.LinkProperties;
 import android.net.LinkAddress;
 import android.net.wifi.WifiInfo;
 import android.net.wifi.WifiManager;
+import android.os.Build;
 
 import com.overdrive.app.daemon.CameraDaemon;
 
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileReader;
 import java.io.InputStreamReader;
 import java.net.Inet4Address;
 import java.net.InetAddress;
+import java.util.Calendar;
+import java.util.Locale;
 
 /**
  * Network Monitor - provides WiFi SSID, IP address, or Mobile Data status
@@ -38,6 +45,13 @@ public class NetworkMonitor {
     private static volatile long lastUpdate = 0;
     private static volatile Context appContext;
     private static volatile boolean shellFallbackLogged = false;
+
+    // Monthly mobile data traffic cache & thresholds
+    private static volatile long cachedMonthlyMobileBytes = -1;
+    private static volatile long lastTrafficQueryTime = 0;
+    private static final long TRAFFIC_QUERY_INTERVAL_MS = 30000L; // 30s cache
+    public static final long DEFAULT_MOBILE_LIMIT_BYTES = 10L * 1024 * 1024 * 1024; // 10 GB
+    public static final double WARNING_RATIO = 0.8; // 80% warning threshold
 
     public static void init(Context context) {
         appContext = context;
@@ -275,13 +289,139 @@ public class NetworkMonitor {
             refresh();
         }
         JSONObject net = new JSONObject();
+        long monthlyBytes = getMonthlyMobileDataBytes();
+        boolean isWarning = isWarningUsage();
+        boolean isExceeded = monthlyBytes >= DEFAULT_MOBILE_LIMIT_BYTES;
+
         try {
             net.put("type", networkType);
             net.put("ssid", wifiSsid);
             net.put("ip", ipAddress);
             net.put("signal", signalPercent);
+            net.put("monthlyMobileBytes", monthlyBytes);
+            net.put("monthlyMobileFormatted", formatDataSize(monthlyBytes));
+            net.put("limitBytes", DEFAULT_MOBILE_LIMIT_BYTES);
+            net.put("isWarning", isWarning);
+            net.put("isExceeded", isExceeded);
         } catch (Exception ignored) {}
         return net;
+    }
+
+    /**
+     * Get total mobile data consumed in current calendar month in bytes.
+     */
+    public static long getMonthlyMobileDataBytes() {
+        long now = System.currentTimeMillis();
+        if (cachedMonthlyMobileBytes >= 0 && (now - lastTrafficQueryTime < TRAFFIC_QUERY_INTERVAL_MS)) {
+            return cachedMonthlyMobileBytes;
+        }
+
+        long bytes = queryCellularBytesFromSystem();
+        if (bytes < 0) {
+            bytes = queryCellularBytesFromProcOrFallback();
+        }
+        cachedMonthlyMobileBytes = Math.max(0, bytes);
+        lastTrafficQueryTime = now;
+        return cachedMonthlyMobileBytes;
+    }
+
+    /**
+     * Checks if current month's cellular usage has reached the warning threshold (>= 80%).
+     */
+    public static boolean isWarningUsage() {
+        long bytes = cachedMonthlyMobileBytes >= 0 ? cachedMonthlyMobileBytes : getMonthlyMobileDataBytes();
+        return bytes >= (long) (DEFAULT_MOBILE_LIMIT_BYTES * WARNING_RATIO);
+    }
+
+    private static long queryCellularBytesFromSystem() {
+        if (appContext == null) return -1;
+        try {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                NetworkStatsManager nsm = (NetworkStatsManager)
+                        appContext.getSystemService(Context.NETWORK_STATS_SERVICE);
+                if (nsm != null) {
+                    Calendar cal = Calendar.getInstance();
+                    cal.set(Calendar.DAY_OF_MONTH, 1);
+                    cal.set(Calendar.HOUR_OF_DAY, 0);
+                    cal.set(Calendar.MINUTE, 0);
+                    cal.set(Calendar.SECOND, 0);
+                    cal.set(Calendar.MILLISECOND, 0);
+                    long start = cal.getTimeInMillis();
+                    long end = System.currentTimeMillis();
+
+                    NetworkStats.Bucket bucket = nsm.querySummaryForDevice(
+                            NetworkCapabilities.TRANSPORT_CELLULAR,
+                            null,
+                            start,
+                            end
+                    );
+                    if (bucket != null) {
+                        return bucket.getRxBytes() + bucket.getTxBytes();
+                    }
+                }
+            }
+        } catch (Throwable ignored) {
+            // UID 2000 or missing permission - fallback
+        }
+        return -1;
+    }
+
+    private static long queryCellularBytesFromProcOrFallback() {
+        long bytes = 0;
+        try {
+            File f = new File("/proc/net/dev");
+            if (f.exists() && f.canRead()) {
+                try (BufferedReader br = new BufferedReader(new FileReader(f))) {
+                    String line;
+                    while ((line = br.readLine()) != null) {
+                        line = line.trim();
+                        if (line.startsWith("rmnet_data") || line.startsWith("rmnet") || line.startsWith("ccmni")) {
+                            int colon = line.indexOf(':');
+                            if (colon > 0) {
+                                String data = line.substring(colon + 1).trim();
+                                String[] tokens = data.split("\\s+");
+                                if (tokens.length >= 9) {
+                                    long rx = Long.parseLong(tokens[0]);
+                                    long tx = Long.parseLong(tokens[8]);
+                                    bytes += (rx + tx);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        } catch (Throwable ignored) {}
+
+        if (bytes > 0) return bytes;
+
+        // Fallback: Check DataUsageMonitor if available
+        try {
+            DataUsageMonitor dum = DataUsageMonitor.getInstance();
+            if (dum != null) {
+                Calendar cal = Calendar.getInstance();
+                int dayOfMonth = cal.get(Calendar.DAY_OF_MONTH);
+                JSONObject usage = dum.getUsage(dayOfMonth);
+                if (usage != null) {
+                    long totalMobile = usage.optLong("totalMobile", -1);
+                    if (totalMobile >= 0) {
+                        return totalMobile;
+                    }
+                }
+            }
+        } catch (Throwable ignored) {}
+
+        return 0;
+    }
+
+    public static String formatDataSize(long bytes) {
+        if (bytes <= 0) return "0 MB";
+        if (bytes < 1024L * 1024L) {
+            return String.format(Locale.US, "%.1f KB", bytes / 1024.0);
+        } else if (bytes < 1024L * 1024L * 1024L) {
+            return String.format(Locale.US, "%.1f MB", bytes / (1024.0 * 1024.0));
+        } else {
+            return String.format(Locale.US, "%.1f GB", bytes / (1024.0 * 1024.0 * 1024.0));
+        }
     }
 
     /**

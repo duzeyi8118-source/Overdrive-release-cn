@@ -1322,6 +1322,12 @@
          three most important live signals (tunnel, services, recording). -->
     <string name="dashboard_chip_recording_active">Recording</string>
     <string name="dashboard_chip_recording_idle">Idle</string>
+    <string name="dashboard_network_checking">Network…</string>
+    <string name="dashboard_network_wifi">Wi-Fi: %1$s</string>
+    <string name="dashboard_network_wifi_connected">Wi-Fi</string>
+    <string name="dashboard_network_cellular_used">Mobile · %1$s</string>
+    <string name="dashboard_network_offline">Offline</string>
+    <string name="dashboard_network_ethernet">Ethernet</string>
     <string name="dashboard_vehicle_tap_to_set">Tap to set</string>
     <string name="dashboard_vehicle_summary">%1$.1f kWh · %2$s</string>
     <string name="vehicle_dialog_title">Set battery capacity</string>

@@ -64,11 +64,13 @@ class DashboardFragment : Fragment() {
     // Hero
     private lateinit var heroGreeting: TextView
     private lateinit var heroSubtitle: TextView
+    private lateinit var heroChipNetwork: Chip
     private lateinit var heroChipTunnel: Chip
     private lateinit var heroChipServices: Chip
     private lateinit var heroChipRecording: Chip
     private lateinit var vehicleSocValue: TextView
     private lateinit var vehicleRangeValue: TextView
+    private var lastNetworkSnapshot: com.overdrive.app.ui.dashboard.DashboardNetworkSnapshot? = null
 
     // Optional, stored-only GenAI dashboard card.
     private lateinit var aiInsightCard: MaterialCardView
@@ -278,6 +280,34 @@ class DashboardFragment : Fragment() {
     private fun bindViews(view: View) {
         heroGreeting = view.findViewById(R.id.heroGreeting)
         heroSubtitle = view.findViewById(R.id.heroSubtitle)
+        heroChipNetwork = view.findViewById(R.id.heroChipNetwork)
+        heroChipNetwork.setOnClickListener {
+            val net = lastNetworkSnapshot
+            val ctx = context ?: return@setOnClickListener
+            val msg = when {
+                net == null -> getString(R.string.dashboard_network_checking)
+                net.type.equals("wifi", ignoreCase = true) -> {
+                    val ssid = net.ssid.trim()
+                    if (ssid.isNotEmpty() && !ssid.equals("WiFi", ignoreCase = true) && !ssid.contains("unknown")) {
+                        getString(R.string.dashboard_network_wifi, ssid)
+                    } else {
+                        getString(R.string.dashboard_network_wifi_connected)
+                    }
+                }
+                net.type.equals("cellular", ignoreCase = true) -> {
+                    val used = if (net.monthlyMobileFormatted.isNotEmpty()) {
+                        net.monthlyMobileFormatted
+                    } else {
+                        com.overdrive.app.monitor.NetworkMonitor.formatDataSize(net.monthlyMobileBytes)
+                    }
+                    val status = if (net.isWarning) " (已接近预警阈值)" else ""
+                    "${getString(R.string.dashboard_network_cellular_used, used)}$status"
+                }
+                net.type.equals("ethernet", ignoreCase = true) -> getString(R.string.dashboard_network_ethernet)
+                else -> getString(R.string.dashboard_network_offline)
+            }
+            AppToast.show(ctx, msg)
+        }
         heroChipTunnel = view.findViewById(R.id.heroChipTunnel)
         heroChipServices = view.findViewById(R.id.heroChipServices)
         heroChipRecording = view.findViewById(R.id.heroChipRecording)
@@ -437,6 +467,7 @@ class DashboardFragment : Fragment() {
      *
      */
     private fun refreshHeroChips() {
+        renderNetworkChip(lastNetworkSnapshot)
         heroChipTunnel.text = metricTunnelValue.text
         heroChipServices.text = tvDaemonsStatus.text
         val recording = recordingViewModel.isRecording.value == true
@@ -461,6 +492,52 @@ class DashboardFragment : Fragment() {
             }
         )
         tintStatusChip(heroChipRecording, if (recording) StatusTone.LIVE else StatusTone.IDLE)
+    }
+
+    private fun renderNetworkChip(network: com.overdrive.app.ui.dashboard.DashboardNetworkSnapshot?) {
+        if (!::heroChipNetwork.isInitialized) return
+        lastNetworkSnapshot = network
+
+        if (network == null) {
+            heroChipNetwork.text = getString(R.string.dashboard_network_checking)
+            tintStatusChip(heroChipNetwork, StatusTone.IDLE)
+            return
+        }
+
+        when (network.type.lowercase()) {
+            "wifi" -> {
+                val ssid = network.ssid.trim()
+                heroChipNetwork.text = if (ssid.isNotEmpty() && !ssid.equals("WiFi", ignoreCase = true) && !ssid.contains("unknown")) {
+                    getString(R.string.dashboard_network_wifi, ssid)
+                } else {
+                    getString(R.string.dashboard_network_wifi_connected)
+                }
+                tintStatusChip(heroChipNetwork, StatusTone.LIVE)
+            }
+            "cellular" -> {
+                val formattedUsed = if (network.monthlyMobileFormatted.isNotEmpty()) {
+                    network.monthlyMobileFormatted
+                } else {
+                    com.overdrive.app.monitor.NetworkMonitor.formatDataSize(network.monthlyMobileBytes)
+                }
+                heroChipNetwork.text = getString(R.string.dashboard_network_cellular_used, formattedUsed)
+
+                // 达到预警换颜色：已超额 -> DOWN(红)，已预警(>=80%) -> IDLE(黄/琥珀)，正常 -> LIVE(绿)
+                when {
+                    network.isExceeded -> tintStatusChip(heroChipNetwork, StatusTone.DOWN)
+                    network.isWarning -> tintStatusChip(heroChipNetwork, StatusTone.IDLE)
+                    else -> tintStatusChip(heroChipNetwork, StatusTone.LIVE)
+                }
+            }
+            "ethernet" -> {
+                heroChipNetwork.text = getString(R.string.dashboard_network_ethernet)
+                tintStatusChip(heroChipNetwork, StatusTone.LIVE)
+            }
+            else -> {
+                heroChipNetwork.text = getString(R.string.dashboard_network_offline)
+                tintStatusChip(heroChipNetwork, StatusTone.DOWN)
+            }
+        }
     }
 
     private enum class StatusTone { LIVE, IDLE, DOWN }
@@ -770,6 +847,7 @@ class DashboardFragment : Fragment() {
                 renderSocGauge(snapshot.socPercent)
                 renderRangeBreakdown(snapshot.rangeDetails)
                 renderCharging(snapshot.charging)
+                renderNetworkChip(snapshot.network)
             }
         }
     }

@@ -69,6 +69,7 @@
                             </div>
                         </div>
                         <div class="dash-hero-status">
+                            <span class="dash-chip" id="dashNetChip">网络 --</span>
                             <span class="dash-chip" id="dashConnChip" data-i18n="dashboard.chip_device_pending">车机 --</span>
                             <span class="dash-chip" id="dashSurvChip" data-i18n="dashboard.chip_surveillance_pending">哨兵 --</span>
                             <span class="dash-chip" id="dashGpsChip" data-i18n="dashboard.chip_gps_pending">GPS 定位中…</span>
@@ -2557,6 +2558,28 @@
                 }
 
                 var driveState = this.updateDriveState(status);
+
+                // Update Network & Cellular Traffic Chip
+                var net = status.network;
+                if (!net || !net.type || net.type === 'none') {
+                    setChip('dashNetChip', BYD.i18n.t('status.no_network') || '无网络', 'alert');
+                } else if (net.type === 'wifi') {
+                    var ssid = (net.ssid || '').trim();
+                    var wifiLabel = (ssid && ssid !== 'WiFi' && ssid.indexOf('unknown') === -1)
+                        ? ('Wi-Fi: ' + ssid)
+                        : (BYD.i18n.t('status.wifi') || 'Wi-Fi');
+                    setChip('dashNetChip', wifiLabel, 'good');
+                } else if (net.type === 'cellular') {
+                    var usedStr = net.monthlyMobileFormatted || '0 MB';
+                    var cellLabel = (BYD.i18n.t('status.mobile_data') || '移动数据') + ' · ' + usedStr;
+                    var cellCls = net.isExceeded ? 'alert' : (net.isWarning ? 'warn' : 'good');
+                    setChip('dashNetChip', cellLabel, cellCls);
+                } else if (net.type === 'ethernet') {
+                    setChip('dashNetChip', BYD.i18n.t('diagnostics.network_ethernet') || '以太网', 'good');
+                } else {
+                    setChip('dashNetChip', net.type, 'good');
+                }
+
                 var deviceLabel = BYD.i18n.t('dashboard.chip_device_value', { id: status.deviceId || '--' })
                                   || ('Device ' + (status.deviceId || '--'));
                 setChip('dashConnChip', deviceLabel, status.deviceId ? 'good' : '');
