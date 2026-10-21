@@ -2648,107 +2648,40 @@
 
                 var driveState = this.updateDriveState(status);
 
-                // Update Network & Cellular Data Card (Scheme 1)
+                // Render compact dashNetChip (Scheme B)
                 var net = status.network;
-                var netCard = document.getElementById('dashNetCard');
-                var netIcon = document.getElementById('dashNetIcon');
-                var netTitle = document.getElementById('dashNetTitle');
-                var netUsedVal = document.getElementById('dashNetUsedVal');
-                var netLimitVal = document.getElementById('dashNetLimitVal');
-                var netBar = document.getElementById('dashNetProgressBar');
-                var netHint = document.getElementById('dashNetHint');
-                var netRemain = document.getElementById('dashNetRemain');
-
-                if (netCard) {
-                    netCard.classList.remove('warn', 'alert');
-                    if (!net || !net.type || net.type === 'none') {
-                        if (netIcon) netIcon.textContent = '⚠️';
-                        if (netTitle) netTitle.textContent = BYD.i18n.t('status.no_network') || '无网络连接';
-                        if (netUsedVal) netUsedVal.textContent = '--';
-                        if (netLimitVal) netLimitVal.textContent = '';
-                        if (netBar) netBar.style.width = '0%';
-                        if (netHint) netHint.textContent = '请检查车机 SIM 卡或 Wi-Fi 设置';
-                        if (netRemain) netRemain.textContent = '网络已断开';
-                        netCard.classList.add('alert');
-                    } else if (net.type === 'wifi') {
+                var netChip = document.getElementById('dashNetChip');
+                if (netChip && net) {
+                    var netType = (net.type || '').toLowerCase();
+                    var netChipText = '';
+                    var netChipClass = 'good';
+                    if (netType === 'wifi') {
                         var ssid = (net.ssid || '').trim();
-                        var hasSsid = (ssid && ssid !== 'WiFi' && ssid.indexOf('unknown') === -1);
-                        if (netIcon) netIcon.textContent = '📶';
-                        if (netTitle) netTitle.textContent = hasSsid ? ('Wi-Fi: ' + ssid) : (BYD.i18n.t('status.wifi') || 'Wi-Fi 已连接');
-                        if (netUsedVal) netUsedVal.textContent = '免流量';
-                        if (netLimitVal) netLimitVal.textContent = '';
-                        if (netBar) netBar.style.width = '100%';
-                        if (netHint) netHint.textContent = '已连接外部 Wi-Fi / 手机热点';
-                        if (netRemain) netRemain.textContent = '不消耗车载 SIM 流量';
-                    } else if (net.type === 'cellular') {
-                        var usedStr = net.monthlyMobileFormatted || '0 MB';
+                        netChipText = (ssid && ssid !== 'WiFi' && ssid.indexOf('unknown') === -1)
+                            ? '🛜 ' + ssid
+                            : '🛜 Wi-Fi';
+                        netChipClass = 'good';
+                    } else if (netType === 'cellular') {
                         var usedBytes = Number(net.monthlyMobileBytes) || 0;
                         var limitBytes = Number(net.limitBytes) || (5 * 1024 * 1024 * 1024);
-                        var pct = Math.min(100, Math.max(0, Math.round((usedBytes / limitBytes) * 100)));
-                        var remainBytes = Math.max(0, limitBytes - usedBytes);
-                        var remainGb = (remainBytes / (1024 * 1024 * 1024)).toFixed(1);
-                        var limitGb = Math.round(limitBytes / (1024 * 1024 * 1024));
-
-                        if (netIcon) netIcon.textContent = '📶';
-                        if (netTitle) netTitle.textContent = BYD.i18n.t('status.mobile_data') || '移动蜂窝网络';
-                        if (netUsedVal) netUsedVal.textContent = usedStr;
-                        if (netLimitVal) netLimitVal.textContent = '/ ' + limitGb + 'G';
-                        if (netBar) netBar.style.width = pct + '%';
-                        if (netRemain) netRemain.textContent = '剩余 ' + remainGb + ' GB';
-
+                        var usedG = (usedBytes / (1024 * 1024 * 1024)).toFixed(1);
+                        var limitG = Math.round(limitBytes / (1024 * 1024 * 1024));
+                        netChipText = '📶 ' + usedG + 'G/' + limitG + 'G';
                         if (net.isExceeded) {
-                            netCard.classList.add('alert');
-                            if (netHint) netHint.textContent = '⚠️ 本月流量已超出限额！';
-                        } else if (net.isWarning) {
-                            netCard.classList.add('warn');
-                            if (netHint) netHint.textContent = '⚡ 流量已用超 80%，请注意余量';
-                        } else {
-                            if (netHint) netHint.textContent = '状态正常 · 连热点自动显示 SSID';
-                        }
-                    } else {
-                        if (netIcon) netIcon.textContent = '🌐';
-                        if (netTitle) netTitle.textContent = BYD.i18n.t('diagnostics.network_ethernet') || '以太网';
-                        if (netUsedVal) netUsedVal.textContent = '--';
-                        if (netLimitVal) netLimitVal.textContent = '';
-                        if (netBar) netBar.style.width = '0%';
-                        if (netHint) netHint.textContent = '有线以太网连接';
-                        if (netRemain) netRemain.textContent = '';
-                    }
-
-                    // Render compact dashNetChip (for mobile & responsive scheme B)
-                    var netChip = document.getElementById('dashNetChip');
-                    if (netChip) {
-                        var netType = (net.type || '').toLowerCase();
-                        var netChipText = '';
-                        var netChipClass = 'good';
-                        if (netType === 'wifi') {
-                            var ssid = (net.ssid || '').trim();
-                            netChipText = (ssid && ssid !== 'WiFi' && ssid.indexOf('unknown') === -1)
-                                ? '🛜 ' + ssid
-                                : '🛜 Wi-Fi';
-                            netChipClass = 'good';
-                        } else if (netType === 'cellular') {
-                            var usedBytes = Number(net.monthlyMobileBytes) || 0;
-                            var limitBytes = Number(net.limitBytes) || (5 * 1024 * 1024 * 1024);
-                            var usedG = (usedBytes / (1024 * 1024 * 1024)).toFixed(1);
-                            var limitG = Math.round(limitBytes / (1024 * 1024 * 1024));
-                            netChipText = '📶 ' + usedG + 'G/' + limitG + 'G';
-                            if (net.isExceeded) {
-                                netChipClass = 'alert';
-                            } else if (net.isWarning) {
-                                netChipClass = 'warn';
-                            } else {
-                                netChipClass = 'good';
-                            }
-                        } else if (netType === 'ethernet') {
-                            netChipText = '🌐 以太网';
-                            netChipClass = 'good';
-                        } else {
-                            netChipText = '⚠️ 无网络';
                             netChipClass = 'alert';
+                        } else if (net.isWarning) {
+                            netChipClass = 'warn';
+                        } else {
+                            netChipClass = 'good';
                         }
-                        setChip('dashNetChip', netChipText, netChipClass);
+                    } else if (netType === 'ethernet') {
+                        netChipText = '🌐 以太网';
+                        netChipClass = 'good';
+                    } else {
+                        netChipText = '⚠️ 无网络';
+                        netChipClass = 'alert';
                     }
+                    setChip('dashNetChip', netChipText, netChipClass);
                 }
 
                 // Compact clean device label without giant hash
