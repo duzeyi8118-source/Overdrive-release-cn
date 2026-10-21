@@ -509,19 +509,16 @@ class DashboardFragment : Fragment() {
             "wifi" -> {
                 val ssid = network.ssid.trim()
                 heroChipNetwork.text = if (ssid.isNotEmpty() && !ssid.equals("WiFi", ignoreCase = true) && !ssid.contains("unknown")) {
-                    getString(R.string.dashboard_network_wifi, ssid)
+                    "🛜 $ssid"
                 } else {
-                    getString(R.string.dashboard_network_wifi_connected)
+                    "🛜 Wi-Fi"
                 }
                 tintStatusChip(heroChipNetwork, StatusTone.LIVE)
             }
             "cellular" -> {
-                val formattedUsed = if (network.monthlyMobileFormatted.isNotEmpty()) {
-                    network.monthlyMobileFormatted
-                } else {
-                    com.overdrive.app.monitor.NetworkMonitor.formatDataSize(network.monthlyMobileBytes)
-                }
-                heroChipNetwork.text = getString(R.string.dashboard_network_cellular_used, formattedUsed)
+                val usedG = String.format(java.util.Locale.US, "%.1fG", network.monthlyMobileBytes / (1024.0 * 1024.0 * 1024.0))
+                val limitG = String.format(java.util.Locale.US, "%dG", network.limitBytes / (1024L * 1024L * 1024L))
+                heroChipNetwork.text = "📶 $usedG/$limitG"
 
                 // 达到预警换颜色：已超额 -> DOWN(红)，已预警(>=80%) -> IDLE(黄/琥珀)，正常 -> LIVE(绿)
                 when {

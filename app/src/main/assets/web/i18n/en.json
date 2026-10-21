@@ -3515,6 +3515,7 @@
     "heading": "Dashboard",
     "subtitle": "Vehicle status, position and main controls.",
     "chip_device_pending": "Device --",
+    "chip_device_online": "Vehicle Online",
     "chip_surveillance_pending": "Surveillance --",
     "chip_gps_pending": "GPS --",
     "chip_device_value": "Device {id}",

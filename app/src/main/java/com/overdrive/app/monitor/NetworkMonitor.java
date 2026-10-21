@@ -50,7 +50,7 @@ public class NetworkMonitor {
     private static volatile long cachedMonthlyMobileBytes = -1;
     private static volatile long lastTrafficQueryTime = 0;
     private static final long TRAFFIC_QUERY_INTERVAL_MS = 30000L; // 30s cache
-    public static final long DEFAULT_MOBILE_LIMIT_BYTES = 10L * 1024 * 1024 * 1024; // 10 GB
+    public static final long DEFAULT_MOBILE_LIMIT_BYTES = 5L * 1024 * 1024 * 1024; // 5 GB
     public static final double WARNING_RATIO = 0.8; // 80% warning threshold
 
     public static void init(Context context) {

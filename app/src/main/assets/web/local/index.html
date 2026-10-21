@@ -92,6 +92,7 @@
 
                         <div class="dash-hero-status">
                             <span class="dash-chip" id="dashConnChip" data-i18n="dashboard.chip_device_pending">车机 --</span>
+                            <span class="dash-chip" id="dashNetChip" style="display: none;">📶 --</span>
                             <span class="dash-chip" id="dashSurvChip" data-i18n="dashboard.chip_surveillance_pending">哨兵 --</span>
                             <span class="dash-chip" id="dashGpsChip" data-i18n="dashboard.chip_gps_pending">GPS 定位中…</span>
                         </div>
@@ -918,6 +919,7 @@
         .dash-chip.good { color: var(--brand-primary); border-color: rgba(0, 212, 170, 0.35); }
         .dash-chip.warn { color: #f59e0b; border-color: rgba(245, 158, 11, 0.35); }
         .dash-chip.alert { color: #ef4444; border-color: rgba(239, 68, 68, 0.35); }
+        #dashNetChip { display: none; }
 
         /* ── Vehicle glance panel ────────────────────────────────────
            Hero right column: top-down schematic + SoC ring + glance
@@ -1566,6 +1568,11 @@
             .dash-hero {
                 padding: 18px;
             }
+            .dash-net-card { display: none !important; }
+            #dashNetChip { display: inline-flex !important; }
+            .dash-hero-main { gap: 10px; }
+            .dash-hero-status { flex-wrap: wrap; gap: 6px; }
+            .dash-chip { padding: 5px 9px; font-size: 11px; }
             .dash-hero h1 { font-size: 27px; }
             .dash-drive-state {
                 grid-template-columns: 50px minmax(0, 1fr);
@@ -1596,10 +1603,12 @@
                (schematic | ring + rows) but relaxes the height so the
                hero doesn't dominate the scroll. */
             .dash-glance {
+                grid-template-columns: minmax(95px, 0.7fr) minmax(180px, 1.3fr);
                 min-height: 0;
                 padding: 2px 0;
             }
-            .dash-car-svg { max-height: 210px; }
+            .dash-car-svg { max-height: 200px; }
+            .dash-glance-row { padding: 6px 8px; font-size: 11px; }
             .dash-soc-ring { width: 92px; height: 92px; }
             .dash-ring-text strong { font-size: 18px; }
             .dash-range-value--personalized strong { font-size: 21px; }
@@ -2696,15 +2705,16 @@
                     } else if (net.type === 'cellular') {
                         var usedStr = net.monthlyMobileFormatted || '0 MB';
                         var usedBytes = Number(net.monthlyMobileBytes) || 0;
-                        var limitBytes = Number(net.limitBytes) || (10 * 1024 * 1024 * 1024);
+                        var limitBytes = Number(net.limitBytes) || (5 * 1024 * 1024 * 1024);
                         var pct = Math.min(100, Math.max(0, Math.round((usedBytes / limitBytes) * 100)));
                         var remainBytes = Math.max(0, limitBytes - usedBytes);
                         var remainGb = (remainBytes / (1024 * 1024 * 1024)).toFixed(1);
+                        var limitGb = Math.round(limitBytes / (1024 * 1024 * 1024));
 
                         if (netIcon) netIcon.textContent = '📶';
                         if (netTitle) netTitle.textContent = BYD.i18n.t('status.mobile_data') || '移动蜂窝网络';
                         if (netUsedVal) netUsedVal.textContent = usedStr;
-                        if (netLimitVal) netLimitVal.textContent = '/ 10G';
+                        if (netLimitVal) netLimitVal.textContent = '/ ' + limitGb + 'G';
                         if (netBar) netBar.style.width = pct + '%';
                         if (netRemain) netRemain.textContent = '剩余 ' + remainGb + ' GB';
 
@@ -2726,11 +2736,50 @@
                         if (netHint) netHint.textContent = '有线以太网连接';
                         if (netRemain) netRemain.textContent = '';
                     }
+
+                    // Render compact dashNetChip (for mobile & responsive scheme B)
+                    var netChip = document.getElementById('dashNetChip');
+                    if (netChip) {
+                        var netType = (net.type || '').toLowerCase();
+                        var netChipText = '';
+                        var netChipClass = 'good';
+                        if (netType === 'wifi') {
+                            var ssid = (net.ssid || '').trim();
+                            netChipText = (ssid && ssid !== 'WiFi' && ssid.indexOf('unknown') === -1)
+                                ? '🛜 ' + ssid
+                                : '🛜 Wi-Fi';
+                            netChipClass = 'good';
+                        } else if (netType === 'cellular') {
+                            var usedBytes = Number(net.monthlyMobileBytes) || 0;
+                            var limitBytes = Number(net.limitBytes) || (5 * 1024 * 1024 * 1024);
+                            var usedG = (usedBytes / (1024 * 1024 * 1024)).toFixed(1);
+                            var limitG = Math.round(limitBytes / (1024 * 1024 * 1024));
+                            netChipText = '📶 ' + usedG + 'G/' + limitG + 'G';
+                            if (net.isExceeded) {
+                                netChipClass = 'alert';
+                            } else if (net.isWarning) {
+                                netChipClass = 'warn';
+                            } else {
+                                netChipClass = 'good';
+                            }
+                        } else if (netType === 'ethernet') {
+                            netChipText = '🌐 以太网';
+                            netChipClass = 'good';
+                        } else {
+                            netChipText = '⚠️ 无网络';
+                            netChipClass = 'alert';
+                        }
+                        setChip('dashNetChip', netChipText, netChipClass);
+                    }
                 }
 
                 // Compact clean device label without giant hash
+                var deviceOnlineText = BYD.i18n.t('dashboard.chip_device_online');
+                if (!deviceOnlineText || deviceOnlineText.indexOf('.') !== -1) {
+                    deviceOnlineText = '车机 在线';
+                }
                 var deviceLabel = status.deviceId
-                    ? (BYD.i18n.t('dashboard.chip_device_online') || '车机 在线')
+                    ? deviceOnlineText
                     : (BYD.i18n.t('dashboard.chip_device_pending') || '车机 --');
                 setChip('dashConnChip', deviceLabel, status.deviceId ? 'good' : '');
                 var survLabel = BYD.i18n.t('dashboard.chip_surveillance_value', { state: tOnOff(status.gpuSurveillance) })

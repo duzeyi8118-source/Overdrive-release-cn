@@ -3274,6 +3274,7 @@
     "heading": "仪表盘",
     "subtitle": "整车状态、实时位置与快捷车控",
     "chip_device_pending": "车机 --",
+    "chip_device_online": "车机 在线",
     "chip_surveillance_pending": "哨兵 --",
     "chip_gps_pending": "GPS 定位中…",
     "chip_device_value": "车机 {id}",
