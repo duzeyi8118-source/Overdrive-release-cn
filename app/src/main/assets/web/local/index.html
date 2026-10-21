@@ -68,8 +68,29 @@
                                 </div>
                             </div>
                         </div>
+                        <!-- Network & Cellular Data Monitor Card (Scheme 1: fills empty space elegantly) -->
+                        <div class="dash-net-card" id="dashNetCard">
+                            <div class="dash-net-card-header">
+                                <div class="dash-net-type" id="dashNetType">
+                                    <span class="dash-net-icon" id="dashNetIcon">📶</span>
+                                    <strong id="dashNetTitle">移动蜂窝网络</strong>
+                                </div>
+                                <div class="dash-net-usage" id="dashNetUsage">
+                                    <span class="dash-net-used-label">本月已用</span>
+                                    <strong class="dash-net-used-val" id="dashNetUsedVal">--</strong>
+                                    <small class="dash-net-limit-val" id="dashNetLimitVal">/ 10G</small>
+                                </div>
+                            </div>
+                            <div class="dash-net-progress-track" id="dashNetProgressTrack">
+                                <div class="dash-net-progress-bar" id="dashNetProgressBar" style="width: 0%;"></div>
+                            </div>
+                            <div class="dash-net-card-footer" id="dashNetCardFooter">
+                                <span class="dash-net-hint" id="dashNetHint">连热点自动显示 SSID</span>
+                                <span class="dash-net-remain" id="dashNetRemain">--</span>
+                            </div>
+                        </div>
+
                         <div class="dash-hero-status">
-                            <span class="dash-chip" id="dashNetChip">网络 --</span>
                             <span class="dash-chip" id="dashConnChip" data-i18n="dashboard.chip_device_pending">车机 --</span>
                             <span class="dash-chip" id="dashSurvChip" data-i18n="dashboard.chip_surveillance_pending">哨兵 --</span>
                             <span class="dash-chip" id="dashGpsChip" data-i18n="dashboard.chip_gps_pending">GPS 定位中…</span>
@@ -784,33 +805,114 @@
             100% { box-shadow: 0 0 0 0 rgba(14, 165, 233, 0); }
         }
 
-        .dash-hero-status {
-            flex-wrap: nowrap;
-            overflow-x: auto;
-            padding-bottom: 2px;
-            scrollbar-width: none;
+        /* Network & Monthly Mobile Data Card (Fills previously empty gap) */
+        .dash-net-card {
+            background: var(--bg-elevated);
+            border: 1px solid var(--border-subtle);
+            border-radius: 8px;
+            padding: 10px 14px;
+            display: flex;
+            flex-direction: column;
+            gap: 7px;
+            margin: 6px 0 2px 0;
+            transition: border-color 0.2s ease, background-color 0.2s ease;
         }
+        .dash-net-card.warn {
+            border-color: rgba(245, 158, 11, 0.4);
+            background: rgba(245, 158, 11, 0.05);
+        }
+        .dash-net-card.alert {
+            border-color: rgba(239, 68, 68, 0.4);
+            background: rgba(239, 68, 68, 0.05);
+        }
+        .dash-net-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            min-height: 22px;
+        }
+        .dash-net-type {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--text-primary);
+            font-size: 13px;
+        }
+        .dash-net-type strong {
+            font-weight: 700;
+        }
+        .dash-net-usage {
+            display: flex;
+            align-items: baseline;
+            gap: 4px;
+            font-size: 12px;
+        }
+        .dash-net-used-label {
+            color: var(--text-secondary);
+            font-size: 11px;
+        }
+        .dash-net-used-val {
+            color: var(--brand-primary);
+            font-size: 14px;
+            font-weight: 700;
+        }
+        .dash-net-card.warn .dash-net-used-val { color: #f59e0b; }
+        .dash-net-card.alert .dash-net-used-val { color: #ef4444; }
+        .dash-net-limit-val {
+            color: var(--text-muted);
+            font-size: 11px;
+        }
+        .dash-net-progress-track {
+            width: 100%;
+            height: 6px;
+            background: rgba(0, 0, 0, 0.07);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+        [data-theme="dark"] .dash-net-progress-track {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        .dash-net-progress-bar {
+            height: 100%;
+            background: var(--brand-primary);
+            border-radius: 3px;
+            transition: width 0.3s ease;
+        }
+        .dash-net-card.warn .dash-net-progress-bar { background: #f59e0b; }
+        .dash-net-card.alert .dash-net-progress-bar { background: #ef4444; }
+        .dash-net-card-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 11px;
+            color: var(--text-muted);
+        }
+        .dash-net-remain {
+            color: var(--brand-primary);
+            font-weight: 600;
+        }
+        .dash-net-card.warn .dash-net-remain { color: #f59e0b; }
+        .dash-net-card.alert .dash-net-remain { color: #ef4444; }
 
-        .dash-hero-status::-webkit-scrollbar { display: none; }
+        .dash-hero-status {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            padding-bottom: 2px;
+        }
 
         .dash-action-row { flex-wrap: wrap; }
 
         .dash-chip {
-            padding: 8px 11px;
+            padding: 6px 12px;
             border-radius: 999px;
             background: var(--bg-elevated);
             color: var(--text-secondary);
             border: 1px solid var(--border-subtle);
             font-size: 12px;
-            font-weight: 700;
+            font-weight: 600;
             white-space: nowrap;
-            /* Cap chip width so a verbose locale (long device-id, long
-               GPS-cached label, etc.) can't push the chip row past the
-               hero card boundary. Ellipsis kicks in only past the cap;
-               normal-length chips render unchanged. */
-            max-width: 180px;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            flex: 0 0 auto;
         }
 
         .dash-chip.good { color: var(--brand-primary); border-color: rgba(0, 212, 170, 0.35); }
@@ -2559,29 +2661,77 @@
 
                 var driveState = this.updateDriveState(status);
 
-                // Update Network & Cellular Traffic Chip
+                // Update Network & Cellular Data Card (Scheme 1)
                 var net = status.network;
-                if (!net || !net.type || net.type === 'none') {
-                    setChip('dashNetChip', BYD.i18n.t('status.no_network') || '无网络', 'alert');
-                } else if (net.type === 'wifi') {
-                    var ssid = (net.ssid || '').trim();
-                    var wifiLabel = (ssid && ssid !== 'WiFi' && ssid.indexOf('unknown') === -1)
-                        ? ('Wi-Fi: ' + ssid)
-                        : (BYD.i18n.t('status.wifi') || 'Wi-Fi');
-                    setChip('dashNetChip', wifiLabel, 'good');
-                } else if (net.type === 'cellular') {
-                    var usedStr = net.monthlyMobileFormatted || '0 MB';
-                    var cellLabel = (BYD.i18n.t('status.mobile_data') || '移动数据') + ' · ' + usedStr;
-                    var cellCls = net.isExceeded ? 'alert' : (net.isWarning ? 'warn' : 'good');
-                    setChip('dashNetChip', cellLabel, cellCls);
-                } else if (net.type === 'ethernet') {
-                    setChip('dashNetChip', BYD.i18n.t('diagnostics.network_ethernet') || '以太网', 'good');
-                } else {
-                    setChip('dashNetChip', net.type, 'good');
+                var netCard = document.getElementById('dashNetCard');
+                var netIcon = document.getElementById('dashNetIcon');
+                var netTitle = document.getElementById('dashNetTitle');
+                var netUsedVal = document.getElementById('dashNetUsedVal');
+                var netLimitVal = document.getElementById('dashNetLimitVal');
+                var netBar = document.getElementById('dashNetProgressBar');
+                var netHint = document.getElementById('dashNetHint');
+                var netRemain = document.getElementById('dashNetRemain');
+
+                if (netCard) {
+                    netCard.classList.remove('warn', 'alert');
+                    if (!net || !net.type || net.type === 'none') {
+                        if (netIcon) netIcon.textContent = '⚠️';
+                        if (netTitle) netTitle.textContent = BYD.i18n.t('status.no_network') || '无网络连接';
+                        if (netUsedVal) netUsedVal.textContent = '--';
+                        if (netLimitVal) netLimitVal.textContent = '';
+                        if (netBar) netBar.style.width = '0%';
+                        if (netHint) netHint.textContent = '请检查车机 SIM 卡或 Wi-Fi 设置';
+                        if (netRemain) netRemain.textContent = '网络已断开';
+                        netCard.classList.add('alert');
+                    } else if (net.type === 'wifi') {
+                        var ssid = (net.ssid || '').trim();
+                        var hasSsid = (ssid && ssid !== 'WiFi' && ssid.indexOf('unknown') === -1);
+                        if (netIcon) netIcon.textContent = '📶';
+                        if (netTitle) netTitle.textContent = hasSsid ? ('Wi-Fi: ' + ssid) : (BYD.i18n.t('status.wifi') || 'Wi-Fi 已连接');
+                        if (netUsedVal) netUsedVal.textContent = '免流量';
+                        if (netLimitVal) netLimitVal.textContent = '';
+                        if (netBar) netBar.style.width = '100%';
+                        if (netHint) netHint.textContent = '已连接外部 Wi-Fi / 手机热点';
+                        if (netRemain) netRemain.textContent = '不消耗车载 SIM 流量';
+                    } else if (net.type === 'cellular') {
+                        var usedStr = net.monthlyMobileFormatted || '0 MB';
+                        var usedBytes = Number(net.monthlyMobileBytes) || 0;
+                        var limitBytes = Number(net.limitBytes) || (10 * 1024 * 1024 * 1024);
+                        var pct = Math.min(100, Math.max(0, Math.round((usedBytes / limitBytes) * 100)));
+                        var remainBytes = Math.max(0, limitBytes - usedBytes);
+                        var remainGb = (remainBytes / (1024 * 1024 * 1024)).toFixed(1);
+
+                        if (netIcon) netIcon.textContent = '📶';
+                        if (netTitle) netTitle.textContent = BYD.i18n.t('status.mobile_data') || '移动蜂窝网络';
+                        if (netUsedVal) netUsedVal.textContent = usedStr;
+                        if (netLimitVal) netLimitVal.textContent = '/ 10G';
+                        if (netBar) netBar.style.width = pct + '%';
+                        if (netRemain) netRemain.textContent = '剩余 ' + remainGb + ' GB';
+
+                        if (net.isExceeded) {
+                            netCard.classList.add('alert');
+                            if (netHint) netHint.textContent = '⚠️ 本月流量已超出限额！';
+                        } else if (net.isWarning) {
+                            netCard.classList.add('warn');
+                            if (netHint) netHint.textContent = '⚡ 流量已用超 80%，请注意余量';
+                        } else {
+                            if (netHint) netHint.textContent = '状态正常 · 连热点自动显示 SSID';
+                        }
+                    } else {
+                        if (netIcon) netIcon.textContent = '🌐';
+                        if (netTitle) netTitle.textContent = BYD.i18n.t('diagnostics.network_ethernet') || '以太网';
+                        if (netUsedVal) netUsedVal.textContent = '--';
+                        if (netLimitVal) netLimitVal.textContent = '';
+                        if (netBar) netBar.style.width = '0%';
+                        if (netHint) netHint.textContent = '有线以太网连接';
+                        if (netRemain) netRemain.textContent = '';
+                    }
                 }
 
-                var deviceLabel = BYD.i18n.t('dashboard.chip_device_value', { id: status.deviceId || '--' })
-                                  || ('Device ' + (status.deviceId || '--'));
+                // Compact clean device label without giant hash
+                var deviceLabel = status.deviceId
+                    ? (BYD.i18n.t('dashboard.chip_device_online') || '车机 在线')
+                    : (BYD.i18n.t('dashboard.chip_device_pending') || '车机 --');
                 setChip('dashConnChip', deviceLabel, status.deviceId ? 'good' : '');
                 var survLabel = BYD.i18n.t('dashboard.chip_surveillance_value', { state: tOnOff(status.gpuSurveillance) })
                                 || ('Surveillance ' + tOnOff(status.gpuSurveillance));
