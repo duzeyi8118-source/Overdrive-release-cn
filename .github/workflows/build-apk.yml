@@ -99,22 +99,27 @@ jobs:
         if: github.ref == 'refs/heads/main'
         with:
           tag_name: "v${{ env.APP_VERSION }}-cn-sec"
-          name: "OverDrive v${{ env.APP_VERSION }} - 修复防冲锁存SafeKeep总开关与单视频解锁失效缺陷"
+          name: "OverDrive v${{ env.APP_VERSION }} - 合入上游关键稳定性修复与DiLink5驻车保活"
           body: |
             ## OverDrive v${{ env.APP_VERSION }} 定制版
 
-            ### 🛡️ 1. 修复防冲锁存 (SafeKeep) 总开关无法关闭与回弹缺陷
-            - **支持持久化停用**：`/api/safekeep/enable` 路由接入参数解析与磁盘持久化，开关状态真实保存；
-            - **状态接口对齐**：`/api/safekeep/status` 与 `/api/safekeep/config` 联动真实 `enabled` 状态，彻底消除关闭后页面自动弹回开启的硬编码问题；
-            - **同步队列与条件预检完善**：适配 `/api/safekeep/queue` 与 `/api/safekeep/dryrun` 接口，确保管理页无缝切换。
+            ### 🚀 1. DiLink 5.0 驻车防休眠保活 (QNX 车辆网络协议)
+            - **底层免云端保活**：调用底层 `IQnx` 通信协议，熄火后每 30 秒维持车辆网络清醒，彻底杜绝驻车哨兵 1 分钟被 MCU 强制休眠；
+            - **小电瓶安全保护**：实时监听 12V 电瓶电压，低于 12V/11V 或超时自动释放断开，防止小电瓶亏电。
 
-            ### 🔓 2. 修复录像/哨兵列表已加锁视频解锁失效
-            - **双向参数兼容**：`SafeKeepApiHandler.handleLock` 支持前端发送的 `locked` 参数名及后端传统的 `lock` 参数名；
-            - **解锁即时生效**：彻底解决点击解锁因字段缺失默认判为加锁并重复锁存的死循环，恢复正常的加锁与解锁功能；
-            - **录像状态元数据补全**：`/api/safekeep/clips` 补齐 `states` 结构，录像卡片实时显示真实锁存与同步标记。
+            ### 🔄 2. 根治车机重启/更新后电池容量变成 "Tap to set" 缺陷
+            - **启动期平滑过渡**：SOH 评估器未就绪时自动兜底读取持久化配置，避免仪表盘闪烁或清空已配置电池容量。
 
-            ### 🔒 3. 门禁验证与安全发布
+            ### 🌐 3. Cloudflared 隧道断网自愈与退出清理增强
+            - **退避重连缩短**：指数退避上限压降至 5（最长 5 分钟），解决出地下车库后 4G 信号恢复却长时间无法重连的死锁；
+            - **进程查杀纠偏**：修正 `libcloudflared.so` 真实运行二进制查杀逻辑与开机自愈。
+
+            ### ⚡ 4. 车身自动化新增解锁来源与便利进出信号
+            - **信号扩展**：增加 `unlockSource`（遥控钥匙/蓝牙/远程解锁源）与 `easyEntry`（便利进出/座椅迎宾动作状态）自动化条件。
+
+            ### 🔒 5. 门禁验证与安全发布
             - 严格通过 `scripts/i18n_check.py` 门禁；
+            - 补齐简体中文国际化配置；
             - APK 采用独立车机永久密钥签名，安全防冲。
           files: release-assets/*.apk
         env:
