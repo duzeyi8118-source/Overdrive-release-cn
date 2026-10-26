@@ -64,7 +64,7 @@ class DashboardFragment : Fragment() {
     // Hero
     private lateinit var heroGreeting: TextView
     private lateinit var heroSubtitle: TextView
-    private lateinit var heroChipNetwork: Chip
+    private var heroChipNetwork: Chip? = null
     private lateinit var heroChipTunnel: Chip
     private lateinit var heroChipServices: Chip
     private lateinit var heroChipRecording: Chip
@@ -286,7 +286,7 @@ class DashboardFragment : Fragment() {
         heroGreeting = view.findViewById(R.id.heroGreeting)
         heroSubtitle = view.findViewById(R.id.heroSubtitle)
         heroChipNetwork = view.findViewById(R.id.heroChipNetwork)
-        heroChipNetwork.setOnClickListener {
+        heroChipNetwork?.setOnClickListener {
             val net = lastNetworkSnapshot
             val ctx = context ?: return@setOnClickListener
             val msg = when {
@@ -501,44 +501,44 @@ class DashboardFragment : Fragment() {
     }
 
     private fun renderNetworkChip(network: com.overdrive.app.ui.dashboard.DashboardNetworkSnapshot?) {
-        if (!::heroChipNetwork.isInitialized) return
+        val chip = heroChipNetwork ?: return
         lastNetworkSnapshot = network
 
         if (network == null) {
-            heroChipNetwork.text = getString(R.string.dashboard_network_checking)
-            tintStatusChip(heroChipNetwork, StatusTone.IDLE)
+            chip.text = getString(R.string.dashboard_network_checking)
+            tintStatusChip(chip, StatusTone.IDLE)
             return
         }
 
         when (network.type.lowercase()) {
             "wifi" -> {
                 val ssid = network.ssid.trim()
-                heroChipNetwork.text = if (ssid.isNotEmpty() && !ssid.equals("WiFi", ignoreCase = true) && !ssid.contains("unknown")) {
+                chip.text = if (ssid.isNotEmpty() && !ssid.equals("WiFi", ignoreCase = true) && !ssid.contains("unknown")) {
                     "🛜 $ssid"
                 } else {
                     "🛜 Wi-Fi"
                 }
-                tintStatusChip(heroChipNetwork, StatusTone.LIVE)
+                tintStatusChip(chip, StatusTone.LIVE)
             }
             "cellular" -> {
                 val usedG = String.format(java.util.Locale.US, "%.1fG", network.monthlyMobileBytes / (1024.0 * 1024.0 * 1024.0))
                 val limitG = String.format(java.util.Locale.US, "%dG", network.limitBytes / (1024L * 1024L * 1024L))
-                heroChipNetwork.text = "📶 $usedG/$limitG"
+                chip.text = "📶 $usedG/$limitG"
 
                 // 达到预警换颜色：已超额 -> DOWN(红)，已预警(>=80%) -> IDLE(黄/琥珀)，正常 -> LIVE(绿)
                 when {
-                    network.isExceeded -> tintStatusChip(heroChipNetwork, StatusTone.DOWN)
-                    network.isWarning -> tintStatusChip(heroChipNetwork, StatusTone.IDLE)
-                    else -> tintStatusChip(heroChipNetwork, StatusTone.LIVE)
+                    network.isExceeded -> tintStatusChip(chip, StatusTone.DOWN)
+                    network.isWarning -> tintStatusChip(chip, StatusTone.IDLE)
+                    else -> tintStatusChip(chip, StatusTone.LIVE)
                 }
             }
             "ethernet" -> {
-                heroChipNetwork.text = getString(R.string.dashboard_network_ethernet)
-                tintStatusChip(heroChipNetwork, StatusTone.LIVE)
+                chip.text = getString(R.string.dashboard_network_ethernet)
+                tintStatusChip(chip, StatusTone.LIVE)
             }
             else -> {
-                heroChipNetwork.text = getString(R.string.dashboard_network_offline)
-                tintStatusChip(heroChipNetwork, StatusTone.DOWN)
+                chip.text = getString(R.string.dashboard_network_offline)
+                tintStatusChip(chip, StatusTone.DOWN)
             }
         }
     }

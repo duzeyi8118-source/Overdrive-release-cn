@@ -309,6 +309,13 @@
                                 app:singleLine="false">
 
                                 <com.google.android.material.chip.Chip
+                                    android:id="@+id/heroChipNetwork"
+                                    style="@style/Widget.Overdrive.HeroChip"
+                                    android:text="@string/dashboard_network_checking"
+                                    android:textColor="?attr/colorPrimary"
+                                    app:chipBackgroundColor="?attr/colorPrimaryContainer" />
+
+                                <com.google.android.material.chip.Chip
                                     android:id="@+id/heroChipTunnel"
                                     style="@style/Widget.Overdrive.HeroChip"
                                     android:text="@string/dashboard_tunnel_offline"
