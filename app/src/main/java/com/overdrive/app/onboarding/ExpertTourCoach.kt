@@ -37,9 +37,7 @@ class ExpertTourCoach(
         VEHICLE("vehicle"),
         RECORDINGS("recordings"),
         LIVE("live"),
-        TRIPS("trips"),
         INTEGRATIONS("integrations"),
-        ROADSENSE("roadsense"),   // includes Blind Spot as a 2nd step (same screen/tab)
         MAPS("maps"),
         SURVEILLANCE("surveillance"),
         DIAGNOSTICS("diagnostics"),
@@ -92,9 +90,7 @@ class ExpertTourCoach(
             Chapter.VEHICLE -> chapterVehicle()
             Chapter.RECORDINGS -> chapterRecordings()
             Chapter.LIVE -> chapterLive()
-            Chapter.TRIPS -> chapterTrips()
             Chapter.INTEGRATIONS -> chapterIntegrations()
-            Chapter.ROADSENSE -> chapterRoadSense()
             Chapter.MAPS -> chapterMaps()
             Chapter.SURVEILLANCE -> chapterSurveillance()
             Chapter.DIAGNOSTICS -> chapterDiagnostics()
@@ -163,56 +159,7 @@ class ExpertTourCoach(
         }
     }
 
-    // ---- Trips (web page — point at the rail entry / container) ----------------------
-
-    private fun chapterTrips() {
-        val railRow = ma?.railRowView(R.id.railDestTrips)
-        if (railRow != null && railRow.width > 0) {
-            overlay.spotlight(railRow)
-            overlay.consumeCutoutTouch = true
-            card(Chapter.TRIPS, R.string.onboarding_expert_trips_title, R.string.onboarding_expert_trips_body)
-        } else {
-            navigateThen(R.id.tripsFragment) { root ->
-                spotlightOrCenter(root)
-                overlay.consumeCutoutTouch = false
-                card(Chapter.TRIPS, R.string.onboarding_expert_trips_title, R.string.onboarding_expert_trips_body)
-            }
-        }
-    }
-
-    // ---- RoadSense (+ Blind Spot 2nd step — both live on the same /road-sense screen) -
-
-    private fun chapterRoadSense() {
-        navigateThen(R.id.roadSenseFragment) { root ->
-            // RoadSenseFragment is a bare FrameLayout host; only the container is
-            // anchorable (tabs are web DOM). Spotlight the pane and explain the feature,
-            // then a 2nd step for Blind Spot (a tab on THIS same screen) — so we don't
-            // navigate to the identical-looking screen twice with no visible difference.
-            spotlightOrCenter(root)
-            overlay.consumeCutoutTouch = false
-            overlay.bindStep(
-                title = activity.getString(R.string.onboarding_expert_roadsense_title),
-                body = activity.getString(R.string.onboarding_expert_roadsense_body),
-                primaryText = activity.getString(R.string.onboarding_next),
-                onPrimary = { roadSenseBlindSpotStep() },
-                secondaryText = activity.getString(R.string.onboarding_exit),
-                onSecondary = { finish() },
-                stepLabel = chapterLabel(Chapter.ROADSENSE),
-            )
-        }
-    }
-
-    private fun roadSenseBlindSpotStep() {
-        // Blind Spot is the 'Blind Spot' tab on the RoadSense page; the overlay itself is
-        // a background SurfaceControl shown on the turn signal. Pure explainer, same pane.
-        overlay.consumeCutoutTouch = false
-        card(
-            Chapter.ROADSENSE,
-            R.string.onboarding_expert_blindspot_title,
-            R.string.onboarding_expert_blindspot_body,
-        )
-    }
-
+    // SLIM-CN: 行程（TRIPS）与 RoadSense（含盲区 2nd step）章节已砍，入口与导航目标一并删除。
     // ---- Maps (hazard map + cluster — separate Activity, spotlight the rail entry) ---
 
     private fun chapterMaps() {
