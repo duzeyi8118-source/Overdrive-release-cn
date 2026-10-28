@@ -3,7 +3,8 @@ name: Build BYD Overdrive APK
 on:
   workflow_dispatch:
   push:
-    branches: [ main, master ]
+    # SLIM-CN: 精简分支也触发构建，让用户从自己的 fork 就能云端编出包。
+    branches: [ main, master, slim-cn ]
 
 permissions:
   contents: write
@@ -36,13 +37,26 @@ jobs:
         # RELEASE_KEYSTORE_BASE64 holds the PKCS12 keystore generated once and stored
         # as a GitHub Secret. Decoding it here guarantees every CI run signs with the
         # EXACT same certificate, so `pm install -r` upgrades work without uninstalling.
+        # SLIM-CN fallback: 用户自己的 fork 里没有这个 secret 时，不报错中断 ——
+        # 改用标准 debug keystore（androiddebugkey/android）打包。此时签名与中文版
+        # 不同，装精简版前必须先卸载中文版；且指纹校验步骤会自动跳过。
         env:
           RELEASE_KEYSTORE_BASE64: ${{ secrets.RELEASE_KEYSTORE_BASE64 }}
         run: |
-          echo "$RELEASE_KEYSTORE_BASE64" | base64 -d > app/release.keystore
-          echo "Keystore decoded: $(stat -c%s app/release.keystore) bytes"
           mkdir -p ~/.android
-          cp app/release.keystore ~/.android/debug.keystore
+          if [ -n "$RELEASE_KEYSTORE_BASE64" ]; then
+            echo "$RELEASE_KEYSTORE_BASE64" | base64 -d > app/release.keystore
+            echo "Keystore decoded: $(stat -c%s app/release.keystore) bytes"
+            cp app/release.keystore ~/.android/debug.keystore
+            echo "SLIM_FALLBACK_KEYSTORE=false" >> $GITHUB_ENV
+          else
+            echo "No RELEASE_KEYSTORE_BASE64 secret — SLIM fallback: generating throwaway debug keystore"
+            keytool -genkeypair -v -keystore ~/.android/debug.keystore \
+              -storepass android -alias androiddebugkey -keypass android \
+              -keyalg RSA -keysize 2048 -validity 10000 \
+              -dname "CN=OverDrive Slim, OU=slim, O=slim, C=CN"
+            echo "SLIM_FALLBACK_KEYSTORE=true" >> $GITHUB_ENV
+          fi
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
@@ -62,6 +76,8 @@ jobs:
           ./gradlew assembleDebug -PoverdriveVersionName="$VERSION" -PoverdriveVersionCode="$VERSION_CODE" -PoverdriveUpdateChannel=alpha --stacktrace --no-daemon
 
       - name: Verify APK signature fingerprint
+        # SLIM-CN: fallback debug 签名时指纹必然与中文版永久密钥不同，跳过校验。
+        if: env.SLIM_FALLBACK_KEYSTORE != 'true'
         run: |
           APK=$(find app/build/outputs/apk -name "*.apk" | head -1)
           echo "Verifying: $APK"
