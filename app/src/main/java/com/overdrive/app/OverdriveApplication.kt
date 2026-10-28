@@ -72,9 +72,8 @@ class OverdriveApplication : Application() {
             LocaleManager.replayPendingWriteAsync()
         }
 
-        // App-process listener that binds Telenav's OEM AIDL for the daemon's
-        // HTTP endpoint (the daemon can't bindService itself). Idempotent.
-        com.overdrive.app.telenav.TelenavIpcServer.start(this)
+        // SLIM-CN: Telenav 已砍，不再启动 TelenavIpcServer（daemon 侧 Telenav
+        // 调试端点随之失效；telenav 包代码保留，仅入口删除）。
 
         // Signal relays for the daemon (it cannot read call/Bluetooth state from
         // UID 2000). Started HERE, on plain process start, and not only from
