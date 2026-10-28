@@ -23,6 +23,11 @@ public final class CameraProfiles {
     public static final String PROFILE_ATTO_3 = "atto3";
     public static final String PROFILE_TANG_2022 = "tang_2022";
     public static final String PROFILE_DILINK5_SEALION7 = "dilink5_sealion7";
+    // SLIM-CN: 汉 DiLink 4 默认。左=2、右=3 是 2026-10-28 在用户汉 DM-i
+    // 第一代尊荣版（DiLink 4.0）真车上实测确认的独立摄像头编号；前/后不在此
+    // 写死（保持自动/手动映射），后摄 ID 至今未知、全景流在该车上未找到，
+    // 一律不编造。panoCameraId=1 / 5120x960 是该车诊断页实测到的那路流。
+    public static final String PROFILE_HAN_DILINK4 = "han_dilink4";
 
     private static final LinkedHashMap<String, CameraProfile> PROFILES = new LinkedHashMap<>();
 
@@ -113,6 +118,25 @@ public final class CameraProfiles {
                 720,
                 tangMappings,
                 FOV_DEG_DEFAULT));
+
+        // SLIM-CN: 汉 DiLink 4。左右两路用独立摄像头直连（非全景切片），因为
+        // 该车的全景拼合流未被应用发现；前/后两路故意不写进默认映射，解析器
+        // 只在用户手动映射（unified.camera.roleMappings）里取前/后，未映射
+        // 就是没有，绝不拿前摄顶替。
+        EnumMap<CameraRole, CameraSourceRef> hanMappings = new EnumMap<>(CameraRole.class);
+        hanMappings.put(CameraRole.PANO_LEFT, CameraSourceRef.direct(2));
+        hanMappings.put(CameraRole.PANO_RIGHT, CameraSourceRef.direct(3));
+        register(new CameraProfile(
+                PROFILE_HAN_DILINK4,
+                "BYD Han DiLink 4 (field verified left=2 right=3)",
+                1,
+                5120,
+                960,
+                0,
+                1280,
+                960,
+                hanMappings,
+                FOV_DEG_DEFAULT));
     }
 
     private CameraProfiles() {
@@ -139,6 +163,12 @@ public final class CameraProfiles {
                     .replace(" ", "");
             if (normalized.contains("atto3") || normalized.contains("yuanplus")) {
                 return get(PROFILE_ATTO_3);
+            }
+            // SLIM-CN: 车型字符串里带 han 时走汉默认。比亚迪车机常只暴露
+            // "BYD AUTO" 这类通用型号，推断不到时仍走 legacy 默认，用户需在
+            // 摄像头映射里手动选 han_dilink4。
+            if (normalized.contains("han")) {
+                return get(PROFILE_HAN_DILINK4);
             }
         }
 
