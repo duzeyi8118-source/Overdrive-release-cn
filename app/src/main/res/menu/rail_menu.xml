@@ -17,34 +17,19 @@
         android:id="@+id/recordingsFragment"
         android:icon="@drawable/ic_recording"
         android:title="@string/rail_recordings" />
-    <item
-        android:id="@+id/parkingFragment"
-        android:icon="@drawable/ic_parking"
-        android:title="@string/rail_parking" />
+    <!-- SLIM-CN: parking / trips / automations / roadSense 入口已砍（本文件为历史遗留菜单，主界面实际用 activity_main_new.xml + MainActivity 绑定）。 -->
     <item
         android:id="@+id/vehicleControlFragment"
         android:icon="@drawable/ic_vehicle_control"
         android:title="@string/rail_vehicle" />
     <item
-        android:id="@+id/tripsFragment"
-        android:icon="@drawable/ic_trips"
-        android:title="@string/rail_trips" />
-    <item
         android:id="@+id/chargingFragment"
         android:icon="@drawable/ic_charging"
         android:title="@string/rail_charging" />
     <item
-        android:id="@+id/automationsFragment"
-        android:icon="@drawable/ic_automations"
-        android:title="@string/rail_automations" />
-    <item
         android:id="@+id/integrationsFragment"
         android:icon="@drawable/ic_integrations"
         android:title="@string/rail_integrations" />
-    <item
-        android:id="@+id/roadSenseFragment"
-        android:icon="@drawable/ic_roadsense"
-        android:title="@string/rail_roadsense" />
     <item
         android:id="@+id/networkFragment"
         android:icon="@drawable/ic_hotspot"

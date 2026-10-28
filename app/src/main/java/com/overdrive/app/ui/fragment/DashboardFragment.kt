@@ -398,9 +398,8 @@ class DashboardFragment : Fragment() {
         quickLive.setOnClickListener {
             findNavController().navigate(R.id.liveViewFragment, null, fadeThrough)
         }
-        quickTrips?.setOnClickListener {
-            findNavController().navigate(R.id.tripsFragment, null, fadeThrough)
-        }
+        // SLIM-CN: 行程入口已砍。卡片直接隐藏，不再导航到已删除的 tripsFragment。
+        quickTrips?.visibility = View.GONE
         quickVehicleControl?.setOnClickListener {
             findNavController().navigate(R.id.vehicleControlFragment, null, fadeThrough)
         }
@@ -1089,7 +1088,8 @@ class DashboardFragment : Fragment() {
             .filter { it.isNotEmpty() }
             .joinToString(" · ")
         renderAiInsightExpansion()
-        aiInsightCard.visibility = View.VISIBLE
+        // SLIM-CN: 语音助手（genai）仪表盘洞察卡片已砍，有数据也不显示。
+        aiInsightCard.visibility = View.GONE
     }
 
     private fun renderAiInsightExpansion() {

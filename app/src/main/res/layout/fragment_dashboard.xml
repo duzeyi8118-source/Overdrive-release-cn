@@ -849,7 +849,8 @@
                 <!-- Quick actions, second row: Trips + Vehicle Controls. Same tile
                      pattern as Live/Services above; wired null-safely by
                      DashboardFragment.wireClicks to the existing nav-graph
-                     destinations (tripsFragment / vehicleControlFragment). -->
+                     destinations (tripsFragment / vehicleControlFragment).
+                     SLIM-CN: tripsFragment 已删，该行在 DashboardFragment 里已 GONE。 -->
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"

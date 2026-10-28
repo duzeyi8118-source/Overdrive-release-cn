@@ -598,6 +598,12 @@
     <string name="daemons_wifi_auto_enable_title">Wi&#8209;Fi</string>
     <string name="daemons_wifi_auto_enable_subtitle">Turns Wi&#8209;Fi on or off now. When off, OverDrive’s sentry daemons will not turn it back on.</string>
     <string name="daemons_wifi_auto_enable_save_failed">Could not change the Wi&#8209;Fi state.</string>
+    <!-- SLIM-CN: 停用原厂记录仪开关。中文写在默认 values 里；values-zh-rCN 按任务要求未动，
+         中文环境下缺失的 key 会回落到默认 values，因此中文用户仍看到中文。合入 main 前需把
+         同名 key 补进 values-zh-rCN，否则 i18n 质量闸会报缺失（该闸不阻塞 APK 构建）。 -->
+    <string name="slim_cdr_disable_title">停用原厂记录仪（释放摄像头）</string>
+    <string name="slim_cdr_disable_subtitle">停用比亚迪自带记录仪 com.byd.cdr，把摄像头独占让给 OverDrive；关闭后恢复原厂记录仪。需要无线 ADB 与守护进程已启动，停用后需重启摄像头守护进程或重进摄像头映射。</string>
+    <string name="slim_cdr_apply_failed">切换失败：无线 ADB 或守护进程未就绪，状态已恢复。</string>
 
     <!-- dialog_time_window -->
 

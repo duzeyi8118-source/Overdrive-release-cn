@@ -8,7 +8,8 @@
   by the recycler so individual cards can use marginHorizontal=0.
 
   IDs read by DaemonsFragment.kt:
-    recyclerDaemons, tvDaemonsCount, rowWifiAutoEnable, swWifiAutoEnable
+    recyclerDaemons, tvDaemonsCount, rowWifiAutoEnable, swWifiAutoEnable,
+    rowCdrDisable, swCdrDisable (SLIM-CN)
 -->
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
@@ -104,6 +105,65 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:contentDescription="@string/daemons_wifi_auto_enable_title" />
+        </LinearLayout>
+    </com.google.android.material.card.MaterialCardView>
+
+    <!-- SLIM-CN: 停用原厂记录仪开关（DiPlus 实测思路）。结构与上方 Wi-Fi 卡片一致。 -->
+    <com.google.android.material.card.MaterialCardView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginHorizontal="@dimen/page_padding_horizontal"
+        android:layout_marginBottom="@dimen/card_gap_vertical"
+        app:cardBackgroundColor="?attr/colorSurfaceContainer"
+        app:cardCornerRadius="@dimen/card_radius_standard"
+        app:cardElevation="0dp">
+
+        <LinearLayout
+            android:id="@+id/rowCdrDisable"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="?attr/selectableItemBackground"
+            android:clickable="true"
+            android:focusable="true"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:padding="@dimen/card_padding_standard">
+
+            <ImageView
+                android:layout_width="@dimen/card_icon_standard"
+                android:layout_height="@dimen/card_icon_standard"
+                android:contentDescription="@null"
+                android:src="@drawable/ic_dashcam_all"
+                app:tint="?attr/colorPrimary" />
+
+            <LinearLayout
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_weight="1"
+                android:orientation="vertical">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/slim_cdr_disable_title"
+                    android:textAppearance="@style/TextAppearance.Material3.TitleMedium"
+                    android:textColor="?attr/colorOnSurface" />
+
+                <TextView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:text="@string/slim_cdr_disable_subtitle"
+                    android:textAppearance="@style/TextAppearance.Material3.BodySmall"
+                    android:textColor="?attr/colorOnSurfaceVariant" />
+            </LinearLayout>
+
+            <com.google.android.material.switchmaterial.SwitchMaterial
+                android:id="@+id/swCdrDisable"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:contentDescription="@string/slim_cdr_disable_title" />
         </LinearLayout>
     </com.google.android.material.card.MaterialCardView>
 

@@ -70,13 +70,11 @@ class IntegrationsFragment : Fragment() {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        view.findViewById<View>(R.id.cardTelegram).setOnClickListener {
-            findNavController().navigateDrillDown(R.id.telegramSettingsFragment)
-        }
+        // SLIM-CN: Telegram / MQTT 入口已砍（子页面已从 nav_graph 删除），卡片直接隐藏。
+        // ABRP 卡片此前已隐藏；仅保留比亚迪云卡片。状态轮询未动，仅更新已隐藏视图。
+        view.findViewById<View>(R.id.cardTelegram)?.visibility = View.GONE
         view.findViewById<View>(R.id.cardAbrp)?.visibility = View.GONE
-        view.findViewById<View>(R.id.cardMqtt).setOnClickListener {
-            findNavController().navigateDrillDown(R.id.mqttFragment)
-        }
+        view.findViewById<View>(R.id.cardMqtt)?.visibility = View.GONE
         view.findViewById<View>(R.id.cardBydCloud).setOnClickListener {
             findNavController().navigateDrillDown(R.id.bydCloudFragment)
         }

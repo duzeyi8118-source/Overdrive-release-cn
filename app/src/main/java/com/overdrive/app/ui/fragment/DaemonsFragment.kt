@@ -46,8 +46,11 @@ class DaemonsFragment : Fragment() {
     private lateinit var recyclerDaemons: RecyclerView
     private lateinit var tvDaemonsCount: TextView
     private lateinit var swWifiAutoEnable: SwitchMaterial
+    // SLIM-CN: 停用原厂记录仪开关（见 CdrController）。
+    private lateinit var swCdrDisable: SwitchMaterial
     private lateinit var daemonAdapter: DaemonAdapter
     private var applyingWifiAutoEnable = false
+    private var applyingCdrDisable = false
 
     // Document picker for the WireGuard dialog (.conf or a picture of a QR code).
     // Registered as a property so it exists before the fragment is STARTED.
@@ -94,11 +97,71 @@ class DaemonsFragment : Fragment() {
             }
             persistWifiAutoEnable(enabled)
         }
+
+        // SLIM-CN: 停用原厂记录仪开关，与上方 Wi-Fi 开关同一交互模式。
+        swCdrDisable = view.findViewById(R.id.swCdrDisable)
+        view.findViewById<View>(R.id.rowCdrDisable).setOnClickListener {
+            if (swCdrDisable.isEnabled) {
+                swCdrDisable.isChecked = !swCdrDisable.isChecked
+            }
+        }
+        swCdrDisable.setOnCheckedChangeListener { _, enabled ->
+            if (applyingCdrDisable || !swCdrDisable.isEnabled) {
+                return@setOnCheckedChangeListener
+            }
+            persistCdrDisable(enabled)
+        }
     }
 
     override fun onResume() {
         super.onResume()
         if (::swWifiAutoEnable.isInitialized) refreshWifiAutoEnable()
+        if (::swCdrDisable.isInitialized) refreshCdrDisable()
+    }
+
+    // SLIM-CN: 读应用私有偏好回显开关（默认关闭；系统真源以 pm list packages -d 为准）。
+    private fun refreshCdrDisable() {
+        val ctx = context ?: return
+        val disabled = com.overdrive.app.cdr.CdrController.isDisabled(ctx)
+        handler.post {
+            if (view == null || !::swCdrDisable.isInitialized) return@post
+            applyingCdrDisable = true
+            swCdrDisable.isChecked = disabled
+            swCdrDisable.isEnabled = true
+            applyingCdrDisable = false
+        }
+    }
+
+    private fun persistCdrDisable(enabled: Boolean) {
+        val ctx = context ?: return
+        swCdrDisable.isEnabled = false
+        // 复用现有的单线程后台 worker，不新开线程池。
+        wifiSettingsWorker.execute {
+            var applyError: String? = null
+            val latch = java.util.concurrent.CountDownLatch(1)
+            com.overdrive.app.cdr.CdrController.apply(ctx, enabled) { success, error ->
+                if (!success) applyError = error
+                latch.countDown()
+            }
+            // ADB 命令有内部 deadline；这里只做有限等待，避免界面卡死。
+            latch.await(30, java.util.concurrent.TimeUnit.SECONDS)
+            val persistedState =
+                com.overdrive.app.cdr.CdrController.isDisabled(ctx)
+            handler.post {
+                if (view == null || !::swCdrDisable.isInitialized) return@post
+                applyingCdrDisable = true
+                swCdrDisable.isChecked = persistedState
+                swCdrDisable.isEnabled = true
+                applyingCdrDisable = false
+                if (applyError != null || persistedState != enabled) {
+                    Toast.makeText(
+                        ctx,
+                        R.string.slim_cdr_apply_failed,
+                        Toast.LENGTH_LONG,
+                    ).show()
+                }
+            }
+        }
     }
 
     override fun onDestroyView() {

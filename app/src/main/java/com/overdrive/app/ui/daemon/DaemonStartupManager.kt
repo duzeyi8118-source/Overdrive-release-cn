@@ -746,16 +746,8 @@ class DaemonStartupManager(
             startTunnelFromPreferences(vm)
         }
 
-        // Start Telegram Bot daemon if user enabled it and hasn't stopped it.
-        if (PreferencesManager.isDaemonEnabled(DaemonType.TELEGRAM_DAEMON)) {
-            syncTelegramEnabledToUnifiedConfig(true)
-            handler.postDelayed({
-                ifNotUserStopped(DaemonType.TELEGRAM_DAEMON) {
-                    log.info(TAG, "Starting Telegram Bot daemon (user enabled)...")
-                    vm.startDaemon(DaemonType.TELEGRAM_DAEMON, userInitiated = false)
-                }
-            }, 15000)
-        }
+        /* SLIM-CN: Telegram 已砍，不再自启 Telegram Bot daemon（ViewModel 路径）。
+           daemon/telegram 代码与 TelegramBotDaemon 保留，仅自启入口删除。 */
     }
 
     /**
@@ -904,16 +896,8 @@ class DaemonStartupManager(
                 }
             }, tunnelDelay)
 
-            // Start Telegram Bot daemon if user enabled it and hasn't stopped it.
-            if (PreferencesManager.isDaemonEnabled(DaemonType.TELEGRAM_DAEMON)) {
-                syncTelegramEnabledToUnifiedConfig(true)
-                handler.postDelayed({
-                    ifNotUserStopped(DaemonType.TELEGRAM_DAEMON) {
-                        log.info(TAG, "Boot: Starting Telegram Bot daemon...")
-                        adbLauncher.launchTelegramDaemon(createLogCallback("TelegramBot"))
-                    }
-                }, 15000) // Start after core daemons are up
-            }
+            /* SLIM-CN: Telegram 已砍，不再自启 Telegram Bot daemon（ADB 路径）。
+               daemon/telegram 代码与 TelegramBotDaemon 保留，仅自启入口删除。 */
         } catch (e: Exception) {
             log.error(TAG, "Error starting optional daemons: ${e.message}")
         }
