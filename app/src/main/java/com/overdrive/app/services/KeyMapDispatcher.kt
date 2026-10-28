@@ -935,33 +935,10 @@ object KeyMapDispatcher {
     }
 
     /** Punt the bound action's daemon POST to the pooled I/O executor. */
+    // SLIM-CN: 按键映射已砍。配置界面（keyMappingFragment）已删，触发链在此截断：
+    // 历史已配映射也不再触发。原实现见 git 历史（SLIM-CN 前的 fire()）；分发器其余
+    // 代码（快照、监听）保留，仅触发行为关闭。
     private fun fire(binding: JSONObject) {
-        val action = binding.optJSONObject("action") ?: return
-        io.submit {
-            try {
-                // Local loopback to the in-process daemon — keep timeouts tight so
-                // a wedged daemon can't tie up a pool thread for long.
-                val conn = DaemonHttpClient.open("/api/keymap/fire", "POST", 2000, 3000)
-                conn.doOutput = true
-                conn.setRequestProperty("Content-Type", "application/json")
-                conn.outputStream.use { it.write(action.toString().toByteArray()) }
-                val code = conn.responseCode
-                // Read the body so the log shows the daemon's actual outcome
-                // (success/outcome/message), not just the HTTP code — this is what
-                // makes "the action didn't perform" diagnosable from logcat.
-                val stream = if (code in 200..299) conn.inputStream else conn.errorStream
-                val body = try {
-                    stream?.bufferedReader()?.use { it.readText() } ?: ""
-                } catch (_: Throwable) { "" }
-                if (code in 200..299) {
-                    Log.i(TAG, "keymap fire ok kind=${action.optString("kind")} resp=$body")
-                } else {
-                    Log.w(TAG, "keymap fire HTTP $code kind=${action.optString("kind")} resp=$body")
-                }
-                conn.disconnect()
-            } catch (t: Throwable) {
-                Log.w(TAG, "keymap fire failed: ${t.message}")
-            }
-        }
+        Log.i(TAG, "keymap fire suppressed by SLIM-CN")
     }
 }
