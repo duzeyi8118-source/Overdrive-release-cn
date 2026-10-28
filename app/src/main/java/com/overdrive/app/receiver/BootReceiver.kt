@@ -230,13 +230,7 @@ class BootReceiver : BroadcastReceiver() {
             "com.byd.action.ACC_ON",
             "com.byd.action.IGN_ON" -> {
                 startDaemons(context, action)
-                // Arm the blind-spot overlay ON ACC-ON, app-independently. Without
-                // this the overlay only started via MainActivity.syncBlindSpotOverlay()
-                // on app resume — so a fresh ACC-on with the app backgrounded left
-                // the pipeline un-armed and the panel wouldn't pop on the indicator.
-                // Gated on the same blindspot.enabled flag the activity uses, so a
-                // disabled feature stays off.
-                armBlindSpotIfEnabled(context)
+                // SLIM-CN: 盲区覆盖层属于 RoadSense/ADAS，已砍，不再随 ACC-ON 唤醒。
             }
 
             // ACC_MODE_CHANGED with NO parked marker (the marker-present case returned
@@ -261,7 +255,7 @@ class BootReceiver : BroadcastReceiver() {
                             DaemonStartupManager.ensureAccSentryJudgeRunning(appCtx)
                         } else {
                             startDaemons(appCtx, action)
-                            armBlindSpotIfEnabled(appCtx)
+                            // SLIM-CN: 盲区覆盖层已砍（见 ACC_ON 分支注释）。
                         }
                     } catch (e: Exception) {
                         Log.w(TAG, "Deferred ACC_MODE_CHANGED handling failed: ${e.message}")
@@ -285,17 +279,7 @@ class BootReceiver : BroadcastReceiver() {
         }
     }
     
-    /** On ACC-ON, arm the NATIVE blind-spot lane IF the feature is enabled, so the
-     *  daemon brings up its SurfaceControl layer without needing MainActivity to be
-     *  foregrounded. BlindSpotControl.sync POSTs the daemon control surface; the
-     *  daemon owns show/hide (turn-trigger) + positioning. No app-process overlay. */
-    private fun armBlindSpotIfEnabled(context: Context) {
-        try {
-            com.overdrive.app.roadsense.overlay.BlindSpotControl.sync(context)
-        } catch (t: Throwable) {
-            Log.w(TAG, "armBlindSpotIfEnabled failed: ${t.message}")
-        }
-    }
+    // SLIM-CN: armBlindSpotIfEnabled 已删除（RoadSense/ADAS 连同盲区覆盖层一起砍）。
 
     // Triggers that mean "the car is being used again" — these CLEAR the parked-shutdown
     // marker (verified) and recover the full stack: the direction-unambiguous BYD ACC/IGN
