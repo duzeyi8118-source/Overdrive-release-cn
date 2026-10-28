@@ -523,15 +523,12 @@ open class MainActivity : AppCompatActivity() {
         intent.removeExtra(EXTRA_NAVIGATE_TO)
         setIntent(intent)
         val destinationId = when (target) {
-            "trips" -> R.id.tripsFragment
+            // SLIM-CN: trips / roadsense / parking / assistant 深链已砍，未知值直接忽略。
             "charging" -> R.id.chargingFragment
-            "roadsense" -> R.id.roadSenseFragment
             "recordings" -> R.id.recordingsFragment
-            "parking" -> R.id.parkingFragment
             "live" -> R.id.liveViewFragment
             "vehicle" -> R.id.vehicleControlFragment
             "dashboard" -> R.id.dashboardFragment
-            "assistant" -> R.id.genAiFragment
             else -> return
         }
         // navigateToRailDestination self-defers via pendingRailDestination when
@@ -1653,19 +1650,12 @@ open class MainActivity : AppCompatActivity() {
         appBarConfiguration = AppBarConfiguration(
             setOf(
                 R.id.dashboardFragment,
-                R.id.genAiFragment,
                 R.id.liveViewFragment,
                 R.id.recordingsFragment,
-                R.id.parkingFragment,
                 R.id.vehicleControlFragment,
                 R.id.seatPositionsFragment,
-                R.id.projectionFragment,
-                R.id.tripsFragment,
                 R.id.chargingFragment,
-                R.id.automationsFragment,
-                R.id.keyMappingFragment,
                 R.id.integrationsFragment,
-                R.id.roadSenseFragment,
                 R.id.networkFragment,
                 R.id.diagnosticsFragment,
                 R.id.settingsFragment,
@@ -1705,8 +1695,7 @@ open class MainActivity : AppCompatActivity() {
         val items = listOf(
             RailItem(RAIL_KEY_DASHBOARD, R.id.railDestDashboard, R.id.dashboardFragment,
                 R.drawable.ic_dashboard, R.string.rail_dashboard),
-            RailItem(NavigationRailCatalog.ASSISTANT, R.id.railDestAssistant,
-                R.id.genAiFragment, R.drawable.ic_smart_toy, R.string.rail_assistant),
+            // SLIM-CN: 语音助手（genAi）入口已砍，代码保留、导航入口删除。
             RailItem(NavigationRailCatalog.LIVE, R.id.railDestLive, R.id.liveViewFragment,
                 R.drawable.ic_live, R.string.rail_live),
             RailItem(NavigationRailCatalog.RECORDINGS, R.id.railDestRecordings,
@@ -1716,36 +1705,24 @@ open class MainActivity : AppCompatActivity() {
                     R.id.surveillanceSettingsWebFragment,
                     R.id.recordingSettingsWebFragment,
                 )),
-            RailItem(NavigationRailCatalog.PARKING, R.id.railDestParking,
-                R.id.parkingFragment, R.drawable.ic_parking, R.string.rail_parking),
+            // SLIM-CN: 停车智能（parkingFragment：记车位/OCR 车库，非哨兵本体）入口已砍。
             RailItem(NavigationRailCatalog.VEHICLE, R.id.railDestVehicle,
                 R.id.vehicleControlFragment,
                 R.drawable.ic_vehicle_control, R.string.rail_vehicle),
             RailItem(NavigationRailCatalog.SEAT_POSITIONS, R.id.railDestSeatPositions,
                 R.id.seatPositionsFragment,
                 R.drawable.ic_seat_positions, R.string.rail_seat_positions),
-            RailItem(NavigationRailCatalog.PROJECTION, R.id.railDestProjection,
-                R.id.projectionFragment,
-                R.drawable.ic_projection, R.string.rail_projection),
+            // SLIM-CN: 仪表盘投影（projectionFragment）入口已砍。
             RailItem(NavigationRailCatalog.CHARGING, R.id.railDestCharging,
                 R.id.chargingFragment,
                 R.drawable.ic_charging, R.string.rail_charging),
-            RailItem(NavigationRailCatalog.TRIPS, R.id.railDestTrips, R.id.tripsFragment,
-                R.drawable.ic_trips, R.string.rail_trips),
+            // SLIM-CN: 行程（trips）、自动化（automations）、按键映射（keyMapping）入口已砍。
             // ROAD_SENSE & MAP removed for clean CN experience
-            RailItem(NavigationRailCatalog.AUTOMATIONS, R.id.railDestAutomations,
-                R.id.automationsFragment,
-                R.drawable.ic_automations, R.string.rail_automations),
-            RailItem(NavigationRailCatalog.KEY_MAPPING, R.id.railDestKeyMapping,
-                R.id.keyMappingFragment,
-                R.drawable.ic_key_mapping, R.string.rail_key_mapping),
             RailItem(NavigationRailCatalog.INTEGRATIONS, R.id.railDestIntegrations,
                 R.id.integrationsFragment, R.drawable.ic_integrations,
                 R.string.rail_integrations,
                 ownedDestinationIds = setOf(
-                    R.id.telegramSettingsFragment,
-                    R.id.abrpSettingsFragment,
-                    R.id.mqttFragment,
+                    // SLIM-CN: telegram/abrp/mqtt 子页面已砍，仅保留 bydCloud。
                     R.id.bydCloudFragment,
                 )),
             RailItem(NavigationRailCatalog.NETWORK, R.id.railDestNetwork,
@@ -1804,6 +1781,21 @@ open class MainActivity : AppCompatActivity() {
                     navigateToRailDestination(item.destinationId)
                 }
             }
+        }
+
+        // SLIM-CN: 被砍功能的 layout 行仍在 activity_main_new.xml 里（item_rail_destination
+        // 无静态图标/文字，不绑定就是空行），这里直接 GONE，避免界面上留下空白可点行。
+        listOf(
+            R.id.railDestAssistant,
+            R.id.railDestParking,
+            R.id.railDestProjection,
+            R.id.railDestTrips,
+            R.id.railDestRoadSense,
+            R.id.railDestMap,
+            R.id.railDestAutomations,
+            R.id.railDestKeyMapping,
+        ).forEach { rowId ->
+            navigationRail.findViewById<View>(rowId)?.visibility = View.GONE
         }
 
         actions.forEach { item ->
